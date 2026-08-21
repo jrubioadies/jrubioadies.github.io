@@ -1,135 +1,206 @@
-<title>Javier Rubio · Oracle ERP</title>
+<!doctype html>
+<html lang="es">
+<head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Javier Rubio · Oracle ERP</title>
+<meta name="description" content="Consultor senior Oracle ERP (Cloud y EBS). Consultoría financiera, aplicaciones satélite y automatizaciones con IA para lo que el estándar no resuelve.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600&family=Source+Sans+3:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@75..100,400..800&family=JetBrains+Mono:wght@400;500;600&display=swap">
 <style>
 :root{
-  --paper:#F3F5F7; --paper-2:#E9EDF1; --ink:#14233A; --ink-2:#3C4A5E; --ink-3:#6B7889;
-  --rule:#CBD3DC; --accent:#1F6F5B; --accent-ink:#FFFFFF; --accent-soft:#DCEDE6;
-  --amber:#B8741F; --amber-soft:#F4E6CF; --card:#FFFFFF;
-  --serif:"Newsreader",Georgia,"Times New Roman",serif;
-  --sans:"Source Sans 3","Helvetica Neue",Arial,sans-serif;
-  --mono:"IBM Plex Mono",Menlo,Consolas,monospace;
-}
-@media (prefers-color-scheme: dark){
-  :root:not([data-theme="light"]){
-    --paper:#0F1722; --paper-2:#16202D; --ink:#E6EBF0; --ink-2:#B5C0CD; --ink-3:#7F8C9C;
-    --rule:#2A3646; --accent:#4FB597; --accent-ink:#0F1722; --accent-soft:#173228;
-    --amber:#E0A04F; --amber-soft:#3A2A12; --card:#151F2B;
-  }
-}
-:root[data-theme="dark"]{
-  --paper:#0F1722; --paper-2:#16202D; --ink:#E6EBF0; --ink-2:#B5C0CD; --ink-3:#7F8C9C;
-  --rule:#2A3646; --accent:#4FB597; --accent-ink:#0F1722; --accent-soft:#173228;
-  --amber:#E0A04F; --amber-soft:#3A2A12; --card:#151F2B;
+  --bg:#0B0F14; --bg-2:#10161D; --bg-3:#161E27; --line:#222C37; --line-2:#2D3946;
+  --fg:#E8EDF2; --fg-2:#AAB6C3; --fg-3:#6E7C8B;
+  --go:#3FD39B; --warn:#F0B34A; --nogo:#F2675C; --acc:#3FD39B; --acc-ink:#06110C;
+  --sans:"Archivo","Helvetica Neue",Arial,sans-serif; --mono:"JetBrains Mono",Menlo,Consolas,monospace;
 }
 *{box-sizing:border-box}
-html{scroll-behavior:smooth}
-@media (prefers-reduced-motion: reduce){html{scroll-behavior:auto}}
-body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);font-size:17px;line-height:1.55;-webkit-font-smoothing:antialiased}
-a{color:var(--accent);text-decoration-thickness:1px;text-underline-offset:3px}
-a:focus-visible,button:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
-[lang-hide]{display:none!important}
-.wrap{max-width:1120px;margin:0 auto;padding:0 28px}
+html{scroll-behavior:smooth;background:var(--bg)}
+html,body{overflow-x:hidden;max-width:100%}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}*{animation-duration:.001s!important;transition-duration:.001s!important}}
+body{margin:0;background:var(--bg);color:var(--fg);font-family:var(--sans);font-size:17px;line-height:1.55;-webkit-font-smoothing:antialiased;
+  background-image:linear-gradient(var(--line) 1px,transparent 1px),linear-gradient(90deg,var(--line) 1px,transparent 1px);background-size:72px 72px;background-position:center top}
+body::before{content:"";position:fixed;inset:0;pointer-events:none;background:radial-gradient(1200px 600px at 70% -10%,rgba(63,211,155,.10),transparent 60%),radial-gradient(900px 500px at 0% 100%,rgba(240,179,74,.06),transparent 60%)}
+a{color:var(--acc);text-decoration:none}
+a:hover{text-decoration:underline;text-underline-offset:3px}
+a:focus-visible,button:focus-visible{outline:2px solid var(--acc);outline-offset:3px}
+.wrap{max-width:1200px;margin:0 auto;padding:0 32px;position:relative}
+.mono{font-family:var(--mono)}
+.label{font-family:var(--mono);font-size:11.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--fg-3)}
 
-/* top bar */
-.top{position:sticky;top:0;z-index:5;background:color-mix(in srgb,var(--paper) 88%,transparent);backdrop-filter:blur(8px);border-bottom:1px solid var(--rule)}
-.top .wrap{display:flex;align-items:center;justify-content:space-between;height:56px;gap:16px}
-.brand{font-family:var(--mono);font-size:13px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-2);text-decoration:none}
-.nav{display:flex;gap:22px;font-size:15px}
-.nav a{color:var(--ink-2);text-decoration:none}
-.nav a:hover{color:var(--accent)}
-.lang{display:inline-flex;border:1px solid var(--rule);border-radius:3px;overflow:hidden;font-family:var(--mono);font-size:12px}
-.lang button{all:unset;cursor:pointer;padding:5px 10px;color:var(--ink-3)}
-.lang button[aria-pressed="true"]{background:var(--ink);color:var(--paper)}
-@media (max-width:760px){.nav{display:none}}
+/* nav */
+.top{position:sticky;top:0;z-index:10;background:rgba(11,15,20,.82);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+.top .wrap{display:flex;align-items:center;justify-content:space-between;height:60px;gap:20px}
+.brand{font-family:var(--mono);font-size:12.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--fg);display:flex;align-items:center;gap:10px}
+.brand i{width:8px;height:8px;border-radius:50%;background:var(--go);box-shadow:0 0 12px var(--go);display:inline-block;animation:pulse 2.4s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.45}}
+.nav{display:flex;gap:26px;font-size:14.5px;font-weight:500}
+.nav a{color:var(--fg-2)}.nav a:hover{color:var(--fg);text-decoration:none}
+.lang{display:inline-flex;border:1px solid var(--line-2);border-radius:4px;overflow:hidden;font-family:var(--mono);font-size:12px}
+.lang button{all:unset;cursor:pointer;padding:6px 11px;color:var(--fg-3)}
+.lang button[aria-pressed="true"]{background:var(--fg);color:var(--bg)}
+@media (max-width:820px){.nav{display:none}}
 
 /* hero */
-.hero{padding:84px 0 64px;border-bottom:1px solid var(--rule)}
-.eyebrow{font-family:var(--mono);font-size:12.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--accent);margin:0 0 18px}
-h1{font-family:var(--serif);font-weight:500;font-size:clamp(38px,6vw,68px);line-height:1.02;letter-spacing:-.015em;margin:0 0 22px;text-wrap:balance;max-width:18ch}
-.lede{font-size:clamp(19px,2.2vw,23px);line-height:1.4;color:var(--ink-2);max-width:34em;margin:0 0 34px}
-.cta{display:flex;gap:12px;flex-wrap:wrap}
-.btn{display:inline-block;padding:11px 18px;border-radius:3px;font-weight:600;font-size:15.5px;text-decoration:none;border:1px solid var(--ink);color:var(--ink)}
-.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
-.ledger{display:grid;grid-template-columns:repeat(4,1fr);gap:0;margin-top:56px;border-top:1px solid var(--rule)}
-.ledger div{padding:18px 18px 18px 0;border-right:1px solid var(--rule)}
-.ledger div:last-child{border-right:0}
-.ledger div+div{padding-left:18px}
-.ledger b{display:block;font-family:var(--serif);font-weight:500;font-size:40px;line-height:1;font-variant-numeric:tabular-nums}
-.ledger span{font-family:var(--mono);font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-3)}
-@media (max-width:760px){.ledger{grid-template-columns:1fr 1fr}.ledger div:nth-child(2){border-right:0}.ledger div:nth-child(3){padding-left:0;border-top:1px solid var(--rule)}.ledger div:nth-child(4){border-top:1px solid var(--rule)}}
+.hero{padding:88px 0 72px;border-bottom:1px solid var(--line)}
+.hero .wrap{display:grid;grid-template-columns:1.05fr .95fr;gap:56px;align-items:center}
+.kicker{display:flex;gap:14px;align-items:center;margin:0 0 26px}
+.kicker .label{color:var(--go)}
+.kicker span.sep{height:1px;width:40px;background:var(--line-2)}
+h1{font-weight:700;font-stretch:88%;font-size:clamp(40px,5.4vw,66px);line-height:.98;letter-spacing:-.03em;margin:0 0 24px;text-wrap:balance}
+h1 em{font-style:normal;color:var(--fg-3)}
+.lede{font-size:clamp(17px,1.6vw,20px);color:var(--fg-2);max-width:34em;margin:0 0 34px;line-height:1.5}
+.cta{display:flex;gap:12px;flex-wrap:wrap;align-items:center}
+.btn{display:inline-flex;align-items:center;gap:10px;padding:13px 20px;border-radius:4px;font-weight:600;font-size:15px;border:1px solid var(--line-2);color:var(--fg);background:var(--bg-2)}
+.btn:hover{text-decoration:none;border-color:var(--fg-3)}
+.btn.primary{background:var(--acc);border-color:var(--acc);color:var(--acc-ink)}
+.btn.primary:hover{filter:brightness(1.08)}
+.btn svg{width:16px;height:16px}
+.facts{display:flex;gap:36px;margin-top:48px;flex-wrap:wrap}
+.facts div b{display:block;font-family:var(--mono);font-weight:500;font-size:30px;letter-spacing:-.02em;line-height:1}
+.facts div span{display:block;margin-top:6px;font-size:13px;color:var(--fg-3)}
+@media (max-width:980px){.hero .wrap{grid-template-columns:1fr;gap:40px}}
 
-/* sections: margin label + content */
-section{padding:64px 0;border-bottom:1px solid var(--rule)}
-.sec{display:grid;grid-template-columns:180px 1fr;gap:40px}
-.sec>aside{font-family:var(--mono);font-size:12.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3);padding-top:8px;position:sticky;top:80px;align-self:start}
-h2{font-family:var(--serif);font-weight:500;font-size:clamp(28px,3.4vw,38px);line-height:1.12;margin:0 0 14px;letter-spacing:-.01em;text-wrap:balance}
-.intro{color:var(--ink-2);font-size:18px;max-width:38em;margin:0 0 34px}
-@media (max-width:860px){.sec{grid-template-columns:1fr;gap:14px}.sec>aside{position:static}}
+/* console */
+.console{background:var(--bg-2);border:1px solid var(--line-2);border-radius:8px;overflow:hidden;box-shadow:0 30px 80px rgba(0,0,0,.55),0 0 0 1px rgba(255,255,255,.02) inset;font-family:var(--mono);font-size:13px}
+.console .bar{display:flex;align-items:center;justify-content:space-between;padding:11px 16px;border-bottom:1px solid var(--line);background:var(--bg-3)}
+.console .bar .t{color:var(--fg-2);font-size:12px;letter-spacing:.06em;text-transform:uppercase}
+.console .bar .dots{display:flex;gap:6px}.console .bar .dots i{width:9px;height:9px;border-radius:50%;background:var(--line-2);display:block}
+.console .tbl{overflow-x:auto}
+.console table{width:100%;border-collapse:collapse;min-width:100%}
+.console th{font-weight:500;color:var(--fg-3);font-size:11px;letter-spacing:.1em;text-transform:uppercase;text-align:left;padding:10px 16px;border-bottom:1px solid var(--line)}
+.console td{padding:11px 16px;border-bottom:1px solid var(--line);color:var(--fg-2);font-variant-numeric:tabular-nums;white-space:nowrap}
+.console td:first-child{color:var(--fg);font-weight:600}
+.console tr:last-child td{border-bottom:0}
+.console .n{text-align:right;color:var(--fg)}
+.pill{display:inline-flex;align-items:center;gap:7px;padding:3px 9px;border-radius:3px;font-size:11.5px;font-weight:600;letter-spacing:.06em;min-width:76px;justify-content:center}
+.pill::before{content:"";width:7px;height:7px;border-radius:50%;background:currentColor}
+.pill.go{color:var(--go);background:rgba(63,211,155,.12)}
+.pill.warn{color:var(--warn);background:rgba(240,179,74,.12)}
+.pill.nogo{color:var(--nogo);background:rgba(242,103,92,.12)}
+.pill.wait{color:var(--fg-3);background:rgba(110,124,139,.12)}
+.pill.wait::before{animation:pulse 1s infinite}
+.console .foot{display:flex;justify-content:space-between;align-items:center;padding:12px 16px;background:var(--bg-3);border-top:1px solid var(--line);font-size:12px;color:var(--fg-3)}
+.console .foot b{color:var(--fg);font-weight:600}
+.console .log{padding:10px 16px;border-top:1px solid var(--line);color:var(--fg-3);font-size:12px;min-height:38px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.console .log .cur{display:inline-block;width:7px;height:13px;background:var(--go);vertical-align:-2px;margin-left:3px;animation:pulse .9s infinite}
+.verdict{font-weight:700}
+.verdict.go{color:var(--go)}.verdict.warn{color:var(--warn)}.verdict.nogo{color:var(--nogo)}
+
+@media (max-width:600px){
+  .wrap{padding:0 20px}
+  h1{font-size:34px;letter-spacing:-.025em}
+  .hero{padding:56px 0 48px}
+  .lede{font-size:16.5px}
+  .console{font-size:12px}
+  .console td,.console th{padding:9px 10px}
+  .console th:nth-child(2),.console td:nth-child(2){white-space:normal}
+  .pill{min-width:0}
+  .console .log{white-space:normal;font-size:11.5px}
+  .facts{gap:22px 28px}
+  .facts div b{font-size:26px}
+  .btn{padding:12px 16px;font-size:14px}
+  section{padding:60px 0}
+  .top .wrap{height:54px}
+  .brand{font-size:11px}
+}
+/* sections */
+section{padding:88px 0;border-bottom:1px solid var(--line)}
+.sec-head{display:grid;grid-template-columns:200px 1fr;gap:40px;margin-bottom:44px;align-items:start}
+.sec-head .label{padding-top:10px}
+h2{font-weight:700;font-stretch:90%;font-size:clamp(30px,3.6vw,46px);line-height:1.04;letter-spacing:-.025em;margin:0 0 14px;text-wrap:balance}
+.intro{color:var(--fg-2);font-size:18px;max-width:40em;margin:0}
+@media (max-width:820px){.sec-head{grid-template-columns:1fr;gap:12px}}
 
 /* services */
-.services{display:grid;gap:0;border-top:1px solid var(--rule)}
-.svc{display:grid;grid-template-columns:1fr 1.6fr;gap:28px;padding:28px 0;border-bottom:1px solid var(--rule)}
-.svc h3{font-family:var(--serif);font-weight:500;font-size:25px;margin:0 0 8px;line-height:1.2}
-.svc .pain{font-family:var(--mono);font-size:12.5px;color:var(--amber);letter-spacing:.04em}
-.svc p{margin:0 0 10px;color:var(--ink-2)}
-.svc ul{margin:8px 0 0;padding-left:18px;color:var(--ink-2)}
-.svc li{margin:3px 0}
-@media (max-width:760px){.svc{grid-template-columns:1fr;gap:8px}}
+.svcs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:1px;background:var(--line);border:1px solid var(--line)}
+.svc{background:var(--bg);padding:30px 28px 32px;display:flex;flex-direction:column;gap:14px;position:relative;transition:background .2s}
+.svc:hover{background:var(--bg-2)}
+.svc .num{font-family:var(--mono);font-size:12px;color:var(--fg-3)}
+.svc .pain{font-family:var(--mono);font-size:12px;color:var(--warn);line-height:1.45}
+.svc h3{font-weight:700;font-stretch:92%;font-size:24px;line-height:1.12;margin:0;letter-spacing:-.015em}
+.svc p{margin:0;color:var(--fg-2);font-size:15.5px}
+.svc ul{margin:4px 0 0;padding:0;list-style:none;display:flex;flex-direction:column;gap:8px;font-size:14.5px;color:var(--fg-2)}
+.svc li{display:flex;gap:10px;align-items:flex-start}
+.svc li::before{content:"";flex:none;width:14px;height:1px;background:var(--acc);margin-top:11px}
+@media (max-width:900px){.svcs{grid-template-columns:1fr}}
 
-/* products */
-.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px}
-.card{background:var(--card);border:1px solid var(--rule);border-radius:4px;padding:22px;display:flex;flex-direction:column;gap:10px}
-.card.base{grid-column:1/-1;background:var(--accent-soft);border-color:transparent}
-.card h3{font-family:var(--mono);font-weight:500;font-size:15px;margin:0;letter-spacing:.02em}
-.card .tag{font-family:var(--mono);font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3)}
-.card p{margin:0;color:var(--ink-2);font-size:16px}
-.card .for{margin-top:auto;padding-top:8px;border-top:1px dashed var(--rule);font-size:14.5px;color:var(--ink-3)}
-.card .for b{color:var(--ink-2);font-weight:600}
+/* tools */
+.tools{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
+.tool{background:var(--bg-2);border:1px solid var(--line);border-radius:6px;padding:22px;display:flex;flex-direction:column;gap:12px;transition:border-color .2s,transform .2s}
+.tool:hover{border-color:var(--line-2);transform:translateY(-2px)}
+.tool.base{grid-column:1/-1;display:grid;grid-template-columns:1fr 1fr;gap:28px;align-items:center;background:linear-gradient(90deg,var(--bg-2),var(--bg-3))}
+.tool .ico{width:40px;height:40px;border:1px solid var(--line-2);border-radius:6px;display:grid;place-items:center;color:var(--acc)}
+.tool .ico svg{width:20px;height:20px}
+.tool h3{font-family:var(--mono);font-weight:600;font-size:14.5px;margin:0;letter-spacing:.01em}
+.tool .prob{font-family:var(--mono);font-size:11.5px;color:var(--warn);letter-spacing:.02em}
+.tool p{margin:0;color:var(--fg-2);font-size:15px}
+.tool .for{margin-top:auto;padding-top:10px;border-top:1px dashed var(--line-2);font-size:13.5px;color:var(--fg-3)}
+.tool .for b{color:var(--fg-2);font-weight:600}
+.split{display:grid;grid-template-columns:1fr auto 1fr;gap:14px;align-items:center;font-family:var(--mono);font-size:12.5px}
+.split .box{border:1px solid var(--line-2);border-radius:4px;padding:14px 16px;background:var(--bg)}
+.split .box b{display:block;color:var(--fg);font-weight:600;letter-spacing:.08em;font-size:11.5px;margin-bottom:6px}
+.split .box span{color:var(--fg-3)}
+.split .wall{width:1px;height:74px;background:var(--nogo);position:relative}
+.split .wall::after{content:"×";position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);background:var(--bg-3);color:var(--nogo);padding:0 4px;font-weight:700}
+@media (max-width:900px){.tools{grid-template-columns:1fr 1fr}.tool.base{grid-template-columns:1fr}}
+@media (max-width:600px){.tools{grid-template-columns:1fr}}
 
 /* cases */
-.cases{display:grid;grid-template-columns:1fr 1fr;gap:16px}
-.case{border:1px solid var(--rule);border-radius:4px;padding:22px;background:var(--card)}
-.case h3{font-family:var(--serif);font-weight:500;font-size:23px;margin:0 0 14px;line-height:1.2}
-.case dl{margin:0;display:grid;grid-template-columns:max-content 1fr;gap:6px 14px;font-size:15.5px}
-.case dt{font-family:var(--mono);font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3);padding-top:3px}
-.case dd{margin:0;color:var(--ink-2)}
-.case .num{font-family:var(--serif);font-size:30px;color:var(--accent);font-variant-numeric:tabular-nums;line-height:1;display:block;margin-bottom:10px}
-.status{display:inline-block;font-family:var(--mono);font-size:11.5px;padding:2px 8px;border-radius:2px;background:var(--accent-soft);color:var(--accent)}
-.status.wip{background:var(--amber-soft);color:var(--amber)}
-@media (max-width:760px){.cases{grid-template-columns:1fr}}
+.cases{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+.case{background:var(--bg-2);border:1px solid var(--line);border-radius:6px;padding:26px;display:grid;grid-template-columns:1fr;gap:16px}
+.case .head{display:flex;justify-content:space-between;align-items:flex-start;gap:16px}
+.case .big{font-family:var(--mono);font-weight:500;font-size:34px;letter-spacing:-.03em;line-height:1;color:var(--acc)}
+.case h3{font-weight:700;font-stretch:92%;font-size:22px;margin:6px 0 0;line-height:1.15;letter-spacing:-.015em}
+.case dl{margin:0;display:grid;grid-template-columns:92px 1fr;gap:8px 14px;font-size:15px}
+.case dt{font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--fg-3);padding-top:4px}
+.case dd{margin:0;color:var(--fg-2)}
+@media (max-width:820px){.cases{grid-template-columns:1fr}}
 
-/* timeline */
-.tl{border-top:1px solid var(--rule)}
-.tl .row{display:grid;grid-template-columns:130px 1fr;gap:20px;padding:14px 0;border-bottom:1px solid var(--rule);font-size:16px}
-.tl .yr{font-family:var(--mono);font-size:13px;color:var(--ink-3);padding-top:3px;font-variant-numeric:tabular-nums}
-.tl .role{font-weight:600}
-.tl .who{color:var(--ink-2)}
-.tl .what{color:var(--ink-3);font-size:15px}
+/* track */
+.track{border-top:1px solid var(--line)}
+.row{display:grid;grid-template-columns:120px 1fr 1fr;gap:24px;padding:18px 0;border-bottom:1px solid var(--line);align-items:baseline}
+.row .yr{font-family:var(--mono);font-size:13px;color:var(--fg-3);font-variant-numeric:tabular-nums}
+.row .role{font-weight:600;font-size:16px}
+.row .what{color:var(--fg-3);font-size:14.5px}
+@media (max-width:820px){.row{grid-template-columns:90px 1fr;gap:8px 16px}.row .what{grid-column:2}}
 
 /* stack */
-.stack{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:22px 36px}
-.stack h4{font-family:var(--mono);font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3);margin:0 0 8px;font-weight:500}
-.stack ul{margin:0;padding:0;list-style:none;color:var(--ink-2);font-size:16px}
-.stack li{padding:3px 0;border-bottom:1px dotted var(--rule)}
+.stack{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:24px}
+.stack h4{font-family:var(--mono);font-size:11.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--fg-3);margin:0 0 10px;font-weight:500}
+.stack ul{margin:0;padding:0;list-style:none;font-size:15px;color:var(--fg-2)}
+.stack li{padding:6px 0;border-bottom:1px solid var(--line)}
+@media (max-width:820px){.stack{grid-template-columns:1fr 1fr}}
 
 /* contact */
-.contact{display:grid;grid-template-columns:1fr 1fr;gap:32px}
-.contact .big{font-family:var(--serif);font-size:clamp(24px,3vw,34px);font-weight:500;line-height:1.2;margin:0 0 18px;text-wrap:balance}
-.contact dl{margin:0;font-size:17px}
-.contact dt{font-family:var(--mono);font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3);margin-top:12px}
-.contact dd{margin:2px 0 0}
-@media (max-width:760px){.contact{grid-template-columns:1fr}}
-footer{padding:28px 0 48px;font-family:var(--mono);font-size:12.5px;color:var(--ink-3)}
+.contact .wrap{display:grid;grid-template-columns:1.2fr .8fr;gap:48px;align-items:start}
+.contact .big{font-weight:700;font-stretch:90%;font-size:clamp(28px,3.4vw,44px);line-height:1.06;letter-spacing:-.025em;margin:0 0 20px;text-wrap:balance}
+.contact p{color:var(--fg-2);margin:0 0 28px;max-width:34em}
+.contact dl{margin:0;background:var(--bg-2);border:1px solid var(--line);border-radius:6px;padding:22px 24px;font-size:16px}
+.contact dt{font-family:var(--mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--fg-3);margin-top:14px}
+.contact dt:first-child{margin-top:0}
+.contact dd{margin:3px 0 0}
+@media (max-width:820px){.contact .wrap{grid-template-columns:1fr}}
+footer{padding:28px 0 56px;font-family:var(--mono);font-size:12px;color:var(--fg-3)}
+footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
+
+/* reveal */
+.rv{opacity:0;transform:translateY(14px);transition:opacity .6s ease,transform .6s ease}
+.rv.in{opacity:1;transform:none}
+@media (max-width:600px){section{padding:60px 0}}
+.hero .wrap>*,.tools>*,.cases>*,.svcs>*,.stack>*,.contact .wrap>*,.sec-head>*{min-width:0}
+.console{min-width:0;max-width:100%}
+.hero .wrap{min-width:0}
 </style>
+</head>
+<body>
 
 <header class="top"><div class="wrap">
-  <a class="brand" href="#">Javier Rubio · Adilco Tech Center</a>
+  <a class="brand" href="#"><i></i>Javier Rubio · Oracle ERP</a>
   <nav class="nav">
     <a href="#servicios" data-es="Servicios" data-en="Services">Servicios</a>
-    <a href="#suite" data-es="Herramientas" data-en="Tools">Herramientas</a>
+    <a href="#herramientas" data-es="Herramientas" data-en="Tools">Herramientas</a>
     <a href="#casos" data-es="Casos" data-en="Cases">Casos</a>
     <a href="#trayectoria" data-es="Trayectoria" data-en="Track record">Trayectoria</a>
     <a href="#contacto" data-es="Contacto" data-en="Contact">Contacto</a>
@@ -142,230 +213,285 @@ footer{padding:28px 0 48px;font-family:var(--mono);font-size:12.5px;color:var(--
 
 <main>
 <div class="hero"><div class="wrap">
-  <p class="eyebrow" data-es="Consultor senior Oracle ERP · Finanzas · 26 años" data-en="Senior Oracle ERP consultant · Finance · 26 years">Consultor senior Oracle ERP · Finanzas · 26 años</p>
-  <h1 data-es="El ERP ya está implantado. Lo que duele es lo que el estándar no resuelve." data-en="The ERP is live. What hurts is what the standard product doesn't solve.">El ERP ya está implantado. Lo que duele es lo que el estándar no resuelve.</h1>
-  <p class="lede" data-es="Soy Javier Rubio. Combino consultoría funcional de Oracle Cloud y E-Business Suite con herramientas a medida construidas con IA: paneles de cierre, comparadores de configuración, cargadores y diagnóstico de incidencias. Primero entiendo el proceso de negocio; después construyo sólo lo que falta." data-en="I'm Javier Rubio. I combine functional consulting on Oracle Cloud and E-Business Suite with purpose-built tools developed with AI: close dashboards, configuration comparators, loaders and incident diagnosis. I understand the business process first; then I build only what's missing.">Soy Javier Rubio. Combino consultoría funcional de Oracle Cloud y E-Business Suite con herramientas a medida construidas con IA: paneles de cierre, comparadores de configuración, cargadores y diagnóstico de incidencias. Primero entiendo el proceso de negocio; después construyo sólo lo que falta.</p>
-  <div class="cta">
-    <a class="btn primary" href="#contacto" data-es="Hablemos de tu caso" data-en="Let's talk about your case">Hablemos de tu caso</a>
-    <a class="btn" href="https://www.linkedin.com/in/jrubioes" target="_blank" rel="noopener">LinkedIn</a>
+  <div>
+    <div class="kicker"><span class="label" data-es="Consultor senior Oracle ERP · Finanzas" data-en="Senior Oracle ERP consultant · Finance">Consultor senior Oracle ERP · Finanzas</span><span class="sep"></span><span class="label">26 <span data-es="años" data-en="years">años</span></span></div>
+    <h1><span data-es="El ERP ya está implantado." data-en="The ERP is live.">El ERP ya está implantado.</span> <em data-es="Lo que duele es lo que el estándar no resuelve." data-en="What hurts is what the standard product doesn't solve.">Lo que duele es lo que el estándar no resuelve.</em></h1>
+    <p class="lede" data-es="Consultoría funcional de Oracle Cloud y E-Business Suite, más herramientas a medida construidas con IA: un panel que dice si se puede cerrar el periodo, un comparador que detecta desvíos de configuración, un investigador que diagnostica incidencias con los datos reales. Primero el proceso; después, sólo lo que falta." data-en="Functional consulting on Oracle Cloud and E-Business Suite, plus purpose-built tools developed with AI: a panel that says whether the period can be closed, a comparator that catches configuration drift, an investigator that diagnoses incidents against real data. Process first; then only what's missing.">Consultoría funcional de Oracle Cloud y E-Business Suite, más herramientas a medida construidas con IA: un panel que dice si se puede cerrar el periodo, un comparador que detecta desvíos de configuración, un investigador que diagnostica incidencias con los datos reales. Primero el proceso; después, sólo lo que falta.</p>
+    <div class="cta">
+      <a class="btn primary" href="#contacto"><span data-es="Cuéntame tu punto de dolor" data-en="Tell me your pain point">Cuéntame tu punto de dolor</span><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 8h10M9 4l4 4-4 4"/></svg></a>
+      <a class="btn" href="https://www.linkedin.com/in/jrubioes" target="_blank" rel="noopener">LinkedIn</a>
+      <a class="btn" href="Javier_Rubio_one-pager.pdf" target="_blank" rel="noopener"><span data-es="One-pager PDF" data-en="One-pager PDF">One-pager PDF</span></a>
+    </div>
+    <div class="facts">
+      <div><b>26</b><span data-es="años en Oracle ERP" data-en="years on Oracle ERP">años en Oracle ERP</span></div>
+      <div><b>7</b><span data-es="herramientas propias en producción" data-en="own tools in production">herramientas propias en producción</span></div>
+      <div><b>3</b><span data-es="idiomas de trabajo · ES EN IT" data-en="working languages · ES EN IT">idiomas de trabajo · ES EN IT</span></div>
+      <div><b>3</b><span data-es="continentes con rollouts entregados" data-en="continents with delivered rollouts">continentes con rollouts entregados</span></div>
+    </div>
   </div>
-  <div class="ledger">
-    <div><b>26</b><span data-es="años en Oracle ERP" data-en="years in Oracle ERP">años en Oracle ERP</span></div>
-    <div><b>7</b><span data-es="herramientas propias en producción" data-en="own tools in production">herramientas propias en producción</span></div>
-    <div><b>3</b><span data-es="idiomas de trabajo: ES · EN · IT" data-en="working languages: ES · EN · IT">idiomas de trabajo: ES · EN · IT</span></div>
-    <div><b>3</b><span data-es="continentes con rollouts entregados" data-en="continents with delivered rollouts">continentes con rollouts entregados</span></div>
+
+  <div class="console" id="console" aria-label="Demo: dashboard de cierre">
+    <div class="bar"><span class="t" data-es="Dashboard de cierre · libro ES01 · periodo JUL-26" data-en="Close dashboard · ledger ES01 · period JUL-26">Dashboard de cierre · libro ES01 · periodo JUL-26</span><span class="dots"><i></i><i></i><i></i></span></div>
+    <div class="tbl"><table>
+      <thead><tr><th data-es="Módulo" data-en="Module">Módulo</th><th class="n" data-es="Sin contabilizar" data-en="Unposted">Sin contabilizar</th><th class="n" data-es="Excepciones" data-en="Exceptions">Excepciones</th><th data-es="Veredicto" data-en="Verdict">Veredicto</th></tr></thead>
+      <tbody>
+        <tr data-m="AP"><td>AP</td><td class="n">—</td><td class="n">—</td><td><span class="pill wait">…</span></td></tr>
+        <tr data-m="AR"><td>AR</td><td class="n">—</td><td class="n">—</td><td><span class="pill wait">…</span></td></tr>
+        <tr data-m="FA"><td>FA</td><td class="n">—</td><td class="n">—</td><td><span class="pill wait">…</span></td></tr>
+        <tr data-m="CM"><td>CM</td><td class="n">—</td><td class="n">—</td><td><span class="pill wait">…</span></td></tr>
+        <tr data-m="GL"><td>GL</td><td class="n">—</td><td class="n">—</td><td><span class="pill wait">…</span></td></tr>
+      </tbody>
+    </table></div>
+    <div class="log" id="log"><span class="cur"></span></div>
+    <div class="foot"><span data-es="Veredicto del periodo" data-en="Period verdict">Veredicto del periodo</span><b id="verdict" class="verdict">—</b></div>
   </div>
 </div></div>
 
-<section id="servicios"><div class="wrap sec">
-  <aside data-es="Servicios" data-en="Services">Servicios</aside>
-  <div>
+<section id="servicios"><div class="wrap">
+  <div class="sec-head rv"><span class="label" data-es="Servicios" data-en="Services">Servicios</span><div>
     <h2 data-es="Tres formas de trabajar juntos" data-en="Three ways to work together">Tres formas de trabajar juntos</h2>
-    <p class="intro" data-es="Cada servicio arranca por un dolor concreto y termina en algo que tu equipo puede usar sin mí." data-en="Every engagement starts from a concrete pain and ends with something your team can run without me.">Cada servicio arranca por un dolor concreto y termina en algo que tu equipo puede usar sin mí.</p>
-    <div class="services">
-      <div class="svc">
-        <div>
-          <span class="pain" data-es="Dolor: el proceso no cuadra con la configuración" data-en="Pain: process and configuration don't match">Dolor: el proceso no cuadra con la configuración</span>
-          <h3 data-es="Consultoría funcional Oracle Cloud y EBS R12" data-en="Functional consulting, Oracle Cloud and EBS R12">Consultoría funcional Oracle Cloud y EBS R12</h3>
-        </div>
-        <div>
-          <p data-es="Finanzas de punta a punta: GL, AR, AP, activos fijos, tesorería, contabilidad de subledger (SLA), Order to Cash y Procure to Pay. Cierre mensual y anual, conciliaciones, AHCS/ARCS." data-en="Finance end to end: GL, AR, AP, fixed assets, cash management, subledger accounting (SLA), Order to Cash and Procure to Pay. Month- and year-end close, reconciliations, AHCS/ARCS.">Finanzas de punta a punta: GL, AR, AP, activos fijos, tesorería, contabilidad de subledger (SLA), Order to Cash y Procure to Pay. Cierre mensual y anual, conciliaciones, AHCS/ARCS.</p>
-          <ul>
-            <li data-es="Fiscalidad: SII, localizaciones España, Italia y LATAM, E-Tax Manager" data-en="Tax: Spain's SII, Spanish, Italian and LATAM localisations, E-Tax Manager">Fiscalidad: SII, localizaciones España, Italia y LATAM, E-Tax Manager</li>
-            <li data-es="Diagnóstico de incidencias de contabilización que llevan meses abiertas" data-en="Diagnosis of accounting incidents that have been open for months">Diagnóstico de incidencias de contabilización que llevan meses abiertas</li>
-            <li data-es="Integraciones: OIC, REST/SOAP, BI Publisher, interfaces con POS y sistemas legados" data-en="Integrations: OIC, REST/SOAP, BI Publisher, POS and legacy interfaces">Integraciones: OIC, REST/SOAP, BI Publisher, interfaces con POS y sistemas legados</li>
-          </ul>
-        </div>
-      </div>
-      <div class="svc">
-        <div>
-          <span class="pain" data-es="Dolor: el estándar no lo hace y nadie lo va a desarrollar" data-en="Pain: the standard product doesn't do it and nobody will build it">Dolor: el estándar no lo hace y nadie lo va a desarrollar</span>
-          <h3 data-es="Aplicaciones satélite y automatizaciones" data-en="Satellite applications and automations">Aplicaciones satélite y automatizaciones</h3>
-        </div>
-        <div>
-          <p data-es="Herramientas pequeñas y específicas que viven al lado del ERP y atacan un problema cada una: un panel que dice si se puede cerrar el periodo, un comparador que detecta desvíos de configuración entre entornos, un cargador de anticipos, un investigador de incidencias que cruza el texto del ticket con los datos reales." data-en="Small, specific tools that live next to the ERP and each attack one problem: a panel that says whether the period can be closed, a comparator that catches configuration drift across environments, a prepayment loader, an incident investigator that cross-checks the ticket text against real data.">Herramientas pequeñas y específicas que viven al lado del ERP y atacan un problema cada una: un panel que dice si se puede cerrar el periodo, un comparador que detecta desvíos de configuración entre entornos, un cargador de anticipos, un investigador de incidencias que cruza el texto del ticket con los datos reales.</p>
-          <ul>
-            <li data-es="Construidas con IA en semanas, no en trimestres; Python puro, sin base de datos externa" data-en="Built with AI in weeks, not quarters; plain Python, no external database">Construidas con IA en semanas, no en trimestres; Python puro, sin base de datos externa</li>
-            <li data-es="Las credenciales no salen del ordenador de quien las usa" data-en="Credentials never leave the user's computer">Las credenciales no salen del ordenador de quien las usa</li>
-            <li data-es="Separación estricta entre leer datos y actuar sobre el ERP" data-en="Strict separation between reading data and acting on the ERP">Separación estricta entre leer datos y actuar sobre el ERP</li>
-          </ul>
-        </div>
-      </div>
-      <div class="svc">
-        <div>
-          <span class="pain" data-es="Dolor: el rollout se alarga y el backlog de soporte crece" data-en="Pain: the rollout drags on and the support backlog grows">Dolor: el rollout se alarga y el backlog de soporte crece</span>
-          <h3 data-es="Optimización de proyectos y soporte" data-en="Project and support optimisation">Optimización de proyectos y soporte</h3>
-        </div>
-        <div>
-          <p data-es="Dirección de workstreams y rollouts multi-país, hypercare, gobierno de configuración y checklists de pase a producción. Reducción del backlog de incidencias con diagnóstico asistido y procedimientos que se quedan documentados." data-en="Workstream and multi-country rollout leadership, hypercare, configuration governance and go-live checklists. Incident backlog reduction through assisted diagnosis and procedures that stay documented.">Dirección de workstreams y rollouts multi-país, hypercare, gobierno de configuración y checklists de pase a producción. Reducción del backlog de incidencias con diagnóstico asistido y procedimientos que se quedan documentados.</p>
-          <ul>
-            <li data-es="Global Process Owner y creación de centros de excelencia internos" data-en="Global Process Owner and building internal centres of excellence">Global Process Owner y creación de centros de excelencia internos</li>
-            <li data-es="Migraciones SAP → Oracle Cloud y EBS → Cloud" data-en="SAP → Oracle Cloud and EBS → Cloud migrations">Migraciones SAP → Oracle Cloud y EBS → Cloud</li>
-            <li data-es="Reporting de comité: cifras reales del ERP, no estimaciones" data-en="Steering-committee reporting: real ERP figures, not estimates">Reporting de comité: cifras reales del ERP, no estimaciones</li>
-          </ul>
-        </div>
-      </div>
+    <p class="intro" data-es="Cada encargo arranca por un dolor concreto y termina en algo que tu equipo puede usar sin mí." data-en="Every engagement starts from a concrete pain and ends with something your team can run without me.">Cada encargo arranca por un dolor concreto y termina en algo que tu equipo puede usar sin mí.</p>
+  </div></div>
+  <div class="svcs rv">
+    <div class="svc">
+      <span class="num">01</span>
+      <span class="pain" data-es="Dolor · el proceso no cuadra con la configuración" data-en="Pain · process and configuration don't match">Dolor · el proceso no cuadra con la configuración</span>
+      <h3 data-es="Consultoría funcional Oracle Cloud y EBS R12" data-en="Functional consulting, Oracle Cloud and EBS R12">Consultoría funcional Oracle Cloud y EBS R12</h3>
+      <p data-es="Finanzas de punta a punta: GL, AR, AP, activos fijos, tesorería, contabilidad de subledger, Order to Cash y Procure to Pay. Cierre mensual y anual, conciliaciones, AHCS/ARCS." data-en="Finance end to end: GL, AR, AP, fixed assets, cash management, subledger accounting, Order to Cash and Procure to Pay. Month- and year-end close, reconciliations, AHCS/ARCS.">Finanzas de punta a punta: GL, AR, AP, activos fijos, tesorería, contabilidad de subledger, Order to Cash y Procure to Pay. Cierre mensual y anual, conciliaciones, AHCS/ARCS.</p>
+      <ul>
+        <li data-es="Fiscalidad: SII, localizaciones España, Italia y LATAM" data-en="Tax: Spain's SII, Spanish, Italian and LATAM localisations">Fiscalidad: SII, localizaciones España, Italia y LATAM</li>
+        <li data-es="Diagnóstico de incidencias de contabilización que llevan meses abiertas" data-en="Diagnosis of accounting incidents open for months">Diagnóstico de incidencias de contabilización que llevan meses abiertas</li>
+        <li data-es="Integraciones: OIC, REST/SOAP, BI Publisher, POS y sistemas legados" data-en="Integrations: OIC, REST/SOAP, BI Publisher, POS and legacy systems">Integraciones: OIC, REST/SOAP, BI Publisher, POS y sistemas legados</li>
+      </ul>
+    </div>
+    <div class="svc">
+      <span class="num">02</span>
+      <span class="pain" data-es="Dolor · el estándar no lo hace y nadie lo va a desarrollar" data-en="Pain · the standard doesn't do it and nobody will build it">Dolor · el estándar no lo hace y nadie lo va a desarrollar</span>
+      <h3 data-es="Aplicaciones satélite y automatizaciones" data-en="Satellite applications and automations">Aplicaciones satélite y automatizaciones</h3>
+      <p data-es="Herramientas pequeñas y específicas que viven al lado del ERP y atacan un problema cada una. Construidas con IA en semanas, no en trimestres; Python puro, sin base de datos externa." data-en="Small, specific tools that live next to the ERP and each attack one problem. Built with AI in weeks, not quarters; plain Python, no external database.">Herramientas pequeñas y específicas que viven al lado del ERP y atacan un problema cada una. Construidas con IA en semanas, no en trimestres; Python puro, sin base de datos externa.</p>
+      <ul>
+        <li data-es="Las credenciales no salen del ordenador de quien las usa" data-en="Credentials never leave the user's computer">Las credenciales no salen del ordenador de quien las usa</li>
+        <li data-es="Separación estricta entre leer datos y actuar sobre el ERP" data-en="Strict separation between reading data and acting on the ERP">Separación estricta entre leer datos y actuar sobre el ERP</li>
+        <li data-es="Se instalan en otro cliente en días, no en meses" data-en="Installed at another client in days, not months">Se instalan en otro cliente en días, no en meses</li>
+      </ul>
+    </div>
+    <div class="svc">
+      <span class="num">03</span>
+      <span class="pain" data-es="Dolor · el rollout se alarga y el backlog crece" data-en="Pain · the rollout drags on and the backlog grows">Dolor · el rollout se alarga y el backlog crece</span>
+      <h3 data-es="Optimización de proyectos y soporte" data-en="Project and support optimisation">Optimización de proyectos y soporte</h3>
+      <p data-es="Dirección de workstreams y rollouts multi-país, hypercare, gobierno de configuración y checklists de pase a producción. Reducción del backlog con diagnóstico asistido y procedimientos que se quedan documentados." data-en="Workstream and multi-country rollout leadership, hypercare, configuration governance and go-live checklists. Backlog reduction through assisted diagnosis and procedures that stay documented.">Dirección de workstreams y rollouts multi-país, hypercare, gobierno de configuración y checklists de pase a producción. Reducción del backlog con diagnóstico asistido y procedimientos que se quedan documentados.</p>
+      <ul>
+        <li data-es="Global Process Owner y centros de excelencia internos" data-en="Global Process Owner and internal centres of excellence">Global Process Owner y centros de excelencia internos</li>
+        <li data-es="Migraciones SAP → Oracle Cloud y EBS → Cloud" data-en="SAP → Oracle Cloud and EBS → Cloud migrations">Migraciones SAP → Oracle Cloud y EBS → Cloud</li>
+        <li data-es="Reporting de comité con cifras reales del ERP, no estimaciones" data-en="Steering-committee reporting with real ERP figures, not estimates">Reporting de comité con cifras reales del ERP, no estimaciones</li>
+      </ul>
     </div>
   </div>
 </div></section>
 
-<section id="suite"><div class="wrap sec">
-  <aside data-es="Herramientas" data-en="Tools">Herramientas</aside>
-  <div>
+<section id="herramientas"><div class="wrap">
+  <div class="sec-head rv"><span class="label" data-es="Herramientas" data-en="Tools">Herramientas</span><div>
     <h2 data-es="Una base, seis productos encima" data-en="One foundation, six products on top">Una base, seis productos encima</h2>
-    <p class="intro" data-es="Todas hablan con Oracle Fusion a través de la misma librería. Eso convierte herramientas sueltas en una arquitectura que se instala en otro cliente en días." data-en="They all talk to Oracle Fusion through the same library. That turns loose tools into an architecture that can be installed at another client in days.">Todas hablan con Oracle Fusion a través de la misma librería. Eso convierte herramientas sueltas en una arquitectura que se instala en otro cliente en días.</p>
-    <div class="grid">
-      <div class="card base">
-        <span class="tag" data-es="Cimiento" data-en="Foundation">Cimiento</span>
-        <h3>fusion-client</h3>
-        <p data-es="Librería Python compartida para Oracle Fusion Cloud. Lee por BI Publisher, actúa por procesos ESS, y no mezcla las dos cosas: lo que lee no puede escribir y lo que escribe no improvisa." data-en="Shared Python library for Oracle Fusion Cloud. Reads through BI Publisher, acts through ESS jobs, and never blends the two: what reads cannot write, and what writes doesn't improvise.">Librería Python compartida para Oracle Fusion Cloud. Lee por BI Publisher, actúa por procesos ESS, y no mezcla las dos cosas: lo que lee no puede escribir y lo que escribe no improvisa.</p>
+    <p class="intro" data-es="Todas hablan con Oracle Fusion a través de la misma librería. Eso convierte herramientas sueltas en una arquitectura." data-en="They all talk to Oracle Fusion through the same library. That turns loose tools into an architecture.">Todas hablan con Oracle Fusion a través de la misma librería. Eso convierte herramientas sueltas en una arquitectura.</p>
+  </div></div>
+  <div class="tools rv">
+    <div class="tool base">
+      <div>
+        <span class="prob" data-es="Cimiento" data-en="Foundation">Cimiento</span>
+        <h3 style="margin-top:8px">fusion-client</h3>
+        <p style="margin-top:10px" data-es="Librería Python compartida para Oracle Fusion Cloud. Lee por BI Publisher, actúa por procesos ESS, y no mezcla las dos cosas: lo que lee no puede escribir y lo que escribe no improvisa." data-en="Shared Python library for Oracle Fusion Cloud. Reads through BI Publisher, acts through ESS jobs, and never blends the two: what reads cannot write, and what writes doesn't improvise.">Librería Python compartida para Oracle Fusion Cloud. Lee por BI Publisher, actúa por procesos ESS, y no mezcla las dos cosas: lo que lee no puede escribir y lo que escribe no improvisa.</p>
       </div>
-      <div class="card">
-        <span class="tag" data-es="Problema: sin acceso a la base de datos" data-en="Problem: no database access">Problema: sin acceso a la base de datos</span>
-        <h3>Fusion Data Studio</h3>
-        <p data-es="IDE de escritorio contra Oracle Fusion: explorador de esquema, SQL con resultados en rejilla, llamadas REST y un generador de consultas por IA para quien no domina SQL. Todo local." data-en="Desktop IDE for Oracle Fusion: schema browser, SQL with grid results, REST calls and an AI query generator for people who don't write SQL. Runs fully locally.">IDE de escritorio contra Oracle Fusion: explorador de esquema, SQL con resultados en rejilla, llamadas REST y un generador de consultas por IA para quien no domina SQL. Todo local.</p>
-        <div class="for"><b data-es="Para" data-en="For">Para</b> <span data-es="equipos técnicos de ERP y consultoras de implantación" data-en="ERP technical teams and implementation partners">equipos técnicos de ERP y consultoras de implantación</span></div>
+      <div class="split">
+        <div class="box"><b data-es="LEE" data-en="READS">LEE</b><span>BI Publisher · SQL · REST GET</span></div>
+        <div class="wall"></div>
+        <div class="box"><b data-es="ACTÚA" data-en="ACTS">ACTÚA</b><span>ESS jobs · REST POST</span></div>
       </div>
-      <div class="card">
-        <span class="tag" data-es="Problema: la configuración se desvía entre entornos" data-en="Problem: configuration drifts across environments">Problema: la configuración se desvía entre entornos</span>
-        <h3>Fusion Checklist</h3>
-        <p data-es="39 controles sobre GL, AP, AR, activos, tesorería, compras e intercompañía, comparados en paralelo entre PROD, DEV y TEST, con detalle de qué registro existe dónde." data-en="39 checks across GL, AP, AR, assets, cash, procurement and intercompany, compared in parallel across PROD, DEV and TEST, down to which record exists where.">39 controles sobre GL, AP, AR, activos, tesorería, compras e intercompañía, comparados en paralelo entre PROD, DEV y TEST, con detalle de qué registro existe dónde.</p>
-        <div class="for"><b data-es="Para" data-en="For">Para</b> <span data-es="responsables de sistemas ERP y QA de implantación" data-en="ERP system owners and implementation QA">responsables de sistemas ERP y QA de implantación</span></div>
-      </div>
-      <div class="card">
-        <span class="tag" data-es="Problema: cerrar sin saber qué queda sin contabilizar" data-en="Problem: closing without knowing what's left unposted">Problema: cerrar sin saber qué queda sin contabilizar</span>
-        <h3 data-es="Dashboard de Cierre" data-en="Close Dashboard">Dashboard de Cierre</h3>
-        <p data-es="Por cada libro y periodo, revisa AP, AR, FA, CM y GL, da un veredicto GO / WARN / NO-GO y, si procede, ejecuta el cierre de subledgers a GL mediante procesos programados." data-en="For every ledger and period it reviews AP, AR, FA, CM and GL, returns a GO / WARN / NO-GO verdict and, when cleared, runs the subledger-to-GL close through scheduled processes.">Por cada libro y periodo, revisa AP, AR, FA, CM y GL, da un veredicto GO / WARN / NO-GO y, si procede, ejecuta el cierre de subledgers a GL mediante procesos programados.</p>
-        <div class="for"><b data-es="Para" data-en="For">Para</b> <span data-es="dirección financiera y responsables de cierre" data-en="finance leadership and close owners">dirección financiera y responsables de cierre</span></div>
-      </div>
-      <div class="card">
-        <span class="tag" data-es="Problema: incidencias que tardan meses en diagnosticarse" data-en="Problem: incidents that take months to diagnose">Problema: incidencias que tardan meses en diagnosticarse</span>
-        <h3 data-es="Resolución de incidencias con IA" data-en="AI incident resolution">Resolución de incidencias con IA</h3>
-        <p data-es="Un investigador con modelo de lenguaje lee el ticket de Jira, consulta los datos reales del ERP, localiza la causa y redacta el diagnóstico y la respuesta. Integrado con el tablero del equipo." data-en="A language-model investigator reads the Jira ticket, queries real ERP data, pinpoints the cause and drafts the diagnosis and reply. Integrated with the team's board.">Un investigador con modelo de lenguaje lee el ticket de Jira, consulta los datos reales del ERP, localiza la causa y redacta el diagnóstico y la respuesta. Integrado con el tablero del equipo.</p>
-        <div class="for"><b data-es="Para" data-en="For">Para</b> <span data-es="responsables de soporte y service delivery" data-en="support and service-delivery managers">responsables de soporte y service delivery</span></div>
-      </div>
-      <div class="card">
-        <span class="tag" data-es="Problema: anticipos de clientes creados a mano" data-en="Problem: customer prepayments keyed by hand">Problema: anticipos de clientes creados a mano</span>
-        <h3>Customer Prepayment Creator</h3>
-        <p data-es="Aplicación web que genera transacciones de anticipo de clientes en Oracle Fusion por servicio web, con validación previa y trazabilidad de cada carga." data-en="Web application that creates customer prepayment transactions in Oracle Fusion via web services, with upfront validation and a trail for every load.">Aplicación web que genera transacciones de anticipo de clientes en Oracle Fusion por servicio web, con validación previa y trazabilidad de cada carga.</p>
-        <div class="for"><b data-es="Para" data-en="For">Para</b> <span data-es="equipos de cuentas a cobrar y tesorería" data-en="receivables and treasury teams">equipos de cuentas a cobrar y tesorería</span></div>
-      </div>
-      <div class="card">
-        <span class="tag" data-es="Problema: el conocimiento del proyecto se pierde" data-en="Problem: project knowledge gets lost">Problema: el conocimiento del proyecto se pierde</span>
-        <h3 data-es="Base de conocimiento RAG" data-en="RAG knowledge base">Base de conocimiento RAG</h3>
-        <p data-es="Búsqueda semántica sobre la documentación funcional, los diseños y las incidencias resueltas del proyecto, para que la respuesta a una pregunta ya contestada tarde segundos y no otra investigación." data-en="Semantic search over the project's functional documentation, designs and resolved incidents, so a question that was already answered takes seconds, not another investigation.">Búsqueda semántica sobre la documentación funcional, los diseños y las incidencias resueltas del proyecto, para que la respuesta a una pregunta ya contestada tarde segundos y no otra investigación.</p>
-        <div class="for"><b data-es="Para" data-en="For">Para</b> <span data-es="equipos de soporte y nuevos consultores del proyecto" data-en="support teams and consultants joining the project">equipos de soporte y nuevos consultores del proyecto</span></div>
-      </div>
+    </div>
+
+    <div class="tool">
+      <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 9h18M8 13h3M8 16h6"/></svg></div>
+      <span class="prob" data-es="Problema · cerrar sin saber qué queda sin contabilizar" data-en="Problem · closing without knowing what's left unposted">Problema · cerrar sin saber qué queda sin contabilizar</span>
+      <h3 data-es="Dashboard de Cierre" data-en="Close Dashboard">Dashboard de Cierre</h3>
+      <p data-es="Por cada libro y periodo revisa AP, AR, FA, CM y GL, da un veredicto GO / WARN / NO-GO y, si procede, ejecuta el cierre de subledgers a GL. Es la demo de la portada." data-en="For every ledger and period it reviews AP, AR, FA, CM and GL, returns a GO / WARN / NO-GO verdict and, when cleared, runs the subledger-to-GL close. It's the demo at the top.">Por cada libro y periodo revisa AP, AR, FA, CM y GL, da un veredicto GO / WARN / NO-GO y, si procede, ejecuta el cierre de subledgers a GL. Es la demo de la portada.</p>
+      <div class="for"><b data-es="Para" data-en="For">Para</b> <span data-es="dirección financiera y responsables de cierre" data-en="finance leadership and close owners">dirección financiera y responsables de cierre</span></div>
+    </div>
+    <div class="tool">
+      <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M4 6h7v12H4zM13 6h7v12h-7z"/><path d="M7 10h1M7 13h1M16 10h1M16 13h1" stroke-linecap="round"/></svg></div>
+      <span class="prob" data-es="Problema · la configuración se desvía entre entornos" data-en="Problem · configuration drifts across environments">Problema · la configuración se desvía entre entornos</span>
+      <h3>Fusion Checklist</h3>
+      <p data-es="39 controles sobre GL, AP, AR, activos, tesorería, compras e intercompañía comparados en paralelo entre PROD, DEV y TEST, con detalle de qué registro existe dónde." data-en="39 checks across GL, AP, AR, assets, cash, procurement and intercompany compared in parallel across PROD, DEV and TEST, down to which record exists where.">39 controles sobre GL, AP, AR, activos, tesorería, compras e intercompañía comparados en paralelo entre PROD, DEV y TEST, con detalle de qué registro existe dónde.</p>
+      <div class="for"><b data-es="Para" data-en="For">Para</b> <span data-es="responsables de sistemas ERP y QA de implantación" data-en="ERP system owners and implementation QA">responsables de sistemas ERP y QA de implantación</span></div>
+    </div>
+    <div class="tool">
+      <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M4 5h16v14H4z"/><path d="M7 9l3 3-3 3M12 15h5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+      <span class="prob" data-es="Problema · sin acceso a la base de datos" data-en="Problem · no database access">Problema · sin acceso a la base de datos</span>
+      <h3>Fusion Data Studio</h3>
+      <p data-es="IDE de escritorio contra Oracle Fusion: explorador de esquema, SQL con resultados en rejilla, llamadas REST y un generador de consultas por IA. Todo local." data-en="Desktop IDE for Oracle Fusion: schema browser, SQL with grid results, REST calls and an AI query generator. Fully local.">IDE de escritorio contra Oracle Fusion: explorador de esquema, SQL con resultados en rejilla, llamadas REST y un generador de consultas por IA. Todo local.</p>
+      <div class="for"><b data-es="Para" data-en="For">Para</b> <span data-es="equipos técnicos de ERP y consultoras" data-en="ERP technical teams and consultancies">equipos técnicos de ERP y consultoras</span></div>
+    </div>
+    <div class="tool">
+      <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="11" cy="11" r="6"/><path d="M20 20l-4.5-4.5M9 11h4M11 9v4" stroke-linecap="round"/></svg></div>
+      <span class="prob" data-es="Problema · incidencias que tardan meses en diagnosticarse" data-en="Problem · incidents that take months to diagnose">Problema · incidencias que tardan meses en diagnosticarse</span>
+      <h3 data-es="Resolución de incidencias con IA" data-en="AI incident resolution">Resolución de incidencias con IA</h3>
+      <p data-es="Un investigador con modelo de lenguaje lee el ticket de Jira, consulta los datos reales del ERP, localiza la causa y redacta el diagnóstico y la respuesta." data-en="A language-model investigator reads the Jira ticket, queries real ERP data, pinpoints the cause and drafts the diagnosis and the reply.">Un investigador con modelo de lenguaje lee el ticket de Jira, consulta los datos reales del ERP, localiza la causa y redacta el diagnóstico y la respuesta.</p>
+      <div class="for"><b data-es="Para" data-en="For">Para</b> <span data-es="responsables de soporte y service delivery" data-en="support and service-delivery managers">responsables de soporte y service delivery</span></div>
+    </div>
+    <div class="tool">
+      <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 4v16M5 11l7-7 7 7" stroke-linecap="round" stroke-linejoin="round"/><path d="M4 20h16"/></svg></div>
+      <span class="prob" data-es="Problema · anticipos de clientes creados a mano" data-en="Problem · customer prepayments keyed by hand">Problema · anticipos de clientes creados a mano</span>
+      <h3>Customer Prepayment Creator</h3>
+      <p data-es="Aplicación web que genera transacciones de anticipo de clientes en Oracle Fusion por servicio web, con validación previa y trazabilidad de cada carga." data-en="Web application that creates customer prepayment transactions in Oracle Fusion via web services, with upfront validation and a trail for every load.">Aplicación web que genera transacciones de anticipo de clientes en Oracle Fusion por servicio web, con validación previa y trazabilidad de cada carga.</p>
+      <div class="for"><b data-es="Para" data-en="For">Para</b> <span data-es="cuentas a cobrar y tesorería" data-en="receivables and treasury">cuentas a cobrar y tesorería</span></div>
+    </div>
+    <div class="tool">
+      <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M5 5h9l5 5v9H5z"/><path d="M14 5v5h5M8 13h8M8 16h5" stroke-linecap="round"/></svg></div>
+      <span class="prob" data-es="Problema · el conocimiento del proyecto se pierde" data-en="Problem · project knowledge gets lost">Problema · el conocimiento del proyecto se pierde</span>
+      <h3 data-es="Base de conocimiento RAG" data-en="RAG knowledge base">Base de conocimiento RAG</h3>
+      <p data-es="Búsqueda semántica sobre diseños, documentación e incidencias resueltas, para que una pregunta ya contestada tarde segundos y no otra investigación." data-en="Semantic search over designs, documentation and resolved incidents, so an already-answered question takes seconds, not another investigation.">Búsqueda semántica sobre diseños, documentación e incidencias resueltas, para que una pregunta ya contestada tarde segundos y no otra investigación.</p>
+      <div class="for"><b data-es="Para" data-en="For">Para</b> <span data-es="soporte y consultores que se incorporan" data-en="support teams and consultants joining">soporte y consultores que se incorporan</span></div>
     </div>
   </div>
 </div></section>
 
-<section id="casos"><div class="wrap sec">
-  <aside data-es="Casos" data-en="Cases">Casos</aside>
-  <div>
+<section id="casos"><div class="wrap">
+  <div class="sec-head rv"><span class="label" data-es="Casos" data-en="Cases">Casos</span><div>
     <h2 data-es="Cuatro problemas reales, resueltos" data-en="Four real problems, solved">Cuatro problemas reales, resueltos</h2>
     <p class="intro" data-es="Grupo hotelero internacional en Oracle Cloud, 2024–2026. Anonimizados; las cifras son las del sistema." data-en="International hotel group on Oracle Cloud, 2024–2026. Anonymised; the figures are the system's own.">Grupo hotelero internacional en Oracle Cloud, 2024–2026. Anonimizados; las cifras son las del sistema.</p>
-    <div class="cases">
-      <div class="case">
-        <span class="num">~3 M€</span>
-        <h3 data-es="Cobros contabilizados en una cuenta errónea" data-en="Receipts posted to the wrong account">Cobros contabilizados en una cuenta errónea</h3>
-        <dl>
-          <dt data-es="Situación" data-en="Situation">Situación</dt><dd data-es="Cinco meses abierta sin causa identificada." data-en="Open for five months with no identified cause.">Cinco meses abierta sin causa identificada.</dd>
-          <dt data-es="Causa" data-en="Cause">Causa</dt><dd data-es="Mapping sets de contabilidad de subledger creados sólo para una moneda; el resto caía en la cuenta por defecto." data-en="Subledger accounting mapping sets created for a single currency; everything else fell to the default account.">Mapping sets de contabilidad de subledger creados sólo para una moneda; el resto caía en la cuenta por defecto.</dd>
-          <dt data-es="Resultado" data-en="Outcome">Resultado</dt><dd><span class="status" data-es="Corregido y validado" data-en="Fixed and validated">Corregido y validado</span></dd>
-        </dl>
-      </div>
-      <div class="case">
-        <span class="num" data-es="1 tarde" data-en="1 afternoon">1 tarde</span>
-        <h3 data-es="Abonos que bloqueaban el cierre del mes" data-en="Credit memos blocking the month-end close">Abonos que bloqueaban el cierre del mes</h3>
-        <dl>
-          <dt data-es="Situación" data-en="Situation">Situación</dt><dd data-es="Abonos retenidos en contabilización a días del cierre." data-en="Credit memos stuck in accounting days before the close.">Abonos retenidos en contabilización a días del cierre.</dd>
-          <dt data-es="Causa" data-en="Cause">Causa</dt><dd data-es="Una regla de cuenta modificada sin actualizar su regla pareja de subcuenta." data-en="An account rule changed without updating its paired sub-account rule.">Una regla de cuenta modificada sin actualizar su regla pareja de subcuenta.</dd>
-          <dt data-es="Resultado" data-en="Outcome">Resultado</dt><dd><span class="status" data-es="Cierre desbloqueado" data-en="Close unblocked">Cierre desbloqueado</span></dd>
-        </dl>
-      </div>
-      <div class="case">
-        <span class="num" data-es="8 semanas" data-en="8 weeks">8 semanas</span>
-        <h3 data-es="Informe de aging a futuro que no cuadraba" data-en="Forward aging report that didn't reconcile">Informe de aging a futuro que no cuadraba</h3>
-        <dl>
-          <dt data-es="Situación" data-en="Situation">Situación</dt><dd data-es="Cabecera y detalle no sumaban lo mismo; el tipo de cambio se aplicaba dos veces en algunos bloques." data-en="Header and detail didn't add up; the exchange rate was applied twice in some blocks.">Cabecera y detalle no sumaban lo mismo; el tipo de cambio se aplicaba dos veces en algunos bloques.</dd>
-          <dt data-es="Causa" data-en="Cause">Causa</dt><dd data-es="Reconstrucción del informe en BI Publisher y puente de conciliación contra el pendiente de cobro." data-en="Rebuilt the BI Publisher report and built a reconciliation bridge against open receivables.">Reconstrucción del informe en BI Publisher y puente de conciliación contra el pendiente de cobro.</dd>
-          <dt data-es="Resultado" data-en="Outcome">Resultado</dt><dd><span class="status" data-es="Cuadra al céntimo" data-en="Reconciles to the cent">Cuadra al céntimo</span></dd>
-        </dl>
-      </div>
-      <div class="case">
-        <span class="num">53</span>
-        <h3 data-es="Procedimiento de reclamaciones históricas perdido" data-en="Lost procedure for historical claims">Procedimiento de reclamaciones históricas perdido</h3>
-        <dl>
-          <dt data-es="Situación" data-en="Situation">Situación</dt><dd data-es="Nadie sabía ya cómo tramitar reclamaciones sobre facturas migradas." data-en="Nobody remembered how to process claims on migrated invoices.">Nadie sabía ya cómo tramitar reclamaciones sobre facturas migradas.</dd>
-          <dt data-es="Causa" data-en="Cause">Causa</dt><dd data-es="Las 53 facturas históricas cargadas en su día sirvieron de patrón para reconstruir y documentar el procedimiento." data-en="The 53 historical invoices loaded originally served as the pattern to rebuild and document the procedure.">Las 53 facturas históricas cargadas en su día sirvieron de patrón para reconstruir y documentar el procedimiento.</dd>
-          <dt data-es="Resultado" data-en="Outcome">Resultado</dt><dd><span class="status" data-es="Procedimiento recuperado" data-en="Procedure recovered">Procedimiento recuperado</span></dd>
-        </dl>
-      </div>
+  </div></div>
+  <div class="cases rv">
+    <div class="case">
+      <div class="head"><div><h3 data-es="Cobros contabilizados en una cuenta errónea" data-en="Receipts posted to the wrong account">Cobros contabilizados en una cuenta errónea</h3></div><span class="big">~3 M€</span></div>
+      <dl>
+        <dt data-es="Situación" data-en="Situation">Situación</dt><dd data-es="Cinco meses abierta sin causa identificada." data-en="Open for five months with no identified cause.">Cinco meses abierta sin causa identificada.</dd>
+        <dt data-es="Causa" data-en="Cause">Causa</dt><dd data-es="Mapping sets de subledger creados para una sola moneda; el resto caía en la cuenta por defecto." data-en="Subledger mapping sets created for a single currency; everything else fell to the default account.">Mapping sets de subledger creados para una sola moneda; el resto caía en la cuenta por defecto.</dd>
+        <dt data-es="Resultado" data-en="Outcome">Resultado</dt><dd><span class="pill go" data-es="Corregido y validado" data-en="Fixed and validated">Corregido y validado</span></dd>
+      </dl>
+    </div>
+    <div class="case">
+      <div class="head"><div><h3 data-es="Abonos que bloqueaban el cierre del mes" data-en="Credit memos blocking the month-end close">Abonos que bloqueaban el cierre del mes</h3></div><span class="big" data-es="1 tarde" data-en="1 pm">1 tarde</span></div>
+      <dl>
+        <dt data-es="Situación" data-en="Situation">Situación</dt><dd data-es="Abonos retenidos en contabilización a días del cierre." data-en="Credit memos stuck in accounting days before the close.">Abonos retenidos en contabilización a días del cierre.</dd>
+        <dt data-es="Causa" data-en="Cause">Causa</dt><dd data-es="Una regla de cuenta modificada sin actualizar su regla pareja de subcuenta." data-en="An account rule changed without updating its paired sub-account rule.">Una regla de cuenta modificada sin actualizar su regla pareja de subcuenta.</dd>
+        <dt data-es="Resultado" data-en="Outcome">Resultado</dt><dd><span class="pill go" data-es="Cierre desbloqueado" data-en="Close unblocked">Cierre desbloqueado</span></dd>
+      </dl>
+    </div>
+    <div class="case">
+      <div class="head"><div><h3 data-es="Informe de aging a futuro que no cuadraba" data-en="Forward aging report that didn't reconcile">Informe de aging a futuro que no cuadraba</h3></div><span class="big">8 <small style="font-size:14px" data-es="sem." data-en="wks">sem.</small></span></div>
+      <dl>
+        <dt data-es="Situación" data-en="Situation">Situación</dt><dd data-es="Cabecera y detalle no sumaban lo mismo; el tipo de cambio se aplicaba dos veces en algunos bloques." data-en="Header and detail didn't add up; the exchange rate was applied twice in some blocks.">Cabecera y detalle no sumaban lo mismo; el tipo de cambio se aplicaba dos veces en algunos bloques.</dd>
+        <dt data-es="Trabajo" data-en="Work">Trabajo</dt><dd data-es="Informe reconstruido en BI Publisher y puente de conciliación contra el pendiente de cobro." data-en="Report rebuilt in BI Publisher plus a reconciliation bridge against open receivables.">Informe reconstruido en BI Publisher y puente de conciliación contra el pendiente de cobro.</dd>
+        <dt data-es="Resultado" data-en="Outcome">Resultado</dt><dd><span class="pill go" data-es="Cuadra al céntimo" data-en="Reconciles to the cent">Cuadra al céntimo</span></dd>
+      </dl>
+    </div>
+    <div class="case">
+      <div class="head"><div><h3 data-es="Procedimiento de reclamaciones históricas perdido" data-en="Lost procedure for historical claims">Procedimiento de reclamaciones históricas perdido</h3></div><span class="big">53</span></div>
+      <dl>
+        <dt data-es="Situación" data-en="Situation">Situación</dt><dd data-es="Nadie sabía ya cómo tramitar reclamaciones sobre facturas migradas." data-en="Nobody remembered how to process claims on migrated invoices.">Nadie sabía ya cómo tramitar reclamaciones sobre facturas migradas.</dd>
+        <dt data-es="Trabajo" data-en="Work">Trabajo</dt><dd data-es="Las 53 facturas históricas cargadas en su día sirvieron de patrón para reconstruir y documentar el procedimiento." data-en="The 53 historical invoices loaded originally served as the pattern to rebuild and document the procedure.">Las 53 facturas históricas cargadas en su día sirvieron de patrón para reconstruir y documentar el procedimiento.</dd>
+        <dt data-es="Resultado" data-en="Outcome">Resultado</dt><dd><span class="pill go" data-es="Procedimiento recuperado" data-en="Procedure recovered">Procedimiento recuperado</span></dd>
+      </dl>
     </div>
   </div>
 </div></section>
 
-<section id="trayectoria"><div class="wrap sec">
-  <aside data-es="Trayectoria" data-en="Track record">Trayectoria</aside>
-  <div>
+<section id="trayectoria"><div class="wrap">
+  <div class="sec-head rv"><span class="label" data-es="Trayectoria" data-en="Track record">Trayectoria</span><div>
     <h2 data-es="26 años entre finanzas, distribución y sistemas" data-en="26 years across finance, distribution and systems">26 años entre finanzas, distribución y sistemas</h2>
     <p class="intro" data-es="Licenciado en Administración de Empresas (Complutense), especialista en auditoría fiscal y contable, Executive Master en Transformación Digital (ISDI). Empecé en el lado del negocio y nunca lo he dejado." data-en="Business Administration degree (Complutense), tax and accounting audit specialist, Executive Master in Digital Transformation (ISDI). I started on the business side and never left it.">Licenciado en Administración de Empresas (Complutense), especialista en auditoría fiscal y contable, Executive Master en Transformación Digital (ISDI). Empecé en el lado del negocio y nunca lo he dejado.</p>
-    <div class="tl">
-      <div class="row"><div class="yr">2024 – 2026</div><div><div class="role" data-es="Project lead Oracle Cloud · grupo hotelero internacional" data-en="Oracle Cloud project lead · international hotel group">Project lead Oracle Cloud · grupo hotelero internacional</div><div class="what" data-es="Rollouts España y México, soporte financiero, panel de cierre y suite de herramientas con IA." data-en="Spain and Mexico rollouts, finance support, close dashboard and AI-built tool suite.">Rollouts España y México, soporte financiero, panel de cierre y suite de herramientas con IA.</div></div></div>
-      <div class="row"><div class="yr">2022 – 2024</div><div><div class="role">Global Process Owner Oracle Cloud · Verisure</div><div class="what" data-es="Compras, SCM, almacenes, planificación y demanda; creación de un centro de excelencia interno." data-en="Procurement, SCM, warehousing, planning and demand; built an internal centre of excellence.">Compras, SCM, almacenes, planificación y demanda; creación de un centro de excelencia interno.</div></div></div>
-      <div class="row"><div class="yr">2022</div><div><div class="role" data-es="Lead R2R · Wood · y lead iProcurement/P2P · American Tower" data-en="R2R lead · Wood · and iProcurement/P2P lead · American Tower">Lead R2R · Wood · y lead iProcurement/P2P · American Tower</div><div class="what" data-es="Implantaciones Oracle Cloud en España e Italia; transición desde SAP." data-en="Oracle Cloud implementations in Spain and Italy; transition from SAP.">Implantaciones Oracle Cloud en España e Italia; transición desde SAP.</div></div></div>
-      <div class="row"><div class="yr">2020 – 2022</div><div><div class="role">Finance lead Oracle Cloud · Oracle Spain</div><div class="what" data-es="Fiscalidad, Order to Cash, integraciones AR/AP por API con sistemas externos." data-en="Tax, Order to Cash, API-based AR/AP integrations with external systems.">Fiscalidad, Order to Cash, integraciones AR/AP por API con sistemas externos.</div></div></div>
-      <div class="row"><div class="yr">2019 – 2020</div><div><div class="role">EBS R12 · Cree Lighting · SGS · Draxton</div><div class="what" data-es="O2C y localización italiana; finanzas EMEA/LATAM/África; SCM y fabricación." data-en="O2C and Italian localisation; EMEA/LATAM/Africa finance; SCM and manufacturing.">O2C y localización italiana; finanzas EMEA/LATAM/África; SCM y fabricación.</div></div></div>
-      <div class="row"><div class="yr">2015 – 2020</div><div><div class="role">Oracle EBS y Salesforce · Specialized Bicycle Components</div><div class="what" data-es="Rollouts de distribución en Europa y LATAM, Salesforce Sales & Service, integración POS (Lightspeed, Shopify) con EBS por Mulesoft, Hyperion." data-en="Distribution rollouts in Europe and LATAM, Salesforce Sales & Service, POS (Lightspeed, Shopify) integration with EBS via Mulesoft, Hyperion.">Rollouts de distribución en Europa y LATAM, Salesforce Sales & Service, integración POS (Lightspeed, Shopify) con EBS por Mulesoft, Hyperion.</div></div></div>
-      <div class="row"><div class="yr">2010 – 2015</div><div><div class="role" data-es="Project manager finanzas y distribución · Bunge (Italia)" data-en="Finance and distribution project manager · Bunge (Italy)">Project manager finanzas y distribución · Bunge (Italia)</div><div class="what" data-es="GL, SLA, consolidación y reporting multi-entidad." data-en="GL, SLA, consolidation and multi-entity reporting.">GL, SLA, consolidación y reporting multi-entidad.</div></div></div>
-      <div class="row"><div class="yr">2009</div><div><div class="role">SAP FI-CO · Iberia</div><div class="what" data-es="Soporte a finanzas y controlling." data-en="Finance and controlling support.">Soporte a finanzas y controlling.</div></div></div>
-    </div>
+  </div></div>
+  <div class="track rv">
+    <div class="row"><span class="yr">2024 – 2026</span><span class="role" data-es="Project lead Oracle Cloud · grupo hotelero internacional" data-en="Oracle Cloud project lead · international hotel group">Project lead Oracle Cloud · grupo hotelero internacional</span><span class="what" data-es="Rollouts España y México, soporte financiero, panel de cierre y suite de herramientas con IA." data-en="Spain and Mexico rollouts, finance support, close dashboard and AI-built tool suite.">Rollouts España y México, soporte financiero, panel de cierre y suite de herramientas con IA.</span></div>
+    <div class="row"><span class="yr">2022 – 2024</span><span class="role">Global Process Owner Oracle Cloud · Verisure</span><span class="what" data-es="Compras, SCM, almacenes, planificación y demanda; creación de un centro de excelencia interno." data-en="Procurement, SCM, warehousing, planning and demand; built an internal centre of excellence.">Compras, SCM, almacenes, planificación y demanda; creación de un centro de excelencia interno.</span></div>
+    <div class="row"><span class="yr">2022</span><span class="role" data-es="Lead R2R · Wood · y lead iProcurement/P2P · American Tower" data-en="R2R lead · Wood · and iProcurement/P2P lead · American Tower">Lead R2R · Wood · y lead iProcurement/P2P · American Tower</span><span class="what" data-es="Implantaciones Oracle Cloud en España e Italia; transición desde SAP." data-en="Oracle Cloud implementations in Spain and Italy; transition from SAP.">Implantaciones Oracle Cloud en España e Italia; transición desde SAP.</span></div>
+    <div class="row"><span class="yr">2020 – 2022</span><span class="role">Finance lead Oracle Cloud · Oracle Spain</span><span class="what" data-es="Fiscalidad, Order to Cash, integraciones AR/AP por API con sistemas externos." data-en="Tax, Order to Cash, API-based AR/AP integrations with external systems.">Fiscalidad, Order to Cash, integraciones AR/AP por API con sistemas externos.</span></div>
+    <div class="row"><span class="yr">2019 – 2020</span><span class="role">EBS R12 · Cree Lighting · SGS · Draxton</span><span class="what" data-es="O2C y localización italiana; finanzas EMEA/LATAM/África; SCM y fabricación." data-en="O2C and Italian localisation; EMEA/LATAM/Africa finance; SCM and manufacturing.">O2C y localización italiana; finanzas EMEA/LATAM/África; SCM y fabricación.</span></div>
+    <div class="row"><span class="yr">2015 – 2020</span><span class="role">Oracle EBS y Salesforce · Specialized Bicycle Components</span><span class="what" data-es="Rollouts de distribución en Europa y LATAM, Salesforce Sales & Service, integración POS (Lightspeed, Shopify) con EBS vía Mulesoft, Hyperion." data-en="Distribution rollouts in Europe and LATAM, Salesforce Sales & Service, POS (Lightspeed, Shopify) integration with EBS via Mulesoft, Hyperion.">Rollouts de distribución en Europa y LATAM, Salesforce Sales & Service, integración POS (Lightspeed, Shopify) con EBS vía Mulesoft, Hyperion.</span></div>
+    <div class="row"><span class="yr">2010 – 2015</span><span class="role" data-es="Project manager finanzas y distribución · Bunge (Italia)" data-en="Finance and distribution project manager · Bunge (Italy)">Project manager finanzas y distribución · Bunge (Italia)</span><span class="what" data-es="GL, SLA, consolidación y reporting multi-entidad." data-en="GL, SLA, consolidation and multi-entity reporting.">GL, SLA, consolidación y reporting multi-entidad.</span></div>
+    <div class="row"><span class="yr">2009</span><span class="role">SAP FI-CO · Iberia</span><span class="what" data-es="Soporte a finanzas y controlling." data-en="Finance and controlling support.">Soporte a finanzas y controlling.</span></div>
   </div>
 </div></section>
 
-<section id="stack"><div class="wrap sec">
-  <aside>Stack</aside>
-  <div>
-    <h2 data-es="Con qué trabajo" data-en="What I work with">Con qué trabajo</h2>
-    <div class="stack">
-      <div><h4>Oracle</h4><ul><li>Oracle Cloud Financials &amp; SCM</li><li>E-Business Suite R12 / 11i</li><li>AHCS · ARCS · Hyperion HFM / Planning</li><li>BI Publisher · OTBI · ESS</li><li data-es="SLA, mapping sets, reglas de cuenta" data-en="SLA, mapping sets, account rules">SLA, mapping sets, reglas de cuenta</li></ul></div>
-      <div><h4 data-es="Integración" data-en="Integration">Integración</h4><ul><li>OIC · REST · SOAP</li><li>Mulesoft · APEX</li><li>Salesforce Sales &amp; Service</li><li>POS: Lightspeed · Shopify</li><li>SII · E-Tax Manager</li></ul></div>
-      <div><h4 data-es="Construcción" data-en="Building">Construcción</h4><ul><li>Python · SQL</li><li data-es="Claude y otros LLM para desarrollo asistido" data-en="Claude and other LLMs for assisted development">Claude y otros LLM para desarrollo asistido</li><li data-es="Servidores MCP, RAG" data-en="MCP servers, RAG">Servidores MCP, RAG</li><li>Jira · Confluence</li><li>Tableau</li></ul></div>
-    </div>
+<section id="stack"><div class="wrap">
+  <div class="sec-head rv"><span class="label">Stack</span><div><h2 data-es="Con qué trabajo" data-en="What I work with">Con qué trabajo</h2></div></div>
+  <div class="stack rv">
+    <div><h4>Oracle</h4><ul><li>Oracle Cloud Financials &amp; SCM</li><li>E-Business Suite R12 / 11i</li><li>AHCS · ARCS · Hyperion HFM / Planning</li><li>BI Publisher · OTBI · ESS</li><li data-es="SLA, mapping sets, reglas de cuenta" data-en="SLA, mapping sets, account rules">SLA, mapping sets, reglas de cuenta</li></ul></div>
+    <div><h4 data-es="Integración" data-en="Integration">Integración</h4><ul><li>OIC · REST · SOAP</li><li>Mulesoft · APEX</li><li>Salesforce Sales &amp; Service</li><li>POS: Lightspeed · Shopify</li><li>SII · E-Tax Manager</li></ul></div>
+    <div><h4 data-es="Construcción" data-en="Building">Construcción</h4><ul><li>Python · SQL</li><li data-es="Claude y otros LLM para desarrollo asistido" data-en="Claude and other LLMs for assisted development">Claude y otros LLM para desarrollo asistido</li><li data-es="Servidores MCP · RAG" data-en="MCP servers · RAG">Servidores MCP · RAG</li><li>Jira · Confluence</li><li>Tableau</li></ul></div>
+    <div><h4 data-es="Idiomas" data-en="Languages">Idiomas</h4><ul><li data-es="Español · nativo" data-en="Spanish · native">Español · nativo</li><li data-es="Inglés · fluido" data-en="English · fluent">Inglés · fluido</li><li data-es="Italiano · fluido" data-en="Italian · fluent">Italiano · fluido</li></ul></div>
   </div>
 </div></section>
 
-<section id="contacto"><div class="wrap sec">
-  <aside data-es="Contacto" data-en="Contact">Contacto</aside>
-  <div class="contact">
-    <div>
-      <p class="big" data-es="Cuéntame el punto de dolor. En una llamada te digo si lo he visto antes y cómo lo atacaría." data-en="Tell me the pain point. In one call I'll tell you whether I've seen it before and how I'd attack it.">Cuéntame el punto de dolor. En una llamada te digo si lo he visto antes y cómo lo atacaría.</p>
-      <p style="color:var(--ink-2);margin:0" data-es="Disponible para proyectos, contratos freelance y posiciones senior en España, Italia, Europa en remoto y LATAM. Facturación a través de Adilco Tech Center SL." data-en="Available for projects, freelance contracts and senior roles in Spain, Italy, remote Europe and LATAM. Invoicing through Adilco Tech Center SL.">Disponible para proyectos, contratos freelance y posiciones senior en España, Italia, Europa en remoto y LATAM. Facturación a través de Adilco Tech Center SL.</p>
-    </div>
-    <dl>
-      <dt>Email</dt><dd><a href="mailto:jrubio.es@gmail.com">jrubio.es@gmail.com</a></dd>
-      <dt data-es="Teléfono" data-en="Phone">Teléfono</dt><dd><a href="tel:+34682822133">+34 682 822 133</a></dd>
-      <dt>LinkedIn</dt><dd><a href="https://www.linkedin.com/in/jrubioes" target="_blank" rel="noopener">linkedin.com/in/jrubioes</a></dd>
-      <dt data-es="Ubicación" data-en="Location">Ubicación</dt><dd>Madrid · <span data-es="remoto" data-en="remote">remoto</span></dd>
-      <dt data-es="Idiomas" data-en="Languages">Idiomas</dt><dd data-es="Español (nativo) · Inglés · Italiano" data-en="Spanish (native) · English · Italian">Español (nativo) · Inglés · Italiano</dd>
-    </dl>
+<section id="contacto" class="contact"><div class="wrap">
+  <div class="rv">
+    <span class="label" data-es="Contacto" data-en="Contact">Contacto</span>
+    <p class="big" style="margin-top:14px" data-es="Cuéntame el punto de dolor. En una llamada te digo si lo he visto antes y cómo lo atacaría." data-en="Tell me the pain point. In one call I'll tell you whether I've seen it before and how I'd attack it.">Cuéntame el punto de dolor. En una llamada te digo si lo he visto antes y cómo lo atacaría.</p>
+    <p data-es="Disponible para proyectos, contratos freelance y posiciones senior en España, Italia, Europa en remoto y LATAM. Facturación a través de Adilco Tech Center SL." data-en="Available for projects, freelance contracts and senior roles in Spain, Italy, remote Europe and LATAM. Invoicing through Adilco Tech Center SL.">Disponible para proyectos, contratos freelance y posiciones senior en España, Italia, Europa en remoto y LATAM. Facturación a través de Adilco Tech Center SL.</p>
+    <a class="btn primary" href="mailto:jrubio.es@gmail.com?subject=Punto%20de%20dolor%20ERP"><span data-es="Escribirme" data-en="Email me">Escribirme</span></a>
   </div>
+  <dl class="rv">
+    <dt>Email</dt><dd><a href="mailto:jrubio.es@gmail.com">jrubio.es@gmail.com</a></dd>
+    <dt data-es="Teléfono" data-en="Phone">Teléfono</dt><dd><a href="tel:+34682822133">+34 682 822 133</a></dd>
+    <dt>LinkedIn</dt><dd><a href="https://www.linkedin.com/in/jrubioes" target="_blank" rel="noopener">linkedin.com/in/jrubioes</a></dd>
+    <dt data-es="Ubicación" data-en="Location">Ubicación</dt><dd>Madrid · <span data-es="remoto" data-en="remote">remoto</span></dd>
+  </dl>
 </div></section>
 </main>
-<footer><div class="wrap">Javier Rubio · Adilco Tech Center SL · Madrid · <span data-es="Casos anonimizados; ninguna cifra identifica a un cliente." data-en="Cases anonymised; no figure identifies a client.">Casos anonimizados; ninguna cifra identifica a un cliente.</span></div></footer>
+<footer><div class="wrap"><span>Javier Rubio · Adilco Tech Center SL · Madrid</span><span data-es="Casos anonimizados; ninguna cifra identifica a un cliente. La demo de la portada usa datos ficticios." data-en="Cases anonymised; no figure identifies a client. The demo at the top uses fictional data.">Casos anonimizados; ninguna cifra identifica a un cliente. La demo de la portada usa datos ficticios.</span></div></footer>
 
 <script>
 (function(){
+  /* i18n */
   var els=document.querySelectorAll('[data-es]');
   function setLang(l){
     els.forEach(function(e){e.textContent=e.getAttribute('data-'+l);});
     document.documentElement.lang=l;
     document.querySelectorAll('[data-setlang]').forEach(function(b){b.setAttribute('aria-pressed',String(b.getAttribute('data-setlang')===l));});
     try{localStorage.setItem('lang',l);}catch(e){}
+    window.__lang=l;
   }
   document.querySelectorAll('[data-setlang]').forEach(function(b){b.addEventListener('click',function(){setLang(b.getAttribute('data-setlang'));});});
   var saved=null; try{saved=localStorage.getItem('lang');}catch(e){}
   setLang(saved==='en'?'en':'es');
+
+  /* reveal */
+  if('IntersectionObserver' in window){
+    var io=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target);}});},{rootMargin:'0px 0px -8% 0px'});
+    document.querySelectorAll('.rv').forEach(function(e){io.observe(e);});
+  }else{document.querySelectorAll('.rv').forEach(function(e){e.classList.add('in');});}
+
+  /* close-dashboard demo */
+  var rows=[].slice.call(document.querySelectorAll('#console tbody tr'));
+  var log=document.getElementById('log'), verdict=document.getElementById('verdict');
+  var reduce=window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var T={es:{go:'GO',warn:'WARN',nogo:'NO-GO',q:'Consultando ',pend:' transacciones sin contabilizar',ex:' excepciones de contabilización',ok:'Subledgers cerrados a GL. Periodo listo para cerrar.',hold:'Cierre retenido: resolver excepciones y relanzar.',run:'Ejecutando Create Accounting en ',rerun:'Reintentando'},
+         en:{go:'GO',warn:'WARN',nogo:'NO-GO',q:'Querying ',pend:' unposted transactions',ex:' accounting exceptions',ok:'Subledgers closed to GL. Period ready to close.',hold:'Close held: fix exceptions and rerun.',run:'Running Create Accounting on ',rerun:'Retrying'}};
+  var scenarios=[
+    [['AP',0,0,'go'],['AR',12,0,'warn'],['FA',0,0,'go'],['CM',0,0,'go'],['GL',3,1,'nogo']],
+    [['AP',0,0,'go'],['AR',0,0,'go'],['FA',0,0,'go'],['CM',0,0,'go'],['GL',0,0,'go']],
+    [['AP',41,2,'nogo'],['AR',0,0,'go'],['FA',7,0,'warn'],['CM',0,0,'go'],['GL',0,0,'go']]
+  ];
+  function sleep(ms){return new Promise(function(r){setTimeout(r,reduce?0:ms);});}
+  function count(td,to,ms){return new Promise(function(res){if(reduce||to===0){td.textContent=to;return res();}var t0=performance.now();(function f(n){var p=Math.min(1,(n-t0)/ms);td.textContent=Math.round(to*(1-Math.pow(1-p,3)));if(p<1)requestAnimationFrame(f);else res();})(t0);});}
+  function setLog(s){var L=T[window.__lang||'es'];log.innerHTML='';log.appendChild(document.createTextNode(s));var c=document.createElement('span');c.className='cur';log.appendChild(c);}
+  async function run(sc){
+    var L=T[window.__lang||'es'];
+    rows.forEach(function(r){r.children[1].textContent='—';r.children[2].textContent='—';r.children[3].innerHTML='<span class="pill wait">…</span>';});
+    verdict.textContent='—';verdict.className='verdict';
+    var worst='go';
+    for(var i=0;i<sc.length;i++){
+      var m=sc[i], r=rows[i];
+      setLog(L.q+m[0]+' · '+m[1]+L.pend);
+      await count(r.children[1],m[1],650); await count(r.children[2],m[2],300);
+      r.children[3].innerHTML='<span class="pill '+m[3]+'">'+L[m[3]]+'</span>';
+      if(m[3]==='nogo')worst='nogo';else if(m[3]==='warn'&&worst!=='nogo')worst='warn';
+      await sleep(420);
+    }
+    verdict.textContent=L[worst];verdict.className='verdict '+worst;
+    setLog(worst==='nogo'?L.hold:(worst==='go'?L.ok:L.run+'AR…'));
+    await sleep(3800);
+  }
+  (async function loop(){var i=0;for(;;){await run(scenarios[i%scenarios.length]);i++;}})();
 })();
 </script>
+</body>
+</html>
