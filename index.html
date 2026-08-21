@@ -11,7 +11,7 @@
 <style>
 :root{
   --bg:#0B0F14; --bg-2:#10161D; --bg-3:#161E27; --line:#222C37; --line-2:#2D3946;
-  --fg:#E8EDF2; --fg-2:#AAB6C3; --fg-3:#6E7C8B;
+  --fg:#E8EDF2; --fg-2:#AAB6C3; --fg-3:#8391A0;
   --go:#3FD39B; --warn:#F0B34A; --nogo:#F2675C; --acc:#3FD39B; --acc-ink:#06110C;
   --sans:"Archivo","Helvetica Neue",Arial,sans-serif; --mono:"JetBrains Mono",Menlo,Consolas,monospace;
 }
@@ -22,7 +22,8 @@ html,body{overflow-x:hidden;max-width:100%}
 body{margin:0;background:var(--bg);color:var(--fg);font-family:var(--sans);font-size:17px;line-height:1.55;-webkit-font-smoothing:antialiased;
   background-image:linear-gradient(var(--line) 1px,transparent 1px),linear-gradient(90deg,var(--line) 1px,transparent 1px);background-size:72px 72px;background-position:center top}
 body::before{content:"";position:fixed;inset:0;pointer-events:none;background:radial-gradient(1200px 600px at 70% -10%,rgba(63,211,155,.10),transparent 60%),radial-gradient(900px 500px at 0% 100%,rgba(240,179,74,.06),transparent 60%)}
-a{color:var(--acc);text-decoration:none}
+a{color:var(--acc);text-decoration:none;transition:color .2s ease,border-color .2s ease,background-color .2s ease}
+button,a,[role="button"]{cursor:pointer}
 a:hover{text-decoration:underline;text-underline-offset:3px}
 a:focus-visible,button:focus-visible{outline:2px solid var(--acc);outline-offset:3px}
 .wrap{max-width:1200px;margin:0 auto;padding:0 32px;position:relative}
@@ -53,7 +54,9 @@ h1 em{font-style:normal;color:var(--fg-3)}
 .lede{font-size:clamp(17px,1.6vw,20px);color:var(--fg-2);max-width:34em;margin:0 0 34px;line-height:1.5}
 .cta{display:flex;gap:12px;flex-wrap:wrap;align-items:center}
 .btn{display:inline-flex;align-items:center;gap:10px;padding:13px 20px;border-radius:4px;font-weight:600;font-size:15px;border:1px solid var(--line-2);color:var(--fg);background:var(--bg-2)}
-.btn:hover{text-decoration:none;border-color:var(--fg-3)}
+.btn{transition:border-color .2s ease,background-color .2s ease,filter .2s ease,transform .15s ease}
+.btn:hover{text-decoration:none;border-color:var(--fg-2)}
+.btn:active{transform:translateY(1px)}
 .btn.primary{background:var(--acc);border-color:var(--acc);color:var(--acc-ink)}
 .btn.primary:hover{filter:brightness(1.08)}
 .btn svg{width:16px;height:16px}
@@ -115,7 +118,7 @@ h2{font-weight:700;font-stretch:90%;font-size:clamp(30px,3.6vw,46px);line-height
 
 /* services */
 .svcs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:1px;background:var(--line);border:1px solid var(--line)}
-.svc{background:var(--bg);padding:30px 28px 32px;display:flex;flex-direction:column;gap:14px;position:relative;transition:background .2s}
+.svc{background:var(--bg);padding:30px 28px 32px;display:flex;flex-direction:column;gap:14px;position:relative;transition:background .25s ease}
 .svc:hover{background:var(--bg-2)}
 .svc .num{font-family:var(--mono);font-size:12px;color:var(--fg-3)}
 .svc .pain{font-family:var(--mono);font-size:12px;color:var(--warn);line-height:1.45}
@@ -128,7 +131,7 @@ h2{font-weight:700;font-stretch:90%;font-size:clamp(30px,3.6vw,46px);line-height
 
 /* tools */
 .tools{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
-.tool{background:var(--bg-2);border:1px solid var(--line);border-radius:6px;padding:22px;display:flex;flex-direction:column;gap:12px;transition:border-color .2s,transform .2s}
+.tool{background:var(--bg-2);border:1px solid var(--line);border-radius:6px;padding:22px;display:flex;flex-direction:column;gap:12px;transition:border-color .25s ease,transform .25s ease}
 .tool:hover{border-color:var(--line-2);transform:translateY(-2px)}
 .tool.base{grid-column:1/-1;display:grid;grid-template-columns:1fr 1fr;gap:28px;align-items:center;background:linear-gradient(90deg,var(--bg-2),var(--bg-3))}
 .tool .ico{width:40px;height:40px;border:1px solid var(--line-2);border-radius:6px;display:grid;place-items:center;color:var(--acc)}
@@ -188,6 +191,22 @@ footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
 /* reveal */
 .rv{opacity:0;transform:translateY(14px);transition:opacity .6s ease,transform .6s ease}
 .rv.in{opacity:1;transform:none}
+.rv.stagger>*{opacity:0;transform:translateY(12px);transition:opacity .4s ease,transform .4s ease}
+.rv.stagger.in>*{opacity:1;transform:none}
+.rv.stagger.in>*:nth-child(1){transition-delay:.00s}.rv.stagger.in>*:nth-child(2){transition-delay:.06s}.rv.stagger.in>*:nth-child(3){transition-delay:.12s}.rv.stagger.in>*:nth-child(4){transition-delay:.18s}.rv.stagger.in>*:nth-child(5){transition-delay:.24s}.rv.stagger.in>*:nth-child(6){transition-delay:.30s}.rv.stagger.in>*:nth-child(7){transition-delay:.36s}.rv.stagger.in>*:nth-child(8){transition-delay:.42s}
+/* headline entrance */
+h1 .w{display:inline-block;opacity:0;transform:translateY(.35em);animation:wordin .55s cubic-bezier(.2,.7,.2,1) forwards}
+@keyframes wordin{to{opacity:1;transform:none}}
+.lede,.cta,.facts,.kicker{animation:fadeup .6s ease both}
+.kicker{animation-delay:.05s}.lede{animation-delay:.55s}.cta{animation-delay:.7s}.facts{animation-delay:.85s}
+.console{animation:fadeup .7s ease .35s both}
+@keyframes fadeup{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){h1 .w,.lede,.cta,.facts,.kicker,.console{animation:none;opacity:1;transform:none}.rv,.rv.stagger>*{opacity:1;transform:none}}
+/* demo controls */
+.console .bar .ctl{display:flex;align-items:center;gap:10px}
+.console .bar button{all:unset;cursor:pointer;display:inline-flex;align-items:center;gap:6px;font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--fg-2);padding:4px 8px;border:1px solid var(--line-2);border-radius:3px;transition:border-color .2s ease,color .2s ease}
+.console .bar button:hover{color:var(--fg);border-color:var(--fg-3)}
+.console .bar button svg{width:11px;height:11px}
 @media (max-width:600px){section{padding:60px 0}}
 .hero .wrap>*,.tools>*,.cases>*,.svcs>*,.stack>*,.contact .wrap>*,.sec-head>*{min-width:0}
 .console{min-width:0;max-width:100%}
@@ -231,7 +250,7 @@ footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
   </div>
 
   <div class="console" id="console" aria-label="Demo: dashboard de cierre">
-    <div class="bar"><span class="t" data-es="Dashboard de cierre · libro ES01 · periodo JUL-26" data-en="Close dashboard · ledger ES01 · period JUL-26">Dashboard de cierre · libro ES01 · periodo JUL-26</span><span class="dots"><i></i><i></i><i></i></span></div>
+    <div class="bar"><span class="t" data-es="Dashboard de cierre · libro ES01 · periodo JUL-26" data-en="Close dashboard · ledger ES01 · period JUL-26">Dashboard de cierre · libro ES01 · periodo JUL-26</span><span class="ctl"><button type="button" id="demoToggle" aria-pressed="false" aria-label="Pausar demo"><svg viewBox="0 0 12 12" fill="currentColor" aria-hidden="true"><rect x="2" y="2" width="3" height="8"/><rect x="7" y="2" width="3" height="8"/></svg><span data-es="Pausar" data-en="Pause">Pausar</span></button></span></div>
     <div class="tbl"><table>
       <thead><tr><th data-es="Módulo" data-en="Module">Módulo</th><th class="n" data-es="Sin contabilizar" data-en="Unposted">Sin contabilizar</th><th class="n" data-es="Excepciones" data-en="Exceptions">Excepciones</th><th data-es="Veredicto" data-en="Verdict">Veredicto</th></tr></thead>
       <tbody>
@@ -252,7 +271,7 @@ footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
     <h2 data-es="Tres formas de trabajar juntos" data-en="Three ways to work together">Tres formas de trabajar juntos</h2>
     <p class="intro" data-es="Cada encargo arranca por un dolor concreto y termina en algo que tu equipo puede usar sin mí." data-en="Every engagement starts from a concrete pain and ends with something your team can run without me.">Cada encargo arranca por un dolor concreto y termina en algo que tu equipo puede usar sin mí.</p>
   </div></div>
-  <div class="svcs rv">
+  <div class="svcs rv stagger">
     <div class="svc">
       <span class="num">01</span>
       <span class="pain" data-es="Dolor · el proceso no cuadra con la configuración" data-en="Pain · process and configuration don't match">Dolor · el proceso no cuadra con la configuración</span>
@@ -294,7 +313,7 @@ footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
     <h2 data-es="Una base, seis productos encima" data-en="One foundation, six products on top">Una base, seis productos encima</h2>
     <p class="intro" data-es="Todas hablan con Oracle Fusion a través de la misma librería. Eso convierte herramientas sueltas en una arquitectura." data-en="They all talk to Oracle Fusion through the same library. That turns loose tools into an architecture.">Todas hablan con Oracle Fusion a través de la misma librería. Eso convierte herramientas sueltas en una arquitectura.</p>
   </div></div>
-  <div class="tools rv">
+  <div class="tools rv stagger">
     <div class="tool base">
       <div>
         <span class="prob" data-es="Cimiento" data-en="Foundation">Cimiento</span>
@@ -358,7 +377,7 @@ footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
     <h2 data-es="Cuatro problemas reales, resueltos" data-en="Four real problems, solved">Cuatro problemas reales, resueltos</h2>
     <p class="intro" data-es="Grupo hotelero internacional en Oracle Cloud, 2024–2026. Anonimizados; las cifras son las del sistema." data-en="International hotel group on Oracle Cloud, 2024–2026. Anonymised; the figures are the system's own.">Grupo hotelero internacional en Oracle Cloud, 2024–2026. Anonimizados; las cifras son las del sistema.</p>
   </div></div>
-  <div class="cases rv">
+  <div class="cases rv stagger">
     <div class="case">
       <div class="head"><div><h3 data-es="Cobros contabilizados en una cuenta errónea" data-en="Receipts posted to the wrong account">Cobros contabilizados en una cuenta errónea</h3></div><span class="big">~3 M€</span></div>
       <dl>
@@ -413,7 +432,7 @@ footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
 
 <section id="stack"><div class="wrap">
   <div class="sec-head rv"><span class="label">Stack</span><div><h2 data-es="Con qué trabajo" data-en="What I work with">Con qué trabajo</h2></div></div>
-  <div class="stack rv">
+  <div class="stack rv stagger">
     <div><h4>Oracle</h4><ul><li>Oracle Cloud Financials &amp; SCM</li><li>E-Business Suite R12 / 11i</li><li>AHCS · ARCS · Hyperion HFM / Planning</li><li>BI Publisher · OTBI · ESS</li><li data-es="SLA, mapping sets, reglas de cuenta" data-en="SLA, mapping sets, account rules">SLA, mapping sets, reglas de cuenta</li></ul></div>
     <div><h4 data-es="Integración" data-en="Integration">Integración</h4><ul><li>OIC · REST · SOAP</li><li>Mulesoft · APEX</li><li>Salesforce Sales &amp; Service</li><li>POS: Lightspeed · Shopify</li><li>SII · E-Tax Manager</li></ul></div>
     <div><h4 data-es="Construcción" data-en="Building">Construcción</h4><ul><li>Python · SQL</li><li data-es="Claude y otros LLM para desarrollo asistido" data-en="Claude and other LLMs for assisted development">Claude y otros LLM para desarrollo asistido</li><li data-es="Servidores MCP · RAG" data-en="MCP servers · RAG">Servidores MCP · RAG</li><li>Jira · Confluence</li><li>Tableau</li></ul></div>
@@ -453,6 +472,11 @@ footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
   var saved=null; try{saved=localStorage.getItem('lang');}catch(e){}
   setLang(saved==='en'?'en':'es');
 
+  /* headline words */
+  (function(){var h=document.querySelector('h1');if(!h)return;var i=0;
+    function wrap(node){if(node.nodeType===3){var f=document.createDocumentFragment();node.textContent.split(/(\s+)/).forEach(function(t){if(!t)return;if(/^\s+$/.test(t)){f.appendChild(document.createTextNode(t));return;}var sp=document.createElement('span');sp.className='w';sp.textContent=t;sp.style.animationDelay=(0.08+i*0.045)+'s';i++;f.appendChild(sp);});node.parentNode.replaceChild(f,node);}else if(node.nodeType===1){[].slice.call(node.childNodes).forEach(wrap);}}
+    [].slice.call(h.childNodes).forEach(wrap);
+    h.__split=true;})();
   /* reveal */
   if('IntersectionObserver' in window){
     var io=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target);}});},{rootMargin:'0px 0px -8% 0px'});
@@ -463,6 +487,13 @@ footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
   var rows=[].slice.call(document.querySelectorAll('#console tbody tr'));
   var log=document.getElementById('log'), verdict=document.getElementById('verdict');
   var reduce=window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var paused=reduce, visible=true, toggle=document.getElementById('demoToggle');
+  function setPaused(p){paused=p;toggle.setAttribute('aria-pressed',String(p));var lab=toggle.querySelector('span');lab.setAttribute('data-es',p?'Reanudar':'Pausar');lab.setAttribute('data-en',p?'Resume':'Pause');lab.textContent=lab.getAttribute('data-'+(window.__lang||'es'));toggle.setAttribute('aria-label',p?'Reanudar demo':'Pausar demo');}
+  toggle.addEventListener('click',function(){setPaused(!paused);});
+  if('IntersectionObserver' in window){new IntersectionObserver(function(es){visible=es[0].isIntersecting;},{threshold:.15}).observe(document.getElementById('console'));}
+  document.addEventListener('visibilitychange',function(){visible=visible&&!document.hidden||!document.hidden&&visible;});
+  function gate(){return new Promise(function(r){(function t(){if(!paused&&visible&&!document.hidden)return r();setTimeout(t,250);})();});}
+  if(reduce)setPaused(true);
   var T={es:{go:'GO',warn:'WARN',nogo:'NO-GO',q:'Consultando ',pend:' transacciones sin contabilizar',ex:' excepciones de contabilización',ok:'Subledgers cerrados a GL. Periodo listo para cerrar.',hold:'Cierre retenido: resolver excepciones y relanzar.',run:'Ejecutando Create Accounting en ',rerun:'Reintentando'},
          en:{go:'GO',warn:'WARN',nogo:'NO-GO',q:'Querying ',pend:' unposted transactions',ex:' accounting exceptions',ok:'Subledgers closed to GL. Period ready to close.',hold:'Close held: fix exceptions and rerun.',run:'Running Create Accounting on ',rerun:'Retrying'}};
   var scenarios=[
@@ -470,7 +501,7 @@ footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
     [['AP',0,0,'go'],['AR',0,0,'go'],['FA',0,0,'go'],['CM',0,0,'go'],['GL',0,0,'go']],
     [['AP',41,2,'nogo'],['AR',0,0,'go'],['FA',7,0,'warn'],['CM',0,0,'go'],['GL',0,0,'go']]
   ];
-  function sleep(ms){return new Promise(function(r){setTimeout(r,reduce?0:ms);});}
+  function sleep(ms){return gate().then(function(){return new Promise(function(r){setTimeout(r,reduce?0:ms);});});}
   function count(td,to,ms){return new Promise(function(res){if(reduce||to===0){td.textContent=to;return res();}var t0=performance.now();(function f(n){var p=Math.min(1,(n-t0)/ms);td.textContent=Math.round(to*(1-Math.pow(1-p,3)));if(p<1)requestAnimationFrame(f);else res();})(t0);});}
   function setLog(s){var L=T[window.__lang||'es'];log.innerHTML='';log.appendChild(document.createTextNode(s));var c=document.createElement('span');c.className='cur';log.appendChild(c);}
   async function run(sc){
@@ -480,6 +511,7 @@ footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
     var worst='go';
     for(var i=0;i<sc.length;i++){
       var m=sc[i], r=rows[i];
+      await gate();
       setLog(L.q+m[0]+' · '+m[1]+L.pend);
       await count(r.children[1],m[1],650); await count(r.children[2],m[2],300);
       r.children[3].innerHTML='<span class="pill '+m[3]+'">'+L[m[3]]+'</span>';
@@ -490,7 +522,9 @@ footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
     setLog(worst==='nogo'?L.hold:(worst==='go'?L.ok:L.run+'AR…'));
     await sleep(3800);
   }
-  (async function loop(){var i=0;for(;;){await run(scenarios[i%scenarios.length]);i++;}})();
+  function renderStatic(sc){var L=T[window.__lang||'es'];var worst='go';sc.forEach(function(m,i){var r=rows[i];r.children[1].textContent=m[1];r.children[2].textContent=m[2];r.children[3].innerHTML='<span class="pill '+m[3]+'">'+L[m[3]]+'</span>';if(m[3]==='nogo')worst='nogo';else if(m[3]==='warn'&&worst!=='nogo')worst='warn';});verdict.textContent=L[worst];verdict.className='verdict '+worst;setLog(worst==='nogo'?L.hold:L.ok);}
+  if(reduce){renderStatic(scenarios[0]);}
+  (async function loop(){var i=0;for(;;){await gate();await run(scenarios[i%scenarios.length]);i++;}})();
 })();
 </script>
 </body>
