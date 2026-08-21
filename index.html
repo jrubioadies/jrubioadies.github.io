@@ -1,0 +1,371 @@
+<title>Javier Rubio · Oracle ERP</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600&family=Source+Sans+3:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+:root{
+  --paper:#F3F5F7; --paper-2:#E9EDF1; --ink:#14233A; --ink-2:#3C4A5E; --ink-3:#6B7889;
+  --rule:#CBD3DC; --accent:#1F6F5B; --accent-ink:#FFFFFF; --accent-soft:#DCEDE6;
+  --amber:#B8741F; --amber-soft:#F4E6CF; --card:#FFFFFF;
+  --serif:"Newsreader",Georgia,"Times New Roman",serif;
+  --sans:"Source Sans 3","Helvetica Neue",Arial,sans-serif;
+  --mono:"IBM Plex Mono",Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --paper:#0F1722; --paper-2:#16202D; --ink:#E6EBF0; --ink-2:#B5C0CD; --ink-3:#7F8C9C;
+    --rule:#2A3646; --accent:#4FB597; --accent-ink:#0F1722; --accent-soft:#173228;
+    --amber:#E0A04F; --amber-soft:#3A2A12; --card:#151F2B;
+  }
+}
+:root[data-theme="dark"]{
+  --paper:#0F1722; --paper-2:#16202D; --ink:#E6EBF0; --ink-2:#B5C0CD; --ink-3:#7F8C9C;
+  --rule:#2A3646; --accent:#4FB597; --accent-ink:#0F1722; --accent-soft:#173228;
+  --amber:#E0A04F; --amber-soft:#3A2A12; --card:#151F2B;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+@media (prefers-reduced-motion: reduce){html{scroll-behavior:auto}}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);font-size:17px;line-height:1.55;-webkit-font-smoothing:antialiased}
+a{color:var(--accent);text-decoration-thickness:1px;text-underline-offset:3px}
+a:focus-visible,button:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
+[lang-hide]{display:none!important}
+.wrap{max-width:1120px;margin:0 auto;padding:0 28px}
+
+/* top bar */
+.top{position:sticky;top:0;z-index:5;background:color-mix(in srgb,var(--paper) 88%,transparent);backdrop-filter:blur(8px);border-bottom:1px solid var(--rule)}
+.top .wrap{display:flex;align-items:center;justify-content:space-between;height:56px;gap:16px}
+.brand{font-family:var(--mono);font-size:13px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-2);text-decoration:none}
+.nav{display:flex;gap:22px;font-size:15px}
+.nav a{color:var(--ink-2);text-decoration:none}
+.nav a:hover{color:var(--accent)}
+.lang{display:inline-flex;border:1px solid var(--rule);border-radius:3px;overflow:hidden;font-family:var(--mono);font-size:12px}
+.lang button{all:unset;cursor:pointer;padding:5px 10px;color:var(--ink-3)}
+.lang button[aria-pressed="true"]{background:var(--ink);color:var(--paper)}
+@media (max-width:760px){.nav{display:none}}
+
+/* hero */
+.hero{padding:84px 0 64px;border-bottom:1px solid var(--rule)}
+.eyebrow{font-family:var(--mono);font-size:12.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--accent);margin:0 0 18px}
+h1{font-family:var(--serif);font-weight:500;font-size:clamp(38px,6vw,68px);line-height:1.02;letter-spacing:-.015em;margin:0 0 22px;text-wrap:balance;max-width:18ch}
+.lede{font-size:clamp(19px,2.2vw,23px);line-height:1.4;color:var(--ink-2);max-width:34em;margin:0 0 34px}
+.cta{display:flex;gap:12px;flex-wrap:wrap}
+.btn{display:inline-block;padding:11px 18px;border-radius:3px;font-weight:600;font-size:15.5px;text-decoration:none;border:1px solid var(--ink);color:var(--ink)}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.ledger{display:grid;grid-template-columns:repeat(4,1fr);gap:0;margin-top:56px;border-top:1px solid var(--rule)}
+.ledger div{padding:18px 18px 18px 0;border-right:1px solid var(--rule)}
+.ledger div:last-child{border-right:0}
+.ledger div+div{padding-left:18px}
+.ledger b{display:block;font-family:var(--serif);font-weight:500;font-size:40px;line-height:1;font-variant-numeric:tabular-nums}
+.ledger span{font-family:var(--mono);font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-3)}
+@media (max-width:760px){.ledger{grid-template-columns:1fr 1fr}.ledger div:nth-child(2){border-right:0}.ledger div:nth-child(3){padding-left:0;border-top:1px solid var(--rule)}.ledger div:nth-child(4){border-top:1px solid var(--rule)}}
+
+/* sections: margin label + content */
+section{padding:64px 0;border-bottom:1px solid var(--rule)}
+.sec{display:grid;grid-template-columns:180px 1fr;gap:40px}
+.sec>aside{font-family:var(--mono);font-size:12.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3);padding-top:8px;position:sticky;top:80px;align-self:start}
+h2{font-family:var(--serif);font-weight:500;font-size:clamp(28px,3.4vw,38px);line-height:1.12;margin:0 0 14px;letter-spacing:-.01em;text-wrap:balance}
+.intro{color:var(--ink-2);font-size:18px;max-width:38em;margin:0 0 34px}
+@media (max-width:860px){.sec{grid-template-columns:1fr;gap:14px}.sec>aside{position:static}}
+
+/* services */
+.services{display:grid;gap:0;border-top:1px solid var(--rule)}
+.svc{display:grid;grid-template-columns:1fr 1.6fr;gap:28px;padding:28px 0;border-bottom:1px solid var(--rule)}
+.svc h3{font-family:var(--serif);font-weight:500;font-size:25px;margin:0 0 8px;line-height:1.2}
+.svc .pain{font-family:var(--mono);font-size:12.5px;color:var(--amber);letter-spacing:.04em}
+.svc p{margin:0 0 10px;color:var(--ink-2)}
+.svc ul{margin:8px 0 0;padding-left:18px;color:var(--ink-2)}
+.svc li{margin:3px 0}
+@media (max-width:760px){.svc{grid-template-columns:1fr;gap:8px}}
+
+/* products */
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px}
+.card{background:var(--card);border:1px solid var(--rule);border-radius:4px;padding:22px;display:flex;flex-direction:column;gap:10px}
+.card.base{grid-column:1/-1;background:var(--accent-soft);border-color:transparent}
+.card h3{font-family:var(--mono);font-weight:500;font-size:15px;margin:0;letter-spacing:.02em}
+.card .tag{font-family:var(--mono);font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3)}
+.card p{margin:0;color:var(--ink-2);font-size:16px}
+.card .for{margin-top:auto;padding-top:8px;border-top:1px dashed var(--rule);font-size:14.5px;color:var(--ink-3)}
+.card .for b{color:var(--ink-2);font-weight:600}
+
+/* cases */
+.cases{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.case{border:1px solid var(--rule);border-radius:4px;padding:22px;background:var(--card)}
+.case h3{font-family:var(--serif);font-weight:500;font-size:23px;margin:0 0 14px;line-height:1.2}
+.case dl{margin:0;display:grid;grid-template-columns:max-content 1fr;gap:6px 14px;font-size:15.5px}
+.case dt{font-family:var(--mono);font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3);padding-top:3px}
+.case dd{margin:0;color:var(--ink-2)}
+.case .num{font-family:var(--serif);font-size:30px;color:var(--accent);font-variant-numeric:tabular-nums;line-height:1;display:block;margin-bottom:10px}
+.status{display:inline-block;font-family:var(--mono);font-size:11.5px;padding:2px 8px;border-radius:2px;background:var(--accent-soft);color:var(--accent)}
+.status.wip{background:var(--amber-soft);color:var(--amber)}
+@media (max-width:760px){.cases{grid-template-columns:1fr}}
+
+/* timeline */
+.tl{border-top:1px solid var(--rule)}
+.tl .row{display:grid;grid-template-columns:130px 1fr;gap:20px;padding:14px 0;border-bottom:1px solid var(--rule);font-size:16px}
+.tl .yr{font-family:var(--mono);font-size:13px;color:var(--ink-3);padding-top:3px;font-variant-numeric:tabular-nums}
+.tl .role{font-weight:600}
+.tl .who{color:var(--ink-2)}
+.tl .what{color:var(--ink-3);font-size:15px}
+
+/* stack */
+.stack{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:22px 36px}
+.stack h4{font-family:var(--mono);font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3);margin:0 0 8px;font-weight:500}
+.stack ul{margin:0;padding:0;list-style:none;color:var(--ink-2);font-size:16px}
+.stack li{padding:3px 0;border-bottom:1px dotted var(--rule)}
+
+/* contact */
+.contact{display:grid;grid-template-columns:1fr 1fr;gap:32px}
+.contact .big{font-family:var(--serif);font-size:clamp(24px,3vw,34px);font-weight:500;line-height:1.2;margin:0 0 18px;text-wrap:balance}
+.contact dl{margin:0;font-size:17px}
+.contact dt{font-family:var(--mono);font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3);margin-top:12px}
+.contact dd{margin:2px 0 0}
+@media (max-width:760px){.contact{grid-template-columns:1fr}}
+footer{padding:28px 0 48px;font-family:var(--mono);font-size:12.5px;color:var(--ink-3)}
+</style>
+
+<header class="top"><div class="wrap">
+  <a class="brand" href="#">Javier Rubio · Adilco Tech Center</a>
+  <nav class="nav">
+    <a href="#servicios" data-es="Servicios" data-en="Services">Servicios</a>
+    <a href="#suite" data-es="Herramientas" data-en="Tools">Herramientas</a>
+    <a href="#casos" data-es="Casos" data-en="Cases">Casos</a>
+    <a href="#trayectoria" data-es="Trayectoria" data-en="Track record">Trayectoria</a>
+    <a href="#contacto" data-es="Contacto" data-en="Contact">Contacto</a>
+  </nav>
+  <div class="lang" role="group" aria-label="Idioma / Language">
+    <button type="button" data-setlang="es" aria-pressed="true">ES</button>
+    <button type="button" data-setlang="en" aria-pressed="false">EN</button>
+  </div>
+</div></header>
+
+<main>
+<div class="hero"><div class="wrap">
+  <p class="eyebrow" data-es="Consultor senior Oracle ERP · Finanzas · 26 años" data-en="Senior Oracle ERP consultant · Finance · 26 years">Consultor senior Oracle ERP · Finanzas · 26 años</p>
+  <h1 data-es="El ERP ya está implantado. Lo que duele es lo que el estándar no resuelve." data-en="The ERP is live. What hurts is what the standard product doesn't solve.">El ERP ya está implantado. Lo que duele es lo que el estándar no resuelve.</h1>
+  <p class="lede" data-es="Soy Javier Rubio. Combino consultoría funcional de Oracle Cloud y E-Business Suite con herramientas a medida construidas con IA: paneles de cierre, comparadores de configuración, cargadores y diagnóstico de incidencias. Primero entiendo el proceso de negocio; después construyo sólo lo que falta." data-en="I'm Javier Rubio. I combine functional consulting on Oracle Cloud and E-Business Suite with purpose-built tools developed with AI: close dashboards, configuration comparators, loaders and incident diagnosis. I understand the business process first; then I build only what's missing.">Soy Javier Rubio. Combino consultoría funcional de Oracle Cloud y E-Business Suite con herramientas a medida construidas con IA: paneles de cierre, comparadores de configuración, cargadores y diagnóstico de incidencias. Primero entiendo el proceso de negocio; después construyo sólo lo que falta.</p>
+  <div class="cta">
+    <a class="btn primary" href="#contacto" data-es="Hablemos de tu caso" data-en="Let's talk about your case">Hablemos de tu caso</a>
+    <a class="btn" href="https://www.linkedin.com/in/jrubioes" target="_blank" rel="noopener">LinkedIn</a>
+  </div>
+  <div class="ledger">
+    <div><b>26</b><span data-es="años en Oracle ERP" data-en="years in Oracle ERP">años en Oracle ERP</span></div>
+    <div><b>7</b><span data-es="herramientas propias en producción" data-en="own tools in production">herramientas propias en producción</span></div>
+    <div><b>3</b><span data-es="idiomas de trabajo: ES · EN · IT" data-en="working languages: ES · EN · IT">idiomas de trabajo: ES · EN · IT</span></div>
+    <div><b>3</b><span data-es="continentes con rollouts entregados" data-en="continents with delivered rollouts">continentes con rollouts entregados</span></div>
+  </div>
+</div></div>
+
+<section id="servicios"><div class="wrap sec">
+  <aside data-es="Servicios" data-en="Services">Servicios</aside>
+  <div>
+    <h2 data-es="Tres formas de trabajar juntos" data-en="Three ways to work together">Tres formas de trabajar juntos</h2>
+    <p class="intro" data-es="Cada servicio arranca por un dolor concreto y termina en algo que tu equipo puede usar sin mí." data-en="Every engagement starts from a concrete pain and ends with something your team can run without me.">Cada servicio arranca por un dolor concreto y termina en algo que tu equipo puede usar sin mí.</p>
+    <div class="services">
+      <div class="svc">
+        <div>
+          <span class="pain" data-es="Dolor: el proceso no cuadra con la configuración" data-en="Pain: process and configuration don't match">Dolor: el proceso no cuadra con la configuración</span>
+          <h3 data-es="Consultoría funcional Oracle Cloud y EBS R12" data-en="Functional consulting, Oracle Cloud and EBS R12">Consultoría funcional Oracle Cloud y EBS R12</h3>
+        </div>
+        <div>
+          <p data-es="Finanzas de punta a punta: GL, AR, AP, activos fijos, tesorería, contabilidad de subledger (SLA), Order to Cash y Procure to Pay. Cierre mensual y anual, conciliaciones, AHCS/ARCS." data-en="Finance end to end: GL, AR, AP, fixed assets, cash management, subledger accounting (SLA), Order to Cash and Procure to Pay. Month- and year-end close, reconciliations, AHCS/ARCS.">Finanzas de punta a punta: GL, AR, AP, activos fijos, tesorería, contabilidad de subledger (SLA), Order to Cash y Procure to Pay. Cierre mensual y anual, conciliaciones, AHCS/ARCS.</p>
+          <ul>
+            <li data-es="Fiscalidad: SII, localizaciones España, Italia y LATAM, E-Tax Manager" data-en="Tax: Spain's SII, Spanish, Italian and LATAM localisations, E-Tax Manager">Fiscalidad: SII, localizaciones España, Italia y LATAM, E-Tax Manager</li>
+            <li data-es="Diagnóstico de incidencias de contabilización que llevan meses abiertas" data-en="Diagnosis of accounting incidents that have been open for months">Diagnóstico de incidencias de contabilización que llevan meses abiertas</li>
+            <li data-es="Integraciones: OIC, REST/SOAP, BI Publisher, interfaces con POS y sistemas legados" data-en="Integrations: OIC, REST/SOAP, BI Publisher, POS and legacy interfaces">Integraciones: OIC, REST/SOAP, BI Publisher, interfaces con POS y sistemas legados</li>
+          </ul>
+        </div>
+      </div>
+      <div class="svc">
+        <div>
+          <span class="pain" data-es="Dolor: el estándar no lo hace y nadie lo va a desarrollar" data-en="Pain: the standard product doesn't do it and nobody will build it">Dolor: el estándar no lo hace y nadie lo va a desarrollar</span>
+          <h3 data-es="Aplicaciones satélite y automatizaciones" data-en="Satellite applications and automations">Aplicaciones satélite y automatizaciones</h3>
+        </div>
+        <div>
+          <p data-es="Herramientas pequeñas y específicas que viven al lado del ERP y atacan un problema cada una: un panel que dice si se puede cerrar el periodo, un comparador que detecta desvíos de configuración entre entornos, un cargador de anticipos, un investigador de incidencias que cruza el texto del ticket con los datos reales." data-en="Small, specific tools that live next to the ERP and each attack one problem: a panel that says whether the period can be closed, a comparator that catches configuration drift across environments, a prepayment loader, an incident investigator that cross-checks the ticket text against real data.">Herramientas pequeñas y específicas que viven al lado del ERP y atacan un problema cada una: un panel que dice si se puede cerrar el periodo, un comparador que detecta desvíos de configuración entre entornos, un cargador de anticipos, un investigador de incidencias que cruza el texto del ticket con los datos reales.</p>
+          <ul>
+            <li data-es="Construidas con IA en semanas, no en trimestres; Python puro, sin base de datos externa" data-en="Built with AI in weeks, not quarters; plain Python, no external database">Construidas con IA en semanas, no en trimestres; Python puro, sin base de datos externa</li>
+            <li data-es="Las credenciales no salen del ordenador de quien las usa" data-en="Credentials never leave the user's computer">Las credenciales no salen del ordenador de quien las usa</li>
+            <li data-es="Separación estricta entre leer datos y actuar sobre el ERP" data-en="Strict separation between reading data and acting on the ERP">Separación estricta entre leer datos y actuar sobre el ERP</li>
+          </ul>
+        </div>
+      </div>
+      <div class="svc">
+        <div>
+          <span class="pain" data-es="Dolor: el rollout se alarga y el backlog de soporte crece" data-en="Pain: the rollout drags on and the support backlog grows">Dolor: el rollout se alarga y el backlog de soporte crece</span>
+          <h3 data-es="Optimización de proyectos y soporte" data-en="Project and support optimisation">Optimización de proyectos y soporte</h3>
+        </div>
+        <div>
+          <p data-es="Dirección de workstreams y rollouts multi-país, hypercare, gobierno de configuración y checklists de pase a producción. Reducción del backlog de incidencias con diagnóstico asistido y procedimientos que se quedan documentados." data-en="Workstream and multi-country rollout leadership, hypercare, configuration governance and go-live checklists. Incident backlog reduction through assisted diagnosis and procedures that stay documented.">Dirección de workstreams y rollouts multi-país, hypercare, gobierno de configuración y checklists de pase a producción. Reducción del backlog de incidencias con diagnóstico asistido y procedimientos que se quedan documentados.</p>
+          <ul>
+            <li data-es="Global Process Owner y creación de centros de excelencia internos" data-en="Global Process Owner and building internal centres of excellence">Global Process Owner y creación de centros de excelencia internos</li>
+            <li data-es="Migraciones SAP → Oracle Cloud y EBS → Cloud" data-en="SAP → Oracle Cloud and EBS → Cloud migrations">Migraciones SAP → Oracle Cloud y EBS → Cloud</li>
+            <li data-es="Reporting de comité: cifras reales del ERP, no estimaciones" data-en="Steering-committee reporting: real ERP figures, not estimates">Reporting de comité: cifras reales del ERP, no estimaciones</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</div></section>
+
+<section id="suite"><div class="wrap sec">
+  <aside data-es="Herramientas" data-en="Tools">Herramientas</aside>
+  <div>
+    <h2 data-es="Una base, seis productos encima" data-en="One foundation, six products on top">Una base, seis productos encima</h2>
+    <p class="intro" data-es="Todas hablan con Oracle Fusion a través de la misma librería. Eso convierte herramientas sueltas en una arquitectura que se instala en otro cliente en días." data-en="They all talk to Oracle Fusion through the same library. That turns loose tools into an architecture that can be installed at another client in days.">Todas hablan con Oracle Fusion a través de la misma librería. Eso convierte herramientas sueltas en una arquitectura que se instala en otro cliente en días.</p>
+    <div class="grid">
+      <div class="card base">
+        <span class="tag" data-es="Cimiento" data-en="Foundation">Cimiento</span>
+        <h3>fusion-client</h3>
+        <p data-es="Librería Python compartida para Oracle Fusion Cloud. Lee por BI Publisher, actúa por procesos ESS, y no mezcla las dos cosas: lo que lee no puede escribir y lo que escribe no improvisa." data-en="Shared Python library for Oracle Fusion Cloud. Reads through BI Publisher, acts through ESS jobs, and never blends the two: what reads cannot write, and what writes doesn't improvise.">Librería Python compartida para Oracle Fusion Cloud. Lee por BI Publisher, actúa por procesos ESS, y no mezcla las dos cosas: lo que lee no puede escribir y lo que escribe no improvisa.</p>
+      </div>
+      <div class="card">
+        <span class="tag" data-es="Problema: sin acceso a la base de datos" data-en="Problem: no database access">Problema: sin acceso a la base de datos</span>
+        <h3>Fusion Data Studio</h3>
+        <p data-es="IDE de escritorio contra Oracle Fusion: explorador de esquema, SQL con resultados en rejilla, llamadas REST y un generador de consultas por IA para quien no domina SQL. Todo local." data-en="Desktop IDE for Oracle Fusion: schema browser, SQL with grid results, REST calls and an AI query generator for people who don't write SQL. Runs fully locally.">IDE de escritorio contra Oracle Fusion: explorador de esquema, SQL con resultados en rejilla, llamadas REST y un generador de consultas por IA para quien no domina SQL. Todo local.</p>
+        <div class="for"><b data-es="Para" data-en="For">Para</b> <span data-es="equipos técnicos de ERP y consultoras de implantación" data-en="ERP technical teams and implementation partners">equipos técnicos de ERP y consultoras de implantación</span></div>
+      </div>
+      <div class="card">
+        <span class="tag" data-es="Problema: la configuración se desvía entre entornos" data-en="Problem: configuration drifts across environments">Problema: la configuración se desvía entre entornos</span>
+        <h3>Fusion Checklist</h3>
+        <p data-es="39 controles sobre GL, AP, AR, activos, tesorería, compras e intercompañía, comparados en paralelo entre PROD, DEV y TEST, con detalle de qué registro existe dónde." data-en="39 checks across GL, AP, AR, assets, cash, procurement and intercompany, compared in parallel across PROD, DEV and TEST, down to which record exists where.">39 controles sobre GL, AP, AR, activos, tesorería, compras e intercompañía, comparados en paralelo entre PROD, DEV y TEST, con detalle de qué registro existe dónde.</p>
+        <div class="for"><b data-es="Para" data-en="For">Para</b> <span data-es="responsables de sistemas ERP y QA de implantación" data-en="ERP system owners and implementation QA">responsables de sistemas ERP y QA de implantación</span></div>
+      </div>
+      <div class="card">
+        <span class="tag" data-es="Problema: cerrar sin saber qué queda sin contabilizar" data-en="Problem: closing without knowing what's left unposted">Problema: cerrar sin saber qué queda sin contabilizar</span>
+        <h3 data-es="Dashboard de Cierre" data-en="Close Dashboard">Dashboard de Cierre</h3>
+        <p data-es="Por cada libro y periodo, revisa AP, AR, FA, CM y GL, da un veredicto GO / WARN / NO-GO y, si procede, ejecuta el cierre de subledgers a GL mediante procesos programados." data-en="For every ledger and period it reviews AP, AR, FA, CM and GL, returns a GO / WARN / NO-GO verdict and, when cleared, runs the subledger-to-GL close through scheduled processes.">Por cada libro y periodo, revisa AP, AR, FA, CM y GL, da un veredicto GO / WARN / NO-GO y, si procede, ejecuta el cierre de subledgers a GL mediante procesos programados.</p>
+        <div class="for"><b data-es="Para" data-en="For">Para</b> <span data-es="dirección financiera y responsables de cierre" data-en="finance leadership and close owners">dirección financiera y responsables de cierre</span></div>
+      </div>
+      <div class="card">
+        <span class="tag" data-es="Problema: incidencias que tardan meses en diagnosticarse" data-en="Problem: incidents that take months to diagnose">Problema: incidencias que tardan meses en diagnosticarse</span>
+        <h3 data-es="Resolución de incidencias con IA" data-en="AI incident resolution">Resolución de incidencias con IA</h3>
+        <p data-es="Un investigador con modelo de lenguaje lee el ticket de Jira, consulta los datos reales del ERP, localiza la causa y redacta el diagnóstico y la respuesta. Integrado con el tablero del equipo." data-en="A language-model investigator reads the Jira ticket, queries real ERP data, pinpoints the cause and drafts the diagnosis and reply. Integrated with the team's board.">Un investigador con modelo de lenguaje lee el ticket de Jira, consulta los datos reales del ERP, localiza la causa y redacta el diagnóstico y la respuesta. Integrado con el tablero del equipo.</p>
+        <div class="for"><b data-es="Para" data-en="For">Para</b> <span data-es="responsables de soporte y service delivery" data-en="support and service-delivery managers">responsables de soporte y service delivery</span></div>
+      </div>
+      <div class="card">
+        <span class="tag" data-es="Problema: anticipos de clientes creados a mano" data-en="Problem: customer prepayments keyed by hand">Problema: anticipos de clientes creados a mano</span>
+        <h3>Customer Prepayment Creator</h3>
+        <p data-es="Aplicación web que genera transacciones de anticipo de clientes en Oracle Fusion por servicio web, con validación previa y trazabilidad de cada carga." data-en="Web application that creates customer prepayment transactions in Oracle Fusion via web services, with upfront validation and a trail for every load.">Aplicación web que genera transacciones de anticipo de clientes en Oracle Fusion por servicio web, con validación previa y trazabilidad de cada carga.</p>
+        <div class="for"><b data-es="Para" data-en="For">Para</b> <span data-es="equipos de cuentas a cobrar y tesorería" data-en="receivables and treasury teams">equipos de cuentas a cobrar y tesorería</span></div>
+      </div>
+      <div class="card">
+        <span class="tag" data-es="Problema: el conocimiento del proyecto se pierde" data-en="Problem: project knowledge gets lost">Problema: el conocimiento del proyecto se pierde</span>
+        <h3 data-es="Base de conocimiento RAG" data-en="RAG knowledge base">Base de conocimiento RAG</h3>
+        <p data-es="Búsqueda semántica sobre la documentación funcional, los diseños y las incidencias resueltas del proyecto, para que la respuesta a una pregunta ya contestada tarde segundos y no otra investigación." data-en="Semantic search over the project's functional documentation, designs and resolved incidents, so a question that was already answered takes seconds, not another investigation.">Búsqueda semántica sobre la documentación funcional, los diseños y las incidencias resueltas del proyecto, para que la respuesta a una pregunta ya contestada tarde segundos y no otra investigación.</p>
+        <div class="for"><b data-es="Para" data-en="For">Para</b> <span data-es="equipos de soporte y nuevos consultores del proyecto" data-en="support teams and consultants joining the project">equipos de soporte y nuevos consultores del proyecto</span></div>
+      </div>
+    </div>
+  </div>
+</div></section>
+
+<section id="casos"><div class="wrap sec">
+  <aside data-es="Casos" data-en="Cases">Casos</aside>
+  <div>
+    <h2 data-es="Cuatro problemas reales, resueltos" data-en="Four real problems, solved">Cuatro problemas reales, resueltos</h2>
+    <p class="intro" data-es="Grupo hotelero internacional en Oracle Cloud, 2024–2026. Anonimizados; las cifras son las del sistema." data-en="International hotel group on Oracle Cloud, 2024–2026. Anonymised; the figures are the system's own.">Grupo hotelero internacional en Oracle Cloud, 2024–2026. Anonimizados; las cifras son las del sistema.</p>
+    <div class="cases">
+      <div class="case">
+        <span class="num">~3 M€</span>
+        <h3 data-es="Cobros contabilizados en una cuenta errónea" data-en="Receipts posted to the wrong account">Cobros contabilizados en una cuenta errónea</h3>
+        <dl>
+          <dt data-es="Situación" data-en="Situation">Situación</dt><dd data-es="Cinco meses abierta sin causa identificada." data-en="Open for five months with no identified cause.">Cinco meses abierta sin causa identificada.</dd>
+          <dt data-es="Causa" data-en="Cause">Causa</dt><dd data-es="Mapping sets de contabilidad de subledger creados sólo para una moneda; el resto caía en la cuenta por defecto." data-en="Subledger accounting mapping sets created for a single currency; everything else fell to the default account.">Mapping sets de contabilidad de subledger creados sólo para una moneda; el resto caía en la cuenta por defecto.</dd>
+          <dt data-es="Resultado" data-en="Outcome">Resultado</dt><dd><span class="status" data-es="Corregido y validado" data-en="Fixed and validated">Corregido y validado</span></dd>
+        </dl>
+      </div>
+      <div class="case">
+        <span class="num" data-es="1 tarde" data-en="1 afternoon">1 tarde</span>
+        <h3 data-es="Abonos que bloqueaban el cierre del mes" data-en="Credit memos blocking the month-end close">Abonos que bloqueaban el cierre del mes</h3>
+        <dl>
+          <dt data-es="Situación" data-en="Situation">Situación</dt><dd data-es="Abonos retenidos en contabilización a días del cierre." data-en="Credit memos stuck in accounting days before the close.">Abonos retenidos en contabilización a días del cierre.</dd>
+          <dt data-es="Causa" data-en="Cause">Causa</dt><dd data-es="Una regla de cuenta modificada sin actualizar su regla pareja de subcuenta." data-en="An account rule changed without updating its paired sub-account rule.">Una regla de cuenta modificada sin actualizar su regla pareja de subcuenta.</dd>
+          <dt data-es="Resultado" data-en="Outcome">Resultado</dt><dd><span class="status" data-es="Cierre desbloqueado" data-en="Close unblocked">Cierre desbloqueado</span></dd>
+        </dl>
+      </div>
+      <div class="case">
+        <span class="num" data-es="8 semanas" data-en="8 weeks">8 semanas</span>
+        <h3 data-es="Informe de aging a futuro que no cuadraba" data-en="Forward aging report that didn't reconcile">Informe de aging a futuro que no cuadraba</h3>
+        <dl>
+          <dt data-es="Situación" data-en="Situation">Situación</dt><dd data-es="Cabecera y detalle no sumaban lo mismo; el tipo de cambio se aplicaba dos veces en algunos bloques." data-en="Header and detail didn't add up; the exchange rate was applied twice in some blocks.">Cabecera y detalle no sumaban lo mismo; el tipo de cambio se aplicaba dos veces en algunos bloques.</dd>
+          <dt data-es="Causa" data-en="Cause">Causa</dt><dd data-es="Reconstrucción del informe en BI Publisher y puente de conciliación contra el pendiente de cobro." data-en="Rebuilt the BI Publisher report and built a reconciliation bridge against open receivables.">Reconstrucción del informe en BI Publisher y puente de conciliación contra el pendiente de cobro.</dd>
+          <dt data-es="Resultado" data-en="Outcome">Resultado</dt><dd><span class="status" data-es="Cuadra al céntimo" data-en="Reconciles to the cent">Cuadra al céntimo</span></dd>
+        </dl>
+      </div>
+      <div class="case">
+        <span class="num">53</span>
+        <h3 data-es="Procedimiento de reclamaciones históricas perdido" data-en="Lost procedure for historical claims">Procedimiento de reclamaciones históricas perdido</h3>
+        <dl>
+          <dt data-es="Situación" data-en="Situation">Situación</dt><dd data-es="Nadie sabía ya cómo tramitar reclamaciones sobre facturas migradas." data-en="Nobody remembered how to process claims on migrated invoices.">Nadie sabía ya cómo tramitar reclamaciones sobre facturas migradas.</dd>
+          <dt data-es="Causa" data-en="Cause">Causa</dt><dd data-es="Las 53 facturas históricas cargadas en su día sirvieron de patrón para reconstruir y documentar el procedimiento." data-en="The 53 historical invoices loaded originally served as the pattern to rebuild and document the procedure.">Las 53 facturas históricas cargadas en su día sirvieron de patrón para reconstruir y documentar el procedimiento.</dd>
+          <dt data-es="Resultado" data-en="Outcome">Resultado</dt><dd><span class="status" data-es="Procedimiento recuperado" data-en="Procedure recovered">Procedimiento recuperado</span></dd>
+        </dl>
+      </div>
+    </div>
+  </div>
+</div></section>
+
+<section id="trayectoria"><div class="wrap sec">
+  <aside data-es="Trayectoria" data-en="Track record">Trayectoria</aside>
+  <div>
+    <h2 data-es="26 años entre finanzas, distribución y sistemas" data-en="26 years across finance, distribution and systems">26 años entre finanzas, distribución y sistemas</h2>
+    <p class="intro" data-es="Licenciado en Administración de Empresas (Complutense), especialista en auditoría fiscal y contable, Executive Master en Transformación Digital (ISDI). Empecé en el lado del negocio y nunca lo he dejado." data-en="Business Administration degree (Complutense), tax and accounting audit specialist, Executive Master in Digital Transformation (ISDI). I started on the business side and never left it.">Licenciado en Administración de Empresas (Complutense), especialista en auditoría fiscal y contable, Executive Master en Transformación Digital (ISDI). Empecé en el lado del negocio y nunca lo he dejado.</p>
+    <div class="tl">
+      <div class="row"><div class="yr">2024 – 2026</div><div><div class="role" data-es="Project lead Oracle Cloud · grupo hotelero internacional" data-en="Oracle Cloud project lead · international hotel group">Project lead Oracle Cloud · grupo hotelero internacional</div><div class="what" data-es="Rollouts España y México, soporte financiero, panel de cierre y suite de herramientas con IA." data-en="Spain and Mexico rollouts, finance support, close dashboard and AI-built tool suite.">Rollouts España y México, soporte financiero, panel de cierre y suite de herramientas con IA.</div></div></div>
+      <div class="row"><div class="yr">2022 – 2024</div><div><div class="role">Global Process Owner Oracle Cloud · Verisure</div><div class="what" data-es="Compras, SCM, almacenes, planificación y demanda; creación de un centro de excelencia interno." data-en="Procurement, SCM, warehousing, planning and demand; built an internal centre of excellence.">Compras, SCM, almacenes, planificación y demanda; creación de un centro de excelencia interno.</div></div></div>
+      <div class="row"><div class="yr">2022</div><div><div class="role" data-es="Lead R2R · Wood · y lead iProcurement/P2P · American Tower" data-en="R2R lead · Wood · and iProcurement/P2P lead · American Tower">Lead R2R · Wood · y lead iProcurement/P2P · American Tower</div><div class="what" data-es="Implantaciones Oracle Cloud en España e Italia; transición desde SAP." data-en="Oracle Cloud implementations in Spain and Italy; transition from SAP.">Implantaciones Oracle Cloud en España e Italia; transición desde SAP.</div></div></div>
+      <div class="row"><div class="yr">2020 – 2022</div><div><div class="role">Finance lead Oracle Cloud · Oracle Spain</div><div class="what" data-es="Fiscalidad, Order to Cash, integraciones AR/AP por API con sistemas externos." data-en="Tax, Order to Cash, API-based AR/AP integrations with external systems.">Fiscalidad, Order to Cash, integraciones AR/AP por API con sistemas externos.</div></div></div>
+      <div class="row"><div class="yr">2019 – 2020</div><div><div class="role">EBS R12 · Cree Lighting · SGS · Draxton</div><div class="what" data-es="O2C y localización italiana; finanzas EMEA/LATAM/África; SCM y fabricación." data-en="O2C and Italian localisation; EMEA/LATAM/Africa finance; SCM and manufacturing.">O2C y localización italiana; finanzas EMEA/LATAM/África; SCM y fabricación.</div></div></div>
+      <div class="row"><div class="yr">2015 – 2020</div><div><div class="role">Oracle EBS y Salesforce · Specialized Bicycle Components</div><div class="what" data-es="Rollouts de distribución en Europa y LATAM, Salesforce Sales & Service, integración POS (Lightspeed, Shopify) con EBS por Mulesoft, Hyperion." data-en="Distribution rollouts in Europe and LATAM, Salesforce Sales & Service, POS (Lightspeed, Shopify) integration with EBS via Mulesoft, Hyperion.">Rollouts de distribución en Europa y LATAM, Salesforce Sales & Service, integración POS (Lightspeed, Shopify) con EBS por Mulesoft, Hyperion.</div></div></div>
+      <div class="row"><div class="yr">2010 – 2015</div><div><div class="role" data-es="Project manager finanzas y distribución · Bunge (Italia)" data-en="Finance and distribution project manager · Bunge (Italy)">Project manager finanzas y distribución · Bunge (Italia)</div><div class="what" data-es="GL, SLA, consolidación y reporting multi-entidad." data-en="GL, SLA, consolidation and multi-entity reporting.">GL, SLA, consolidación y reporting multi-entidad.</div></div></div>
+      <div class="row"><div class="yr">2009</div><div><div class="role">SAP FI-CO · Iberia</div><div class="what" data-es="Soporte a finanzas y controlling." data-en="Finance and controlling support.">Soporte a finanzas y controlling.</div></div></div>
+    </div>
+  </div>
+</div></section>
+
+<section id="stack"><div class="wrap sec">
+  <aside>Stack</aside>
+  <div>
+    <h2 data-es="Con qué trabajo" data-en="What I work with">Con qué trabajo</h2>
+    <div class="stack">
+      <div><h4>Oracle</h4><ul><li>Oracle Cloud Financials &amp; SCM</li><li>E-Business Suite R12 / 11i</li><li>AHCS · ARCS · Hyperion HFM / Planning</li><li>BI Publisher · OTBI · ESS</li><li data-es="SLA, mapping sets, reglas de cuenta" data-en="SLA, mapping sets, account rules">SLA, mapping sets, reglas de cuenta</li></ul></div>
+      <div><h4 data-es="Integración" data-en="Integration">Integración</h4><ul><li>OIC · REST · SOAP</li><li>Mulesoft · APEX</li><li>Salesforce Sales &amp; Service</li><li>POS: Lightspeed · Shopify</li><li>SII · E-Tax Manager</li></ul></div>
+      <div><h4 data-es="Construcción" data-en="Building">Construcción</h4><ul><li>Python · SQL</li><li data-es="Claude y otros LLM para desarrollo asistido" data-en="Claude and other LLMs for assisted development">Claude y otros LLM para desarrollo asistido</li><li data-es="Servidores MCP, RAG" data-en="MCP servers, RAG">Servidores MCP, RAG</li><li>Jira · Confluence</li><li>Tableau</li></ul></div>
+    </div>
+  </div>
+</div></section>
+
+<section id="contacto"><div class="wrap sec">
+  <aside data-es="Contacto" data-en="Contact">Contacto</aside>
+  <div class="contact">
+    <div>
+      <p class="big" data-es="Cuéntame el punto de dolor. En una llamada te digo si lo he visto antes y cómo lo atacaría." data-en="Tell me the pain point. In one call I'll tell you whether I've seen it before and how I'd attack it.">Cuéntame el punto de dolor. En una llamada te digo si lo he visto antes y cómo lo atacaría.</p>
+      <p style="color:var(--ink-2);margin:0" data-es="Disponible para proyectos, contratos freelance y posiciones senior en España, Italia, Europa en remoto y LATAM. Facturación a través de Adilco Tech Center SL." data-en="Available for projects, freelance contracts and senior roles in Spain, Italy, remote Europe and LATAM. Invoicing through Adilco Tech Center SL.">Disponible para proyectos, contratos freelance y posiciones senior en España, Italia, Europa en remoto y LATAM. Facturación a través de Adilco Tech Center SL.</p>
+    </div>
+    <dl>
+      <dt>Email</dt><dd><a href="mailto:jrubio.es@gmail.com">jrubio.es@gmail.com</a></dd>
+      <dt data-es="Teléfono" data-en="Phone">Teléfono</dt><dd><a href="tel:+34682822133">+34 682 822 133</a></dd>
+      <dt>LinkedIn</dt><dd><a href="https://www.linkedin.com/in/jrubioes" target="_blank" rel="noopener">linkedin.com/in/jrubioes</a></dd>
+      <dt data-es="Ubicación" data-en="Location">Ubicación</dt><dd>Madrid · <span data-es="remoto" data-en="remote">remoto</span></dd>
+      <dt data-es="Idiomas" data-en="Languages">Idiomas</dt><dd data-es="Español (nativo) · Inglés · Italiano" data-en="Spanish (native) · English · Italian">Español (nativo) · Inglés · Italiano</dd>
+    </dl>
+  </div>
+</div></section>
+</main>
+<footer><div class="wrap">Javier Rubio · Adilco Tech Center SL · Madrid · <span data-es="Casos anonimizados; ninguna cifra identifica a un cliente." data-en="Cases anonymised; no figure identifies a client.">Casos anonimizados; ninguna cifra identifica a un cliente.</span></div></footer>
+
+<script>
+(function(){
+  var els=document.querySelectorAll('[data-es]');
+  function setLang(l){
+    els.forEach(function(e){e.textContent=e.getAttribute('data-'+l);});
+    document.documentElement.lang=l;
+    document.querySelectorAll('[data-setlang]').forEach(function(b){b.setAttribute('aria-pressed',String(b.getAttribute('data-setlang')===l));});
+    try{localStorage.setItem('lang',l);}catch(e){}
+  }
+  document.querySelectorAll('[data-setlang]').forEach(function(b){b.addEventListener('click',function(){setLang(b.getAttribute('data-setlang'));});});
+  var saved=null; try{saved=localStorage.getItem('lang');}catch(e){}
+  setLang(saved==='en'?'en':'es');
+})();
+</script>
