@@ -1,0 +1,678 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0f3524">
+<meta name="description" content="Othello para jugar en el móvil, contra la CPU o a dos jugadores.">
+<meta property="og:title" content="Othello de Bolsillo">
+<meta property="og:description" content="El clásico de mesa en tu móvil. Contra la CPU o con un amigo, sin descargar nada.">
+<title>Othello de Bolsillo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@700;800&family=Instrument+Sans:wght@400;500;600&display=swap">
+<style>
+/* Layout: one-screen table — scoreboard, felt board with a–h / 1–8 rails, move strip, controls. */
+:root {
+  --bg: #e4e8e1;
+  --surface: #f3f5f1;
+  --ink: #18221c;
+  --muted: #5d6b62;
+  --line: #c7cfc6;
+  --felt: #1d6a46;
+  --felt-dark: #134a31;
+  --frame: #0f3524;
+  --brass: #b88a2e;
+  --brass-soft: rgba(184, 138, 46, .18);
+  --danger: #b4452f;
+  --font-display: "Big Shoulders Display", "Arial Narrow", "Roboto Condensed", sans-serif;
+  --font-body: "Instrument Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0e1411; --surface: #17201b; --ink: #e5ebe6; --muted: #93a398; --line: #2a372f;
+    --felt: #1a5f3f; --felt-dark: #10402a; --frame: #07130d; --brass: #d6aa52; --brass-soft: rgba(214, 170, 82, .16);
+    --danger: #e0735b; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0e1411; --surface: #17201b; --ink: #e5ebe6; --muted: #93a398; --line: #2a372f;
+  --felt: #1a5f3f; --felt-dark: #10402a; --frame: #07130d; --brass: #d6aa52; --brass-soft: rgba(214, 170, 82, .16);
+  --danger: #e0735b; color-scheme: dark;
+}
+
+[hidden] { display: none !important; }
+html, body { height: 100%; }
+:root { padding-top: env(safe-area-inset-top, 0px); padding-bottom: env(safe-area-inset-bottom, 0px); box-sizing: border-box; color-scheme: light; }
+body { margin: 0; }
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-size: 15px;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+  overflow-x: hidden;
+}
+.app {
+  min-height: 100%;
+  box-sizing: border-box;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 14px 18px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  --bs: min(100%, max(264px, min(540px, calc(100dvh - 300px))));
+}
+.top, .scores, .status, .board-frame, .strip, .controls { width: var(--bs); max-width: 100%; box-sizing: border-box; }
+
+.top { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.brand {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 1.6rem;
+  letter-spacing: .02em;
+  text-transform: uppercase;
+  margin: 0;
+  line-height: 1;
+}
+.brand span { color: var(--brass); }
+.mode-tag { font-size: .78rem; color: var(--muted); letter-spacing: .06em; text-transform: uppercase; margin-left: auto; }
+.sound {
+  flex: none; width: 36px; height: 36px; border-radius: 50%; border: 1px solid var(--line);
+  background: var(--surface); color: var(--ink); display: grid; place-items: center; cursor: pointer; padding: 0;
+}
+.sound svg { width: 18px; height: 18px; }
+.sound .off { display: none; }
+.sound[aria-pressed="false"] .on { display: none; }
+.sound[aria-pressed="false"] .off { display: block; }
+.sound[aria-pressed="false"] { color: var(--muted); }
+.sound:focus-visible { outline: 3px solid var(--brass); outline-offset: 2px; }
+
+.scores { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.player {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 12px;
+  border-radius: 12px;
+  background: var(--surface);
+  border: 2px solid transparent;
+  transition: border-color .25s, background .25s;
+}
+.player.active { border-color: var(--brass); background: linear-gradient(var(--brass-soft), var(--brass-soft)), var(--surface); }
+.chip { width: 22px; height: 22px; border-radius: 50%; }
+.chip.b { background: radial-gradient(circle at 35% 30%, #575757, #0b0b0b 70%); box-shadow: 0 1px 2px rgba(0,0,0,.4); }
+.chip.w { background: radial-gradient(circle at 35% 30%, #ffffff, #d4d8d1 75%); box-shadow: 0 1px 2px rgba(0,0,0,.35), inset 0 0 0 1px rgba(0,0,0,.08); }
+.pname { font-weight: 600; font-size: .9rem; line-height: 1.15; min-width: 0; }
+.pname small { display: block; font-weight: 400; color: var(--muted); font-size: .74rem; }
+.count {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 2.1rem;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+
+.status {
+  min-height: 1.4em;
+  text-align: center;
+  font-weight: 500;
+  color: var(--ink);
+  font-size: .95rem;
+}
+.status.notice { color: var(--danger); }
+.status .dots::after { content: "…"; animation: blink 1s steps(2) infinite; }
+@keyframes blink { 50% { opacity: .2; } }
+
+.board-frame {
+  position: relative;
+  background: var(--frame);
+  border-radius: 14px;
+  padding: 6px 6px 6px 6px;
+  display: grid;
+  grid-template-columns: 14px 1fr;
+  grid-template-rows: 14px 1fr;
+  gap: 3px;
+  box-shadow: 0 10px 28px -12px rgba(0,0,0,.55);
+}
+.rail { display: grid; font-family: var(--font-display); font-weight: 700; font-size: .72rem; color: var(--brass); opacity: .85; text-transform: lowercase; }
+.rail.cols { grid-column: 2; grid-template-columns: repeat(8, 1fr); text-align: center; align-items: center; }
+.rail.rows { grid-row: 2; grid-template-rows: repeat(8, 1fr); align-items: center; justify-items: center; }
+.corner { grid-row: 1; grid-column: 1; }
+.board {
+  grid-row: 2; grid-column: 2;
+  aspect-ratio: 1;
+  max-width: 100%;
+  display: grid;
+  grid-template-columns: repeat(8, 1fr);
+  grid-template-rows: repeat(8, 1fr);
+  gap: 2px;
+  background: var(--felt-dark);
+  border: 2px solid var(--felt-dark);
+  border-radius: 4px;
+  position: relative;
+}
+.cell {
+  position: relative;
+  background: var(--felt);
+  border: 0;
+  padding: 0;
+  margin: 0;
+  cursor: default;
+  perspective: 400px;
+  outline: none;
+}
+.cell.legal { cursor: pointer; }
+.cell:focus-visible { box-shadow: inset 0 0 0 3px var(--brass); z-index: 1; }
+/* The four star points that mark the centre squares on a real Othello board. */
+.star {
+  position: absolute; width: 8px; height: 8px; border-radius: 50%; background: var(--felt-dark);
+  translate: -50% -50%; z-index: 3; pointer-events: none;
+}
+.board.hints .cell.legal::after {
+  content: ""; position: absolute; inset: 36%; border-radius: 50%;
+  border: 2px solid rgba(255,255,255,.38);
+  pointer-events: none;
+}
+.board.hints .cell.legal:active::after { background: rgba(255,255,255,.25); }
+
+.disc {
+  position: absolute; inset: 9%;
+  transform-style: preserve-3d;
+  transition: transform .42s cubic-bezier(.4, .1, .3, 1.3);
+  opacity: 0;
+  pointer-events: none;
+}
+.disc[data-c="b"], .disc[data-c="w"] { opacity: 1; }
+.disc[data-c="w"] { transform: rotateY(180deg); }
+.disc.instant { transition: none; }
+.disc.pop { animation: pop .28s ease-out; }
+@keyframes pop { from { scale: .4; } 70% { scale: 1.08; } to { scale: 1; } }
+.face {
+  position: absolute; inset: 0; border-radius: 50%;
+  backface-visibility: hidden; -webkit-backface-visibility: hidden;
+  box-shadow: 0 2px 3px rgba(0,0,0,.45);
+}
+.face.b { background: radial-gradient(circle at 35% 30%, #575757, #0b0b0b 68%); }
+.face.w { background: radial-gradient(circle at 35% 30%, #ffffff, #d4d8d1 75%); transform: rotateY(180deg); }
+.cell.last .disc::after {
+  content: ""; position: absolute; left: 50%; top: 50%; width: 18%; height: 18%;
+  translate: -50% -50%; border-radius: 50%; background: var(--danger); transform: translateZ(1px);
+}
+.disc[data-c="w"]::after { transform: rotateY(180deg) translateZ(1px) !important; }
+
+.result {
+  position: absolute; inset: 0; display: grid; place-items: center;
+  background: rgba(7, 19, 13, .55); border-radius: 14px; z-index: 5;
+}
+.result-card {
+  background: var(--surface); color: var(--ink); border-radius: 16px; padding: 20px 22px;
+  text-align: center; display: grid; gap: 10px; width: min(80%, 300px); box-sizing: border-box;
+  box-shadow: 0 16px 40px -10px rgba(0,0,0,.6);
+}
+.result-card h2 { font-family: var(--font-display); font-weight: 800; font-size: 2rem; text-transform: uppercase; margin: 0; line-height: 1; text-wrap: balance; }
+.result-card p { margin: 0; color: var(--muted); font-variant-numeric: tabular-nums; }
+
+.strip {
+  display: flex; gap: 6px; overflow-x: auto; scrollbar-width: none;
+  font-variant-numeric: tabular-nums; font-size: .8rem; color: var(--muted);
+  min-height: 26px; align-items: center;
+}
+.strip::-webkit-scrollbar { display: none; }
+.strip .label { text-transform: uppercase; letter-spacing: .08em; font-size: .7rem; flex: none; }
+.mv { flex: none; display: inline-flex; align-items: center; gap: 4px; padding: 3px 7px; border-radius: 999px; background: var(--surface); color: var(--ink); }
+.mv .chip { width: 10px; height: 10px; }
+.mv.pass { color: var(--muted); font-style: italic; }
+
+.controls { display: grid; grid-template-columns: 1fr 1fr 1.3fr; gap: 8px; }
+button.btn {
+  font: inherit; font-weight: 600; font-size: .9rem;
+  border-radius: 12px; padding: 12px 10px; cursor: pointer;
+  background: var(--surface); color: var(--ink); border: 1px solid var(--line);
+}
+button.btn:disabled { opacity: .45; cursor: default; }
+button.btn.primary { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+button.btn[aria-pressed="true"] { border-color: var(--brass); box-shadow: inset 0 0 0 1px var(--brass); }
+button.btn:focus-visible { outline: 3px solid var(--brass); outline-offset: 2px; }
+
+.sheet-bg {
+  position: fixed; inset: 0; background: rgba(0,0,0,.45); z-index: 20;
+  display: flex; align-items: flex-end; justify-content: center;
+}
+.sheet {
+  width: 100%; max-width: 560px; box-sizing: border-box; background: var(--surface);
+  border-radius: 20px 20px 0 0; display: grid; gap: 18px;
+  padding-left: max(20px, env(safe-area-inset-left, 0px));
+  padding-right: max(20px, env(safe-area-inset-right, 0px));
+  padding-block: 20px calc(20px + env(safe-area-inset-bottom, 0px));
+  animation: rise .25s ease-out;
+}
+@keyframes rise { from { transform: translateY(30px); opacity: 0; } }
+.sheet h2 { margin: 0; font-family: var(--font-display); font-weight: 800; text-transform: uppercase; font-size: 1.7rem; line-height: 1; }
+.field { display: grid; gap: 8px; border: 0; padding: 0; margin: 0; }
+.field legend { font-size: .72rem; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); padding: 0; margin-bottom: 8px; }
+.seg { display: grid; grid-auto-flow: column; grid-auto-columns: 1fr; gap: 6px; }
+.seg input { position: absolute; opacity: 0; pointer-events: none; }
+.seg label {
+  text-align: center; padding: 11px 6px; border-radius: 10px; border: 1px solid var(--line);
+  background: var(--bg); font-weight: 500; cursor: pointer; font-size: .9rem;
+}
+.seg input:checked + label { border-color: var(--brass); background: var(--brass-soft); font-weight: 600; }
+.seg input:focus-visible + label { outline: 3px solid var(--brass); outline-offset: 2px; }
+.sheet-actions { display: grid; grid-template-columns: 1fr 2fr; gap: 8px; }
+
+@media (prefers-reduced-motion: reduce) {
+  .disc { transition: none; }
+  .disc.pop, .sheet, .status .dots::after { animation: none; }
+}
+</style>
+</head>
+<body>
+<div class="app">
+  <header class="top">
+    <h1 class="brand">Othello<span>.</span></h1>
+    <div class="mode-tag" id="modeTag"></div>
+    <button class="sound" id="sound" type="button" aria-pressed="true" aria-label="Sonido">
+      <svg class="on" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9v6h4l5 4V5L8 9H4z"/><path d="M16.5 8.5a5 5 0 0 1 0 7"/><path d="M19 6a8.5 8.5 0 0 1 0 12"/></svg>
+      <svg class="off" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9v6h4l5 4V5L8 9H4z"/><path d="M17 9l5 6M22 9l-5 6"/></svg>
+    </button>
+  </header>
+
+  <section class="scores" aria-label="Marcador">
+    <div class="player" id="p1">
+      <div class="chip b"></div>
+      <div class="pname">Negras<small id="n1">Tú</small></div>
+      <div class="count" id="c1">2</div>
+    </div>
+    <div class="player" id="p2">
+      <div class="chip w"></div>
+      <div class="pname">Blancas<small id="n2">CPU</small></div>
+      <div class="count" id="c2">2</div>
+    </div>
+  </section>
+
+  <div class="status" id="status" role="status" aria-live="polite"></div>
+
+  <div class="board-frame">
+    <div class="corner"></div>
+    <div class="rail cols" aria-hidden="true"><span>a</span><span>b</span><span>c</span><span>d</span><span>e</span><span>f</span><span>g</span><span>h</span></div>
+    <div class="rail rows" aria-hidden="true"><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span><span>8</span></div>
+    <div class="board hints" id="board" role="grid" aria-label="Tablero"></div>
+    <div class="result" id="result" hidden>
+      <div class="result-card">
+        <h2 id="resultTitle"></h2>
+        <p id="resultText"></p>
+        <button class="btn primary" id="rematch" type="button">Revancha</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="strip" id="strip"></div>
+
+  <nav class="controls">
+    <button class="btn" id="undo" type="button">Deshacer</button>
+    <button class="btn" id="hints" type="button" aria-pressed="true">Pistas</button>
+    <button class="btn primary" id="newGame" type="button">Nueva partida</button>
+  </nav>
+</div>
+
+<div class="sheet-bg" id="sheetBg" hidden>
+  <form class="sheet" id="sheet">
+    <h2>Nueva partida</h2>
+    <fieldset class="field">
+      <legend>Rival</legend>
+      <div class="seg">
+        <input type="radio" name="mode" id="mode-cpu" value="cpu"><label for="mode-cpu">Contra la CPU</label>
+        <input type="radio" name="mode" id="mode-2p" value="2p"><label for="mode-2p">2 jugadores</label>
+      </div>
+    </fieldset>
+    <fieldset class="field" id="levelField">
+      <legend>Nivel de la CPU</legend>
+      <div class="seg">
+        <input type="radio" name="level" id="lvl-1" value="1"><label for="lvl-1">Fácil</label>
+        <input type="radio" name="level" id="lvl-2" value="2"><label for="lvl-2">Medio</label>
+        <input type="radio" name="level" id="lvl-3" value="3"><label for="lvl-3">Difícil</label>
+      </div>
+    </fieldset>
+    <fieldset class="field" id="colorField">
+      <legend>Juegas con</legend>
+      <div class="seg">
+        <input type="radio" name="color" id="col-1" value="1"><label for="col-1">Negras (empiezas)</label>
+        <input type="radio" name="color" id="col-2" value="2"><label for="col-2">Blancas</label>
+      </div>
+    </fieldset>
+    <div class="sheet-actions">
+      <button class="btn" type="button" id="cancel">Cancelar</button>
+      <button class="btn primary" type="submit">Empezar</button>
+    </div>
+  </form>
+</div>
+
+<script>
+(() => {
+  const B = 1, W = 2;
+  const NAMES = { 1: "Negras", 2: "Blancas" };
+  const DIRS = [[-1,-1],[-1,0],[-1,1],[0,-1],[0,1],[1,-1],[1,0],[1,1]];
+  const WEIGHTS = [
+    100,-20, 10,  5,  5, 10,-20,100,
+    -20,-50, -2, -2, -2, -2,-50,-20,
+     10, -2, -1, -1, -1, -1, -2, 10,
+      5, -2, -1, -1, -1, -1, -2,  5,
+      5, -2, -1, -1, -1, -1, -2,  5,
+     10, -2, -1, -1, -1, -1, -2, 10,
+    -20,-50, -2, -2, -2, -2,-50,-20,
+    100,-20, 10,  5,  5, 10,-20,100,
+  ];
+  const sq = i => "abcdefgh"[i & 7] + ((i >> 3) + 1);
+
+  function flipsFor(b, i, p) {
+    if (b[i]) return [];
+    const o = 3 - p, r0 = i >> 3, c0 = i & 7, out = [];
+    for (const [dr, dc] of DIRS) {
+      let r = r0 + dr, c = c0 + dc;
+      const line = [];
+      while (r >= 0 && r < 8 && c >= 0 && c < 8 && b[r * 8 + c] === o) { line.push(r * 8 + c); r += dr; c += dc; }
+      if (line.length && r >= 0 && r < 8 && c >= 0 && c < 8 && b[r * 8 + c] === p) out.push(...line);
+    }
+    return out;
+  }
+  function legalMoves(b, p) {
+    const m = [];
+    for (let i = 0; i < 64; i++) if (!b[i]) { const f = flipsFor(b, i, p); if (f.length) m.push({ i, f }); }
+    return m;
+  }
+  const countOf = (b, p) => b.reduce((n, v) => n + (v === p), 0);
+  function initialBoard() {
+    const b = new Array(64).fill(0);
+    b[27] = W; b[36] = W; b[28] = B; b[35] = B;
+    return b;
+  }
+
+  // CPU: easy is random, medium looks two plies ahead, hard searches deeper and solves the last 10 empties exactly.
+  function evaluate(b, p) {
+    const o = 3 - p;
+    let pos = 0;
+    for (let i = 0; i < 64; i++) if (b[i] === p) pos += WEIGHTS[i]; else if (b[i] === o) pos -= WEIGHTS[i];
+    const mob = legalMoves(b, p).length - legalMoves(b, o).length;
+    return pos + 6 * mob;
+  }
+  function negamax(b, p, depth, alpha, beta, exact) {
+    const ms = legalMoves(b, p);
+    if (!ms.length) {
+      if (!legalMoves(b, 3 - p).length) return (countOf(b, p) - countOf(b, 3 - p)) * 1000;
+      return -negamax(b, 3 - p, depth, -beta, -alpha, exact);
+    }
+    if (depth === 0 && !exact) return evaluate(b, p);
+    ms.sort((x, y) => WEIGHTS[y.i] - WEIGHTS[x.i]);
+    for (const m of ms) {
+      const nb = b.slice(); nb[m.i] = p; for (const f of m.f) nb[f] = p;
+      const v = -negamax(nb, 3 - p, depth - 1, -beta, -alpha, exact);
+      if (v > alpha) alpha = v;
+      if (alpha >= beta) break;
+    }
+    return alpha;
+  }
+  function cpuMove(b, p, level) {
+    const ms = legalMoves(b, p);
+    if (level === 1) return ms[Math.floor(Math.random() * ms.length)];
+    const empties = b.filter(v => !v).length;
+    const exact = level === 3 && empties <= 10;
+    const depth = level === 2 ? 1 : 4;
+    let best = -Infinity, picks = [];
+    for (const m of ms) {
+      const nb = b.slice(); nb[m.i] = p; for (const f of m.f) nb[f] = p;
+      const v = -negamax(nb, 3 - p, depth, -Infinity, Infinity, exact);
+      if (v > best) { best = v; picks = [m]; } else if (v === best) picks.push(m);
+    }
+    return picks[Math.floor(Math.random() * picks.length)];
+  }
+
+  const $ = id => document.getElementById(id);
+  const boardEl = $("board");
+  const cells = [], discs = [];
+  for (let i = 0; i < 64; i++) {
+    const cell = document.createElement("button");
+    cell.type = "button";
+    cell.className = "cell";
+    cell.setAttribute("aria-label", sq(i));
+    const disc = document.createElement("div");
+    disc.className = "disc";
+    disc.innerHTML = '<div class="face b"></div><div class="face w"></div>';
+    cell.appendChild(disc);
+    cell.addEventListener("click", () => humanPlay(i));
+    boardEl.appendChild(cell);
+    cells.push(cell); discs.push(disc);
+  }
+
+  for (const [x, y] of [[25, 25], [75, 25], [25, 75], [75, 75]]) {
+    const dot = document.createElement("span");
+    dot.className = "star";
+    dot.style.left = x + "%"; dot.style.top = y + "%";
+    boardEl.appendChild(dot);
+  }
+
+  // Synthesised clicks: a heavier knock when a disc is set down, a light clack as each captured disc lands.
+  let audio = null;
+  function unlockAudio() {
+    if (!audio) { try { audio = new (window.AudioContext || window.webkitAudioContext)(); } catch (e) { return; } }
+    if (audio.state === "suspended") audio.resume().catch(() => {});
+  }
+  function clack(at, heavy) {
+    if (!audio || S.sound === false || audio.state !== "running") return;
+    const t = audio.currentTime + at / 1000;
+    const len = heavy ? 0.07 : 0.04;
+    const buf = audio.createBuffer(1, Math.ceil(audio.sampleRate * len), audio.sampleRate);
+    const d = buf.getChannelData(0);
+    for (let k = 0; k < d.length; k++) d[k] = (Math.random() * 2 - 1) * Math.pow(1 - k / d.length, heavy ? 3 : 4);
+    const src = audio.createBufferSource(); src.buffer = buf;
+    const bp = audio.createBiquadFilter(); bp.type = "bandpass";
+    bp.frequency.value = (heavy ? 1900 : 3200) * (0.9 + Math.random() * 0.2); bp.Q.value = heavy ? 1.2 : 2;
+    const g = audio.createGain(); g.gain.value = heavy ? 0.9 : 0.45;
+    src.connect(bp).connect(g).connect(audio.destination);
+    src.start(t);
+    if (heavy) {
+      const o = audio.createOscillator(), og = audio.createGain();
+      o.frequency.setValueAtTime(190, t); o.frequency.exponentialRampToValueAtTime(70, t + 0.08);
+      og.gain.setValueAtTime(0.5, t); og.gain.exponentialRampToValueAtTime(0.001, t + 0.09);
+      o.connect(og).connect(audio.destination); o.start(t); o.stop(t + 0.1);
+    }
+  }
+  document.addEventListener("pointerdown", unlockAudio, { capture: true });
+  document.addEventListener("keydown", unlockAudio, { capture: true });
+
+  let S, cpuTimer = null, thinking = false;
+  const STORE = "othello-bolsillo-v1";
+
+  function freshState(settings) {
+    return {
+      board: initialBoard(), turn: B, history: [], log: [], last: -1,
+      over: false, notice: "",
+      mode: settings.mode, level: settings.level, human: settings.human, hints: settings.hints,
+      sound: settings.sound !== false,
+    };
+  }
+  function save() { try { localStorage.setItem(STORE, JSON.stringify(S)); } catch (e) {} }
+  function load() { try { const s = JSON.parse(localStorage.getItem(STORE)); return s && Array.isArray(s.board) && s.board.length === 64 ? s : null; } catch (e) { return null; } }
+
+  const isCpuTurn = () => S.mode === "cpu" && !S.over && S.turn !== S.human;
+
+  function render(anim) {
+    const legal = S.over || isCpuTurn() ? [] : legalMoves(S.board, S.turn);
+    const legalSet = new Set(legal.map(m => m.i));
+    for (let i = 0; i < 64; i++) {
+      const v = S.board[i], c = v === B ? "b" : v === W ? "w" : "";
+      const d = discs[i];
+      if (d.dataset.c !== c) {
+        if (!d.dataset.c || !c || !anim) {
+          d.classList.add("instant");
+          d.dataset.c = c;
+          void d.offsetWidth;
+          d.classList.remove("instant");
+          if (c && anim && i === anim.placed) { d.classList.remove("pop"); void d.offsetWidth; d.classList.add("pop"); }
+        } else {
+          const delay = anim.delays.get(i) || 0;
+          d.style.transitionDelay = delay + "ms";
+          d.dataset.c = c;
+          setTimeout(() => { d.style.transitionDelay = ""; }, delay + 450);
+        }
+      }
+      cells[i].classList.toggle("legal", legalSet.has(i));
+      cells[i].classList.toggle("last", i === S.last);
+      cells[i].setAttribute("aria-label", sq(i) + (v ? (v === B ? ", negra" : ", blanca") : legalSet.has(i) ? ", jugada posible" : ""));
+    }
+    boardEl.classList.toggle("hints", S.hints);
+    $("hints").setAttribute("aria-pressed", String(S.hints));
+    $("sound").setAttribute("aria-pressed", String(S.sound !== false));
+
+    const nb = countOf(S.board, B), nw = countOf(S.board, W);
+    $("c1").textContent = nb; $("c2").textContent = nw;
+    $("p1").classList.toggle("active", !S.over && S.turn === B);
+    $("p2").classList.toggle("active", !S.over && S.turn === W);
+    const levelName = { 1: "fácil", 2: "media", 3: "difícil" }[S.level];
+    if (S.mode === "cpu") {
+      $("n1").textContent = S.human === B ? "Tú" : "CPU " + levelName;
+      $("n2").textContent = S.human === W ? "Tú" : "CPU " + levelName;
+      $("modeTag").textContent = "Contra la CPU · " + levelName;
+    } else {
+      $("n1").textContent = "Jugador 1"; $("n2").textContent = "Jugador 2";
+      $("modeTag").textContent = "2 jugadores";
+    }
+
+    const st = $("status");
+    st.classList.toggle("notice", !!S.notice);
+    if (S.over) st.textContent = "Partida terminada";
+    else if (isCpuTurn()) st.innerHTML = (S.notice ? S.notice + " " : "") + "La CPU piensa<span class=\"dots\"></span>";
+    else if (S.notice) st.textContent = S.notice + " Mueven " + NAMES[S.turn].toLowerCase() + ".";
+    else st.textContent = S.mode === "cpu" ? "Tu turno (" + NAMES[S.turn].toLowerCase() + ")" : "Turno de " + NAMES[S.turn].toLowerCase();
+
+    const strip = $("strip");
+    strip.innerHTML = S.log.length ? '<span class="label">Jugadas</span>' : '<span class="label">Negras abre la partida</span>';
+    S.log.forEach((m, k) => {
+      const el = document.createElement("span");
+      el.className = "mv" + (m.pass ? " pass" : "");
+      el.innerHTML = '<span class="chip ' + (m.p === B ? "b" : "w") + '"></span>' + (m.pass ? "pasa" : (k + 1 - S.log.slice(0, k).filter(x => x.pass).length) + ". " + m.sq);
+      strip.appendChild(el);
+    });
+    strip.scrollLeft = strip.scrollWidth;
+
+    $("undo").disabled = !S.history.length || thinking;
+
+    const res = $("result");
+    res.hidden = !S.over;
+    if (S.over) {
+      let title;
+      if (nb === nw) title = "Empate";
+      else {
+        const winner = nb > nw ? B : W;
+        title = S.mode === "cpu" ? (winner === S.human ? "Has ganado" : "Gana la CPU") : "Ganan " + NAMES[winner].toLowerCase();
+      }
+      $("resultTitle").textContent = title;
+      $("resultText").textContent = "Negras " + nb + " – " + nw + " Blancas";
+    }
+  }
+
+  function play(i, flips) {
+    S.history.push({ board: S.board.slice(), turn: S.turn, log: S.log.slice(), last: S.last, notice: S.notice });
+    const p = S.turn;
+    S.board[i] = p;
+    const r0 = i >> 3, c0 = i & 7, delays = new Map();
+    for (const f of flips) {
+      S.board[f] = p;
+      delays.set(f, (Math.max(Math.abs((f >> 3) - r0), Math.abs((f & 7) - c0)) - 1) * 70);
+    }
+    S.log.push({ p, sq: sq(i) });
+    S.last = i;
+    S.notice = "";
+    const next = 3 - p;
+    if (legalMoves(S.board, next).length) S.turn = next;
+    else if (legalMoves(S.board, p).length) {
+      S.notice = NAMES[next] + " no tienen jugada y pasan.";
+      S.log.push({ p: next, pass: true });
+    } else S.over = true;
+    render({ placed: i, delays });
+    clack(0, true);
+    for (const t of delays.values()) clack(t + 330, false);
+    save();
+    scheduleCpu();
+  }
+
+  function humanPlay(i) {
+    if (S.over || thinking || isCpuTurn()) return;
+    const f = flipsFor(S.board, i, S.turn);
+    if (f.length) play(i, f);
+  }
+
+  function scheduleCpu() {
+    clearTimeout(cpuTimer);
+    if (!isCpuTurn()) { thinking = false; return; }
+    thinking = true;
+    render();
+    const started = Date.now();
+    cpuTimer = setTimeout(() => {
+      const m = cpuMove(S.board, S.turn, S.level);
+      const wait = Math.max(0, 550 - (Date.now() - started));
+      cpuTimer = setTimeout(() => { thinking = false; play(m.i, m.f); }, wait);
+    }, 60);
+  }
+
+  function undo() {
+    if (!S.history.length || thinking) return;
+    let h = S.history.pop();
+    while (S.mode === "cpu" && h.turn !== S.human && S.history.length) h = S.history.pop();
+    Object.assign(S, h, { over: false });
+    render();
+    save();
+    scheduleCpu();
+  }
+
+  function startGame(settings) {
+    clearTimeout(cpuTimer); thinking = false;
+    S = freshState(settings);
+    render();
+    save();
+    scheduleCpu();
+  }
+
+  const sheetBg = $("sheetBg"), sheet = $("sheet");
+  function syncSheet() {
+    const cpu = sheet.elements.mode.value === "cpu";
+    $("levelField").hidden = !cpu; $("colorField").hidden = !cpu;
+  }
+  function openSheet() {
+    sheet.elements.mode.value = S.mode;
+    sheet.elements.level.value = String(S.level);
+    sheet.elements.color.value = String(S.human);
+    syncSheet();
+    sheetBg.hidden = false;
+  }
+  sheet.addEventListener("change", syncSheet);
+  sheet.addEventListener("submit", e => {
+    e.preventDefault();
+    sheetBg.hidden = true;
+    startGame({ mode: sheet.elements.mode.value, level: +sheet.elements.level.value, human: +sheet.elements.color.value, hints: S.hints, sound: S.sound });
+  });
+  $("cancel").addEventListener("click", () => { sheetBg.hidden = true; });
+  sheetBg.addEventListener("click", e => { if (e.target === sheetBg) sheetBg.hidden = true; });
+  document.addEventListener("keydown", e => { if (e.key === "Escape") sheetBg.hidden = true; });
+
+  $("newGame").addEventListener("click", openSheet);
+  $("rematch").addEventListener("click", () => startGame(S));
+  $("undo").addEventListener("click", undo);
+  $("hints").addEventListener("click", () => { S.hints = !S.hints; render(); save(); });
+  $("sound").addEventListener("click", () => { S.sound = S.sound === false; render(); save(); });
+
+  function start(data) {
+    const restored = (data && data.S) || load();
+    if (restored) { S = restored; render(); scheduleCpu(); }
+    else startGame({ mode: "cpu", level: 2, human: B, hints: true });
+  }
+  start({});
+})();
+</script>
+
+</body>
+</html>
