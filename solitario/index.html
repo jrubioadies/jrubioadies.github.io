@@ -1,0 +1,413 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#5e3519">
+<meta property="og:title" content="Solitario de Canicas">
+<meta property="og:description" content="Salta, quita y deja una sola canica. El clásico de toda la vida, gratis en el navegador.">
+<meta property="og:image" content="https://jrubioadies.github.io/solitario/portada.jpg">
+<title>Solitario de Canicas</title>
+<meta name="description" content="El solitario de canicas de toda la vida, en el móvil. Salta, quita y deja una sola. Por Adilco Tech Center, SL.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Outfit:wght@400;500;600;700&display=swap">
+<style>
+/* Mesa de juego: disco de nogal con canicas de cristal; fondo ciruela suave, el tablero manda */
+:root{
+  --bg:#ece7ef; --card:#faf8fb; --ink:#2a1f30; --muted:#6f6377; --line:#d8cfdd; --tint:#e2d9e7;
+  --accent:#8a3fa0; --good:#1f7a5b; --bad:#b8323b;
+  --wood1:#8a5530; --wood2:#5e3519; --wood3:#3f210d;
+  --brand:#1F6F5B; --brand-ink:#ffffff;
+  --display:"Baloo 2","Arial Rounded MT Bold",system-ui,sans-serif;
+  --body:"Outfit",system-ui,-apple-system,"Segoe UI",sans-serif;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#1b1520; --card:#251d2b; --ink:#efe8f3; --muted:#a898b2; --line:#3a2f42; --tint:#2e2535;
+  --accent:#d08ae6; --good:#5fd0a5; --bad:#ff7b84; --brand:#2f8f76; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#1b1520; --card:#251d2b; --ink:#efe8f3; --muted:#a898b2; --line:#3a2f42; --tint:#2e2535;
+  --accent:#d08ae6; --good:#5fd0a5; --bad:#ff7b84; --brand:#2f8f76; color-scheme:dark}
+[hidden]{display:none!important}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);margin:0;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));
+  -webkit-tap-highlight-color:transparent}
+.app{max-width:520px;margin:0 auto;display:flex;flex-direction:column;gap:14px;padding-block:14px 24px}
+header{display:flex;align-items:flex-end;justify-content:space-between;gap:10px;flex-wrap:wrap}
+h1{font:800 34px/.9 var(--display);margin:0;letter-spacing:-.3px}
+h1 em{font-style:normal;color:var(--accent);display:block;font-size:26px}
+.boards{display:flex;gap:2px;background:var(--tint);border-radius:999px;padding:3px}
+.boards button{border:0;background:transparent;color:var(--muted);font:600 13px var(--body);padding:7px 12px;border-radius:999px;cursor:pointer}
+.boards button[aria-pressed="true"]{background:var(--card);color:var(--ink);box-shadow:0 1px 2px rgba(0,0,0,.12)}
+
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.stat{background:var(--card);border-radius:14px;padding:8px 12px;display:flex;flex-direction:column;gap:0}
+.stat small{font-size:11.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em}
+.stat b{font:800 26px/1.1 var(--display);font-variant-numeric:tabular-nums}
+.stat.pegs b{color:var(--accent)}
+
+.wrap{position:relative}
+.board{position:relative;aspect-ratio:1;width:100%;max-width:100%;border-radius:50%;user-select:none;touch-action:manipulation;
+  background:
+    radial-gradient(circle at 50% 50%,transparent 60%,rgba(0,0,0,.28) 100%),
+    repeating-radial-gradient(circle at 46% 54%,rgba(255,255,255,.035) 0 3px,rgba(0,0,0,.05) 3px 7px),
+    radial-gradient(circle at 35% 30%,var(--wood1),var(--wood2) 65%,var(--wood3));
+  box-shadow:0 18px 40px rgba(40,20,10,.35),inset 0 2px 0 rgba(255,255,255,.15),inset 0 -6px 14px rgba(0,0,0,.35)}
+.board::after{content:"";position:absolute;inset:4.5%;border-radius:50%;box-shadow:inset 0 0 0 2px rgba(255,220,180,.10),0 0 0 1px rgba(0,0,0,.18);pointer-events:none}
+.hole{position:absolute;width:var(--hs);height:var(--hs);transform:translate(-50%,-50%);border-radius:50%;border:0;padding:0;cursor:pointer;
+  background:radial-gradient(circle at 50% 38%,#1c0e05 0 45%,#2e170a 70%,#4a2810 100%);
+  box-shadow:inset 0 3px 5px rgba(0,0,0,.7),0 1px 0 rgba(255,220,180,.18)}
+.hole.target{box-shadow:inset 0 3px 5px rgba(0,0,0,.7),0 0 0 3px #ffe08a,0 0 16px 4px rgba(255,224,138,.55)}
+.hole:focus-visible{outline:3px solid #ffe08a;outline-offset:3px}
+.peg{position:absolute;width:var(--ps);height:var(--ps);transform:translate(-50%,-50%);border-radius:50%;pointer-events:none;
+  background:
+    radial-gradient(circle at 34% 28%,rgba(255,255,255,.95) 0 7%,rgba(255,255,255,0) 18%),
+    radial-gradient(circle at 62% 74%,hsla(var(--h),100%,85%,.55) 0 10%,transparent 30%),
+    radial-gradient(circle at 45% 40%,hsl(var(--h) 85% 62%),hsl(var(--h) 80% 40%) 60%,hsl(var(--h) 85% 18%) 100%);
+  box-shadow:0 4px 6px rgba(0,0,0,.45),inset 0 -3px 6px rgba(0,0,0,.35),inset 0 2px 3px rgba(255,255,255,.25)}
+.peg.sel{box-shadow:0 0 0 3px #fff,0 0 0 6px var(--accent),0 10px 16px rgba(0,0,0,.5)}
+.peg.hint{box-shadow:0 0 0 3px #ffe08a,0 0 18px 6px rgba(255,224,138,.7)}
+
+.veil{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:12px;text-align:center;
+  background:color-mix(in srgb,var(--bg) 70%,transparent);backdrop-filter:blur(3px);border-radius:50%;padding:12%}
+.veil h2{font:800 34px/1 var(--display);margin:0}
+.veil p{margin:0;color:var(--muted);line-height:1.4}
+.veil .best{color:var(--good);font-weight:700}
+.toast{position:absolute;left:50%;bottom:-6px;transform:translateX(-50%);background:var(--ink);color:var(--bg);font:600 14px var(--body);
+  padding:8px 14px;border-radius:999px;white-space:nowrap;pointer-events:none;transition:opacity .3s}
+
+.tools{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.tool{border:0;background:var(--card);color:var(--ink);font:600 14px var(--body);display:flex;align-items:center;justify-content:center;gap:8px;padding:12px 0;cursor:pointer;border-radius:14px;box-shadow:0 1px 0 var(--line)}
+.tool svg{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.tool:disabled{opacity:.4;cursor:default}
+.tool.main{background:var(--accent);color:#fff}
+.btn{border:0;border-radius:12px;padding:12px 18px;font:700 15px var(--body);cursor:pointer;background:var(--accent);color:#fff}
+.btn.ghost{background:var(--tint);color:var(--ink)}
+button:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+
+.rules{font-size:13px;color:var(--muted);line-height:1.5;margin:0}
+.promo{display:flex;align-items:center;gap:12px;background:var(--brand);color:var(--brand-ink);border-radius:14px;padding:12px 14px;text-decoration:none}
+.promo .logo{flex:none;width:40px;height:40px;border-radius:10px;background:rgba(255,255,255,.16);display:grid;place-items:center;font:800 22px var(--display)}
+.promo span{min-width:0}
+.promo b{display:block;font-size:15px}
+.promo small{display:block;font-size:12.5px;opacity:.85;margin-top:1px}
+.promo .arrow{margin-left:auto;font-weight:700;font-size:13px;white-space:nowrap}
+.links{font-size:12.5px;color:var(--muted);margin:0;text-align:center;line-height:1.7}
+.links a{color:var(--ink);font-weight:600}
+@media (max-width:460px){.promo .arrow{display:none}}
+
+/* ---------- Modo reel (1080×1920, solo para grabar el vídeo) ---------- */
+#reel{display:none}
+body.reel{padding:0;overflow:hidden}
+body.reel .app{display:none}
+body.reel #reel{display:block;position:fixed;left:0;top:0;width:1080px;height:1920px;overflow:hidden;
+  background:radial-gradient(70% 45% at 50% 45%,#f7f3f9 0%,var(--bg) 75%)}
+.rv-head{position:absolute;left:70px;right:70px;top:110px;display:flex;align-items:flex-end;justify-content:space-between}
+.rv-title{font:800 100px/.82 var(--display);color:var(--ink)}
+.rv-title em{display:block;font-style:normal;color:var(--accent);font-size:74px}
+.rv-count{text-align:right;font:500 30px var(--body);color:var(--muted);text-transform:uppercase;letter-spacing:.1em}
+.rv-count b{display:block;font:800 120px/.9 var(--display);color:var(--accent);letter-spacing:0;font-variant-numeric:tabular-nums}
+.rv-board{position:absolute;left:60px;top:420px;width:960px}
+.rv-cap{position:absolute;left:50%;top:1450px;transform:translateX(-50%);white-space:nowrap;background:var(--ink);color:#fff;
+  font:700 50px var(--body);padding:22px 44px;border-radius:999px;box-shadow:0 12px 30px rgba(42,31,48,.3)}
+.rv-cap.ok{background:var(--good)} .rv-cap.acc{background:var(--accent)}
+.rv-brand{position:absolute;left:0;right:0;bottom:100px;display:flex;justify-content:center}
+.rv-brand div{display:flex;align-items:center;gap:20px;font:700 38px var(--body);color:var(--ink)}
+.rv-lg{width:68px;height:68px;border-radius:16px;background:var(--brand);color:#fff;display:grid;place-items:center;font:800 42px var(--display)}
+.rv-intro{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:20px;text-align:center;
+  background:color-mix(in srgb,var(--bg) 86%,transparent);backdrop-filter:blur(8px)}
+.rv-intro .big{font:800 200px/.8 var(--display);color:var(--ink)}
+.rv-intro .big em{display:block;font-style:normal;color:var(--accent);font-size:150px;margin-top:20px}
+.rv-intro .q{font:700 58px var(--body);color:#fff;background:var(--ink);padding:16px 38px;border-radius:18px;margin-top:50px}
+.rv-end{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:40px;text-align:center;
+  background:radial-gradient(circle at 50% 35%,#3a2244,#1b1020 70%);color:#fff}
+.rv-end h2{font:800 132px/.9 var(--display);margin:0}
+.rv-end h2 span{color:#e9b8f7}
+.rv-end .play{font:600 50px var(--body);opacity:.9}
+.rv-end .url{font:700 50px var(--body);background:#fff;color:#2a1f30;padding:24px 38px;border-radius:22px}
+.rv-end .co{display:flex;align-items:center;gap:26px;margin-top:70px}
+.rv-end .co .rv-lg{width:110px;height:110px;border-radius:24px;font-size:66px}
+.rv-end .co b{display:block;font:700 52px var(--body);text-align:left}
+.rv-end .co small{display:block;font:500 38px var(--body);opacity:.8;text-align:left}
+.rv-end .more{font:600 34px var(--body);opacity:.7;margin-top:10px}
+</style>
+<style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}</style>
+</head>
+<body>
+<div class="app">
+  <header>
+    <h1>Solitario <em>de canicas</em></h1>
+    <div class="boards" role="group" aria-label="Tablero">
+      <button data-b="ingles">Clásico</button>
+      <button data-b="triangulo">Triángulo</button>
+    </div>
+  </header>
+
+  <div class="stats">
+    <div class="stat pegs"><small>Canicas</small><b id="pegs">32</b></div>
+    <div class="stat"><small>Saltos</small><b id="movs">0</b></div>
+    <div class="stat"><small>Récord</small><b id="best">—</b></div>
+  </div>
+
+  <div class="wrap">
+    <div class="board" id="board" aria-label="Tablero de solitario"></div>
+    <div class="veil" id="veil" hidden>
+      <h2 id="veilT"></h2>
+      <p id="veilS"></p>
+      <button class="btn" id="veilB">Otra partida</button>
+    </div>
+    <div class="toast" id="toast" hidden></div>
+  </div>
+
+  <div class="tools">
+    <button class="tool" id="undo"><svg viewBox="0 0 24 24"><path d="M9 14 4 9l5-5"/><path d="M4 9h10.5a5.5 5.5 0 0 1 0 11H11"/></svg>Deshacer</button>
+    <button class="tool" id="hint"><svg viewBox="0 0 24 24"><path d="M9 18h6"/><path d="M10 22h4"/><path d="M12 2a7 7 0 0 0-4 12.7c.6.5 1 1.2 1 2.3h6c0-1.1.4-1.8 1-2.3A7 7 0 0 0 12 2Z"/></svg>Pista</button>
+    <button class="tool main" id="restart"><svg viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/></svg>Empezar</button>
+  </div>
+
+  <p class="rules">Toca una canica y luego un hueco libre a dos casillas: salta por encima de la de en medio, que se retira. Solo en línea recta, nunca en diagonal en el tablero clásico. La partida acaba cuando no quedan saltos. El reto: dejar una sola canica, y en el clásico, que quede justo en el centro.</p>
+
+  <a class="promo" href="https://adilcotech.com" target="_blank" rel="noopener">
+    <span class="logo" aria-hidden="true">A</span>
+    <span><b>Adilco Tech Center, SL</b><small>Consultoría ERP y soluciones tecnológicas a medida</small></span>
+    <span class="arrow">adilcotech.com →</span>
+  </a>
+  <p class="links">Más juegos: <a href="https://jrubioadies.github.io/othello/" target="_blank" rel="noopener">Othello</a> · <a href="https://jrubioadies.github.io/torre-tambaleante/" target="_blank" rel="noopener">Torre Tambaleante</a> · <a href="https://jrubioadies.github.io/sudoku/" target="_blank" rel="noopener">Sudoku</a><br>
+  Hecho por Javier Rubio · <a href="https://jrubioadies.github.io" target="_blank" rel="noopener">jrubioadies.github.io</a> · <a href="https://github.com/jrubioadies/jrubioadies.github.io/tree/main/solitario" target="_blank" rel="noopener">código en GitHub</a></p>
+</div>
+
+<div id="reel" aria-hidden="true">
+  <div class="rv-head"><div class="rv-title">Solitario<em>de canicas</em></div>
+    <div class="rv-count">Canicas<b id="rvPegs">32</b></div></div>
+  <div class="rv-board" id="rvBoard"></div>
+  <div class="rv-cap" id="rvCap" hidden></div>
+  <div class="rv-brand"><div><span class="rv-lg">A</span>Adilco Tech Center, SL</div></div>
+  <div class="rv-intro" id="rvIntro"><div class="big">SOLITARIO<em>de canicas</em></div><div class="q">¿Dejas solo una?</div></div>
+  <div class="rv-end" id="rvEnd" hidden>
+    <h2>¿Eres capaz<br>de dejar <span>una</span>?</h2>
+    <div class="play">Juega gratis en el navegador</div>
+    <div class="url">jrubioadies.github.io/solitario</div>
+    <div class="co"><span class="rv-lg">A</span><span><b>Adilco Tech Center, SL</b><small>adilcotech.com</small></span></div>
+    <div class="more">Más juegos: Othello · Torre · Sudoku</div>
+  </div>
+</div>
+
+<script>
+(()=>{
+const REEL=new URLSearchParams(location.search).has('reel');
+if(REEL)document.body.classList.add('reel');
+const $=id=>document.getElementById(id);
+const KEY='solitario-canicas-v1';
+let clock=0; const now=()=>REEL?clock:performance.now();
+const reduce=!REEL&&matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+// ---------- tableros ----------
+function makeBoard(kind){
+  const holes=[], at={};
+  if(kind==='ingles'){
+    const ok=(r,c)=>r>=0&&r<7&&c>=0&&c<7&&!((r<2||r>4)&&(c<2||c>4));
+    for(let r=0;r<7;r++)for(let c=0;c<7;c++)if(ok(r,c)){at[r+','+c]=holes.length;holes.push({r,c,x:50+(c-3)*11.6,y:50+(r-3)*11.6})}
+    const moves=[];
+    for(const h of holes)for(const [dr,dc] of [[0,1],[1,0],[0,-1],[-1,0]]){
+      const o=at[(h.r+dr)+','+(h.c+dc)], t=at[(h.r+2*dr)+','+(h.c+2*dc)];
+      if(o!==undefined&&t!==undefined)moves.push([at[h.r+','+h.c],o,t]);
+    }
+    return {kind,holes,moves,start:at['3,3'],center:at['3,3'],hs:'8.4%',ps:'8%'};
+  }
+  // triángulo de 15: filas 0..4
+  for(let r=0;r<5;r++)for(let k=0;k<=r;k++){at[r+','+k]=holes.length;holes.push({r,c:k,x:50+(k-r/2)*16,y:50+(r-2)*13.86+4})}
+  const moves=[];
+  for(const h of holes)for(const [dr,dk] of [[0,1],[0,-1],[1,0],[-1,0],[1,1],[-1,-1]]){
+    const o=at[(h.r+dr)+','+(h.c+dk)], t=at[(h.r+2*dr)+','+(h.c+2*dk)];
+    if(o!==undefined&&t!==undefined)moves.push([at[h.r+','+h.c],o,t]);
+  }
+  return {kind,holes,moves,start:at['0,0'],center:-1,hs:'12%',ps:'11.4%'};
+}
+const BOARDS={ingles:makeBoard('ingles'),triangulo:makeBoard('triangulo')};
+const NAMES={ingles:'Clásico',triangulo:'Triángulo'};
+const HUES=[352,28,46,145,200,222,268,305,178];
+
+// ---------- estado ----------
+let S=null, B=null, sel=-1, pegEls={}, holeEls=[], anims=[], hintMove=null;
+function load(){try{const s=JSON.parse(localStorage.getItem(KEY));if(s&&BOARDS[s.board]&&s.pegs.length===BOARDS[s.board].holes.length)return s}catch(e){}return null}
+function save(){if(REEL)return;try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
+function bests(){try{return JSON.parse(localStorage.getItem(KEY+'-best')||'{}')}catch(e){return{}}}
+function setBest(b,n){try{const o=bests();if(!o[b]||n<o[b]){o[b]=n;localStorage.setItem(KEY+'-best',JSON.stringify(o));return true}}catch(e){}return false}
+
+function newGame(kind){
+  kind=kind||(S&&S.board)||'ingles';
+  const bd=BOARDS[kind];
+  S={board:kind,pegs:bd.holes.map((_,i)=>i!==bd.start),hist:[],done:false};
+  sel=-1; hintMove=null; $('veil').hidden=true; build(); save(); render();
+}
+
+// ---------- dibujo ----------
+const boardEl=$('board');
+function build(){
+  B=BOARDS[S.board];
+  boardEl.innerHTML=''; pegEls={}; holeEls=[]; anims=[];
+  boardEl.style.setProperty('--hs',B.hs); boardEl.style.setProperty('--ps',B.ps);
+  B.holes.forEach((h,i)=>{
+    const el=document.createElement('button'); el.className='hole';
+    el.style.left=h.x+'%'; el.style.top=h.y+'%';
+    el.setAttribute('aria-label','Hueco '+(i+1));
+    el.addEventListener('click',()=>tap(i));
+    boardEl.appendChild(el); holeEls.push(el);
+  });
+  S.pegs.forEach((p,i)=>{ if(p) addPeg(i, HUES[(i*5+3)%HUES.length]) });
+}
+function addPeg(i,h){
+  const el=document.createElement('div'); el.className='peg';
+  el.style.setProperty('--h',h); el.dataset.h=h;
+  el.style.left=B.holes[i].x+'%'; el.style.top=B.holes[i].y+'%';
+  boardEl.appendChild(el); pegEls[i]=el; return el;
+}
+function legalFrom(i){return B.moves.filter(([a,o,t])=>a===i&&S.pegs[a]&&S.pegs[o]&&!S.pegs[t])}
+function allLegal(){return B.moves.filter(([a,o,t])=>S.pegs[a]&&S.pegs[o]&&!S.pegs[t])}
+function render(){
+  const n=S.pegs.filter(Boolean).length;
+  $('pegs').textContent=n; $('movs').textContent=S.hist.length; if(REEL)$('rvPegs').textContent=n;
+  const b=bests()[S.board]; $('best').textContent=b?(b===1?'1 ✓':b):'—';
+  const targets=sel>=0?legalFrom(sel).map(m=>m[2]):[];
+  holeEls.forEach((el,i)=>el.classList.toggle('target',targets.includes(i)));
+  for(const k in pegEls){pegEls[k].classList.toggle('sel',+k===sel);pegEls[k].classList.toggle('hint',!!hintMove&&hintMove[0]===+k&&sel!==+k)}
+  if(hintMove) holeEls[hintMove[2]].classList.add('target');
+  document.querySelectorAll('.boards button').forEach(x=>x.setAttribute('aria-pressed',x.dataset.b===S.board));
+  $('undo').disabled=!S.hist.length; $('hint').disabled=S.done;
+}
+
+// ---------- animación ----------
+const ease=x=>x<.5?2*x*x:1-Math.pow(-2*x+2,2)/2;
+function tickAnims(){
+  const t=now();
+  anims=anims.filter(a=>{
+    const k=Math.min(1,Math.max(0,(t-a.t0)/a.dur)), e=ease(k);
+    if(a.type==='move'){
+      a.el.style.left=(a.x0+(a.x1-a.x0)*e)+'%'; a.el.style.top=(a.y0+(a.y1-a.y0)*e)+'%';
+      const lift=Math.sin(Math.PI*k);
+      a.el.style.transform=`translate(-50%,-50%) scale(${1+.32*lift})`; a.el.style.zIndex=k<1?5:'';
+      a.el.style.filter=lift>.01?`drop-shadow(0 ${12*lift}px ${8*lift}px rgba(0,0,0,.35))`:'';
+    }else{
+      a.el.style.opacity=1-e; a.el.style.transform=`translate(-50%,-50%) scale(${1-.6*e})`;
+      if(k>=1)a.el.remove();
+    }
+    return k<1;
+  });
+}
+if(!REEL)(function loop(){tickAnims();requestAnimationFrame(loop)})();
+
+// ---------- jugadas ----------
+function tap(i){
+  if(!S||S.done)return;
+  if(S.pegs[i]){ sel=sel===i?-1:i; if(sel>=0&&!legalFrom(i).length)toast('Esa canica no puede saltar'); render(); return }
+  if(sel>=0){
+    const m=legalFrom(sel).find(m=>m[2]===i);
+    if(m){jump(m);return}
+  }
+  sel=-1; render();
+}
+function jump([a,o,t]){
+  S.hist.push(S.pegs.slice());
+  S.pegs[a]=false;S.pegs[o]=false;S.pegs[t]=true;
+  const el=pegEls[a], gone=pegEls[o]; delete pegEls[a]; delete pegEls[o]; pegEls[t]=el;
+  const d=reduce?1:300;
+  anims.push({type:'move',el,t0:now(),dur:d,x0:B.holes[a].x,y0:B.holes[a].y,x1:B.holes[t].x,y1:B.holes[t].y});
+  anims.push({type:'vanish',el:gone,t0:now()+d*0.45,dur:reduce?1:240});
+  sel=-1; hintMove=null;
+  if(!allLegal().length) setTimeout(finish, REEL?0:650);
+  save(); render();
+}
+function undo(){
+  if(!S.hist.length)return;
+  S.pegs=S.hist.pop(); S.done=false; sel=-1; hintMove=null; $('veil').hidden=true; build(); save(); render();
+}
+function finish(){
+  if(S.done||allLegal().length)return;
+  S.done=true; save();
+  if(REEL)return;
+  $('toast').hidden=true;
+  const n=S.pegs.filter(Boolean).length, inCenter=B.center>=0&&n===1&&S.pegs[B.center];
+  const rec=setBest(S.board,n);
+  const t=n===1?(inCenter?'¡Genio!':'¡Perfecto!'):n===2?'¡Casi!':n<=4?'Muy bien':n<=7?'No está mal':'Sin saltos';
+  const s=n===1?(inCenter?'Una sola canica, y justo en el centro.':'Has dejado una sola canica.'+(B.center>=0?' El reto máximo es que acabe en el centro.':'')):
+    `Quedan ${n} canicas y ya no hay saltos posibles.`;
+  $('veilT').textContent=t; $('veilS').innerHTML=s+(rec?'<br><span class="best">Nuevo récord en este tablero</span>':'');
+  $('veil').hidden=false; render();
+}
+
+// ---------- pista: búsqueda con memoria de posiciones sin salida ----------
+function solve(pegs,budget){
+  const n0=pegs.filter(Boolean).length, dead=new Set(), mv=B.moves; let nodes=0, first=null, exhausted=true;
+  const p=pegs.slice();
+  const key=()=>{let k='';for(let i=0;i<p.length;i++)k+=p[i]?'1':'0';return k};
+  function rec(n,depth){
+    if(n===1)return true;
+    const k=key(); if(dead.has(k))return false;
+    if(++nodes>budget){exhausted=false;return false}
+    for(const m of mv){const [a,o,t]=m;
+      if(p[a]&&p[o]&&!p[t]){p[a]=p[o]=false;p[t]=true;const ok=rec(n-1,depth+1);p[a]=p[o]=true;p[t]=false;
+        if(ok){if(depth===0)first=m;return true} if(nodes>budget)return false}}
+    dead.add(k);return false;
+  }
+  const ok=rec(n0,0);
+  return {ok,move:first,exhausted};
+}
+function hint(){
+  if(!S||S.done)return;
+  toast('Buscando…');
+  setTimeout(()=>{
+    const r=solve(S.pegs,250000);
+    if(r.ok){hintMove=r.move;sel=-1;render();toast('Mueve la canica marcada al hueco iluminado')}
+    else if(r.exhausted){const l=allLegal();hintMove=l[0]||null;render();toast('Desde aquí ya no se puede dejar solo una. Deshaz algún salto')}
+    else{const l=allLegal();hintMove=l[0]||null;render();toast('No encuentro un camino seguro: prueba este salto')}
+  },20);
+}
+let toastT=null;
+function toast(msg){const t=$('toast');t.textContent=msg;t.hidden=false;clearTimeout(toastT);toastT=setTimeout(()=>t.hidden=true,2600)}
+
+// ---------- controles ----------
+$('undo').onclick=undo; $('hint').onclick=hint;
+$('restart').onclick=()=>newGame(); $('veilB').onclick=()=>newGame();
+document.querySelectorAll('.boards button').forEach(b=>b.onclick=()=>newGame(b.dataset.b));
+
+// ---------- modo reel: solución real del tablero clásico ----------
+function setupReel(){
+  $('rvBoard').appendChild(document.querySelector('.wrap'));
+  S={board:'ingles',pegs:BOARDS.ingles.holes.map((_,i)=>i!==BOARDS.ingles.start),hist:[],done:false};
+  build(); render();
+  const at={};B.holes.forEach((h,i)=>at[h.r+','+h.c]=i);
+  const SOL=[[[1,3],[3,3]],[[2,1],[2,3]],[[0,2],[2,2]],[[0,4],[0,2]],[[2,3],[2,1]],[[2,0],[2,2]],[[2,4],[0,4]],[[2,6],[2,4]],[[3,2],[1,2]],[[0,2],[2,2]],[[3,0],[3,2]],[[3,2],[1,2]],[[3,4],[3,2]],[[3,6],[3,4]],[[3,4],[1,4]],[[0,4],[2,4]],[[4,2],[2,2]],[[1,2],[3,2]],[[4,0],[4,2]],[[4,3],[4,1]],[[5,4],[3,4]],[[4,6],[4,4]],[[6,2],[4,2]],[[3,2],[5,2]],[[6,4],[6,2]],[[6,2],[4,2]],[[4,1],[4,3]],[[4,3],[4,5]],[[2,4],[4,4]],[[4,5],[4,3]],[[5,3],[3,3]]]
+    .map(([f,t])=>{const a=at[f[0]+','+f[1]],b=at[t[0]+','+t[1]],o=at[(f[0]+t[0])/2+','+(f[1]+t[1])/2];return [a,o,b]});
+  const cap=(txt,cls)=>{const c=$('rvCap');c.hidden=!txt;if(txt){c.textContent=txt;c.className='rv-cap'+(cls?' '+cls:'')}};
+  const ev=[];const at2=(t,fn)=>ev.push({t,fn});
+  at2(2600,()=>cap('Salta por encima de otra canica'));
+  let t=2800;
+  SOL.forEach((m,k)=>{
+    const slow=k<4, gap=slow?820:k<8?420:250;
+    if(k===4)at2(t-100,()=>cap('…y la de en medio se va','acc'));
+    if(k===9)at2(t-100,()=>cap('Hasta dejar solo una'));
+    at2(t,()=>{sel=m[0];render()});
+    at2(t+(slow?300:k<8?140:70),()=>jump(m));
+    t+=gap;
+  });
+  at2(t+500,()=>{cap('¡Una sola, y en el centro!','ok')});
+  at2(15600,()=>{$('rvEnd').hidden=false;cap('')});
+  window.__reelDuration=19500;
+  window.__step=()=>{
+    clock+=1000/30;
+    ev.sort((a,b)=>a.t-b.t);
+    while(ev.length&&ev[0].t<=clock){const e=ev.shift();e.fn()}
+    tickAnims();
+    const intro=$('rvIntro'); intro.style.opacity=clock<2100?1:Math.max(0,1-(clock-2100)/400); intro.hidden=clock>2500;
+    return clock;
+  };
+  window.__ready=true;
+}
+
+// ---------- arranque ----------
+if(REEL){setupReel();return}
+S=load();
+if(S){build();render();if(S.done){S.done=false;finish()}}else newGame('ingles');
+})();
+</script>
+</body>
+</html>
