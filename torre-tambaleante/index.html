@@ -1,0 +1,488 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#1F6F5B">
+<meta property="og:title" content="Torre Tambaleante">
+<meta property="og:description" content="Saca un bloque, ponlo arriba y que no se caiga. Juego 3D gratis en el navegador.">
+<meta property="og:image" content="https://jrubioadies.github.io/torre-tambaleante/portada.jpg">
+<title>Torre Tambaleante</title>
+<meta name="description" content="Juego de torre de bloques en 3D. Saca un bloque, ponlo arriba y que no se caiga. Por Adilco Tech Center, SL.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lilita+One&family=Nunito:wght@500;700;800&display=swap">
+<style>
+/* Mesa de juego: marcador arriba, torre 3D a casi toda la pantalla, controles y firma de Adilco abajo */
+:root{
+  --bg:#dfe6dc; --felt:#c9d5c4; --ink:#23302a; --muted:#56655c;
+  --p1:#2a6f97; --p2:#c8502a; --card:#f3f6f1; --line:#b9c6b5;
+  --brand:#1F6F5B; --brand-ink:#ffffff;
+  --display:"Lilita One","Arial Rounded MT Bold",system-ui,sans-serif;
+  --body:"Nunito",system-ui,-apple-system,"Segoe UI",sans-serif;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#151c18; --felt:#1f2a24; --ink:#e7eee9; --muted:#9aa9a0;
+  --p1:#5aa7d6; --p2:#ec7a52; --card:#24302a; --line:#35433b; --brand:#2f8f76; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#151c18; --felt:#1f2a24; --ink:#e7eee9; --muted:#9aa9a0;
+  --p1:#5aa7d6; --p2:#ec7a52; --card:#24302a; --line:#35433b; --brand:#2f8f76; color-scheme:dark}
+html,body{height:100%}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);margin:0;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));
+  -webkit-tap-highlight-color:transparent}
+.app{max-width:520px;margin:0 auto;display:flex;flex-direction:column;gap:10px;padding-block:12px;box-sizing:border-box}
+header{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap}
+h1{font-family:var(--display);font-weight:400;font-size:28px;margin:0;letter-spacing:.5px;line-height:1}
+.modes{display:flex;gap:4px;background:var(--felt);border-radius:999px;padding:3px}
+.modes button{border:0;background:transparent;color:var(--muted);font:700 13px var(--body);padding:6px 12px;border-radius:999px;cursor:pointer}
+.modes button[aria-pressed="true"]{background:var(--card);color:var(--ink);box-shadow:0 1px 2px rgba(0,0,0,.15)}
+.score{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:8px}
+.pl{display:flex;flex-direction:column;gap:2px;padding:6px 12px;border-radius:12px;border:2px solid transparent;transition:border-color .2s,background .2s}
+.pl.r{text-align:right}
+.pl .n{font-weight:800;font-size:14px}
+.pl .w{font-family:var(--display);font-size:22px;font-variant-numeric:tabular-nums}
+.pl.p1 .w{color:var(--p1)} .pl.p2 .w{color:var(--p2)}
+.pl.on.p1{border-color:var(--p1);background:var(--card)}
+.pl.on.p2{border-color:var(--p2);background:var(--card)}
+.vs{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.1em}
+.stage{position:relative;background:radial-gradient(120% 90% at 50% 30%,var(--card),var(--felt) 70%);border-radius:18px;overflow:hidden;height:min(68vh,640px);min-height:440px}
+canvas{display:block;width:100%;height:100%;touch-action:none;cursor:grab}
+canvas:active{cursor:grabbing}
+.status{position:absolute;left:12px;right:12px;top:10px;text-align:center;font-weight:700;font-size:14px;pointer-events:none;text-shadow:0 1px 0 var(--card)}
+.status small{display:block;font-weight:500;color:var(--muted);font-size:12px;margin-top:2px}
+.hint{position:absolute;left:0;right:0;bottom:10px;text-align:center;font-size:12px;color:var(--muted);pointer-events:none;transition:opacity .6s}
+.overlay{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:color-mix(in srgb,var(--bg) 50%,transparent);backdrop-filter:blur(2px)}
+.overlay .box{background:var(--card);border-radius:16px;padding:20px 24px;text-align:center;display:flex;flex-direction:column;gap:12px;box-shadow:0 8px 30px rgba(0,0,0,.2);max-width:80%}
+.overlay h2{font-family:var(--display);font-weight:400;font-size:30px;margin:0}
+.bar{display:flex;gap:8px;align-items:center}
+.btn{border:0;border-radius:12px;padding:12px 14px;font:800 15px var(--body);cursor:pointer;background:var(--card);color:var(--ink);box-shadow:0 1px 0 var(--line)}
+.btn:focus-visible,.modes button:focus-visible,a:focus-visible{outline:3px solid var(--p1);outline-offset:2px}
+.btn.go{flex:1;color:#fff;background:var(--p1)}
+.btn.go.p2{background:var(--p2)}
+.btn:disabled{opacity:.45;cursor:default}
+.risk{font-variant-numeric:tabular-nums}
+.rules{font-size:12.5px;color:var(--muted);line-height:1.45;margin:0}
+.promo{display:flex;align-items:center;gap:12px;background:var(--brand);color:var(--brand-ink);border-radius:14px;padding:12px 14px;text-decoration:none}
+.promo .logo{flex:none;width:40px;height:40px;border-radius:10px;background:rgba(255,255,255,.16);display:grid;place-items:center;font-family:var(--display);font-size:22px}
+.promo b{display:block;font-size:15px}
+.promo small{display:block;font-size:12.5px;opacity:.85;margin-top:1px}
+.promo .arrow{margin-left:auto;font-weight:800;font-size:13px;white-space:nowrap}
+.links{font-size:12.5px;color:var(--muted);margin:0;text-align:center}
+.links a{color:var(--ink);font-weight:700}
+
+/* ---------- Modo reel (1080×1920, se usa solo para grabar el vídeo) ---------- */
+body.reel{padding:0;background:#0f1a15;overflow:hidden}
+body.reel .app{display:none}
+#reel{display:none}
+body.reel #reel{display:block;position:fixed;inset:0;width:1080px;height:1920px;overflow:hidden;
+  background:radial-gradient(90% 60% at 50% 38%,#2f4a3d 0%,#16241d 60%,#0d1612 100%);font-family:var(--body);color:#fff}
+#reel canvas{position:absolute;inset:0;width:1080px;height:1920px}
+.r-top{position:absolute;top:120px;left:0;right:0;text-align:center}
+.r-title{font-family:var(--display);font-size:120px;line-height:1;letter-spacing:2px;text-shadow:0 6px 0 rgba(0,0,0,.25);transition:none}
+.r-sub{font-size:46px;font-weight:800;opacity:.85;margin-top:18px}
+.r-chip{position:absolute;left:50%;top:1450px;transform:translateX(-50%);background:#fff;color:#16241d;font-weight:800;font-size:52px;padding:22px 40px;border-radius:999px;white-space:nowrap;box-shadow:0 10px 30px rgba(0,0,0,.35)}
+.r-risk{position:absolute;left:50%;top:330px;transform:translateX(-50%);font-weight:800;font-size:44px;padding:14px 30px;border-radius:999px;color:#fff;white-space:nowrap}
+.r-brand{position:absolute;left:0;right:0;bottom:120px;display:flex;justify-content:center}
+.r-brand div{display:flex;align-items:center;gap:22px;background:rgba(255,255,255,.1);border-radius:24px;padding:20px 34px;font-size:38px;font-weight:700}
+.r-brand .lg{width:70px;height:70px;border-radius:16px;background:#1F6F5B;display:grid;place-items:center;font-family:var(--display);font-size:42px}
+.r-end{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:40px;background:rgba(13,22,18,.86);text-align:center}
+.r-end h2{font-family:var(--display);font-weight:400;font-size:110px;margin:0;line-height:1}
+.r-end .play{font-size:54px;font-weight:800}
+.r-end .url{font-size:50px;font-weight:800;background:#fff;color:#16241d;padding:22px 36px;border-radius:22px}
+.r-end .co{display:flex;align-items:center;gap:26px;margin-top:60px}
+.r-end .co .lg{width:110px;height:110px;border-radius:24px;background:#1F6F5B;display:grid;place-items:center;font-family:var(--display);font-size:66px}
+.r-end .co b{display:block;font-size:52px;text-align:left}
+.r-end .co small{display:block;font-size:38px;opacity:.8;text-align:left}
+</style>
+<style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}[hidden]{display:none!important}</style>
+</head>
+<body>
+<div class="app">
+  <header>
+    <h1>Torre Tambaleante</h1>
+    <div class="modes" role="group" aria-label="Modo de juego">
+      <button id="m-cpu" aria-pressed="true">vs CPU</button>
+      <button id="m-2p" aria-pressed="false">2 jugadores</button>
+    </div>
+  </header>
+
+  <div class="score">
+    <div class="pl p1 on" id="pl1"><span class="n" id="n1">Tú</span><span class="w" id="w1">0</span></div>
+    <span class="vs">victorias</span>
+    <div class="pl p2 r" id="pl2"><span class="n" id="n2">CPU</span><span class="w" id="w2">0</span></div>
+  </div>
+
+  <div class="stage" id="stage">
+    <canvas id="cv" aria-label="Torre de bloques en 3D. Arrastra para girar, toca un bloque para elegirlo."></canvas>
+    <div class="status" id="status"></div>
+    <div class="hint" id="hint">Arrastra para girar · pellizca para acercar</div>
+    <div class="overlay" id="over" hidden>
+      <div class="box">
+        <h2 id="overT">¡Se cayó!</h2>
+        <div id="overS"></div>
+        <button class="btn go" id="again">Otra partida</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="bar">
+    <button class="btn" id="rot" aria-label="Girar la torre 90 grados">↻ Girar</button>
+    <button class="btn go" id="take" disabled>Elige un bloque</button>
+    <button class="btn" id="reset" aria-label="Nueva partida">Nueva</button>
+  </div>
+  <p class="rules">Toca un bloque y pulsa <b>Sacar</b>: se coloca solo arriba. El último piso completo no se toca. Un piso que se queda solo con un bloque lateral hace caer la torre, y cada hueco aumenta el riesgo. Quien la derriba, pierde.</p>
+
+  <a class="promo" href="https://adilcotech.com" target="_blank" rel="noopener">
+    <span class="logo" aria-hidden="true">A</span>
+    <span><b>Adilco Tech Center, SL</b><small>Consultoría ERP y soluciones tecnológicas a medida</small></span>
+    <span class="arrow">adilcotech.com →</span>
+  </a>
+  <p class="links">Hecho por Javier Rubio · <a href="https://jrubioadies.github.io" target="_blank" rel="noopener">jrubioadies.github.io</a> · <a href="https://github.com/jrubioadies/jrubioadies.github.io/tree/main/torre-tambaleante" target="_blank" rel="noopener">código en GitHub</a></p>
+</div>
+
+<div id="reel" aria-hidden="true">
+  <canvas id="rcv"></canvas>
+  <div class="r-top" id="rTop"><div class="r-title">Torre<br>Tambaleante</div><div class="r-sub">¿Hasta dónde aguantas?</div></div>
+  <div class="r-risk" id="rRisk" hidden></div>
+  <div class="r-chip" id="rChip" hidden></div>
+  <div class="r-brand" id="rBrand"><div><span class="lg">A</span>Adilco Tech Center, SL</div></div>
+  <div class="r-end" id="rEnd" hidden>
+    <h2>¿Te atreves?</h2>
+    <div class="play">Juega gratis en el navegador</div>
+    <div class="url">jrubioadies.github.io/torre-tambaleante</div>
+    <div class="co"><span class="lg">A</span><span><b>Adilco Tech Center, SL</b><small>adilcotech.com</small></span></div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/three@0.149.0/build/three.min.js"></script>
+<script>
+(()=>{
+const REEL=new URLSearchParams(location.search).has('reel');
+if(REEL) document.body.classList.add('reel');
+const $=id=>document.getElementById(id);
+const reduce=!REEL&&matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+// ---------- utilidades ----------
+function mulberry32(a){return function(){a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
+const rnd=REEL?mulberry32(20261028):Math.random;
+const css=v=>getComputedStyle(document.documentElement).getPropertyValue(v).trim();
+let clock=0; const now=()=>REEL?clock:performance.now();
+
+// ---------- reglas ----------
+const LEVELS0=12, H=0.6, G=0.045, BW=1, BL=3;
+let mode='cpu', wins=[0,0];
+let levels, turn, sel, anim, collapse, over, shake=0, busy, rotTarget=null;
+
+function maxTakeLevel(){const L=levels.length, full=levels[L-1].every(v=>v!==null);return full?L-2:L-3}
+function legal(i,j){return levels[i][j]!==null && i<=maxTakeLevel()}
+function holes(){let h=0;for(let i=0;i<levels.length-1;i++)for(const v of levels[i])if(v===null)h++;return h}
+function risk(i,j){
+  const left=levels[i].map((v,k)=>k!==j&&v!==null);
+  const n=left.filter(Boolean).length;
+  let p;
+  if(n===0)p=1; else if(n===1)p=left[1]?0.09:1; else p=left[1]?0.012:0.035;
+  if(p<1){p+=holes()*0.004+Math.max(0,levels.length-LEVELS0)*0.006;p=Math.min(p,0.6)}
+  return p;
+}
+function nextSlot(){const L=levels.length, top=levels[L-1];return top.every(v=>v!==null)?[L,0]:[L-1,top.indexOf(null)]}
+function slotPose(i,j){
+  const o=i%2, off=(j-1)*BW;
+  return {x:o?off:0, z:o?0:off, y:i*H+H/2, ry:o?Math.PI/2:0};
+}
+
+// ---------- Three.js ----------
+const canvas=REEL?$('rcv'):$('cv');
+const renderer=new THREE.WebGLRenderer({canvas,antialias:true,alpha:true,preserveDrawingBuffer:REEL});
+renderer.setPixelRatio(REEL?1:Math.min(devicePixelRatio||1,2));
+renderer.shadowMap.enabled=true; renderer.shadowMap.type=THREE.PCFSoftShadowMap;
+renderer.outputEncoding=THREE.sRGBEncoding;
+const scene=new THREE.Scene();
+const camera=new THREE.PerspectiveCamera(34,1,0.1,200);
+
+scene.add(new THREE.HemisphereLight(0xfff3e0,0x2b3a30,0.55));
+const sun=new THREE.DirectionalLight(0xfff4e6,0.95);
+sun.position.set(6,14,8); sun.castShadow=true;
+sun.shadow.mapSize.set(2048,2048);
+Object.assign(sun.shadow.camera,{left:-9,right:9,top:14,bottom:-6,near:1,far:40});
+sun.shadow.bias=-0.0006; scene.add(sun);
+const fill=new THREE.DirectionalLight(0xcfdcff,0.18); fill.position.set(-8,6,-6); scene.add(fill);
+
+// mesa redonda
+const table=new THREE.Mesh(new THREE.CylinderGeometry(6.2,6.2,0.35,64),new THREE.MeshStandardMaterial({color:0x24392e,roughness:0.95}));
+table.position.y=-0.175; table.receiveShadow=true; scene.add(table);
+const rim=new THREE.Mesh(new THREE.TorusGeometry(6.2,0.12,12,80),new THREE.MeshStandardMaterial({color:0x6b4a2f,roughness:0.6}));
+rim.rotation.x=Math.PI/2; rim.position.y=0; scene.add(rim);
+
+// texturas de madera generadas
+function grainTex(seed){
+  const r=mulberry32(seed), c=document.createElement('canvas'); c.width=512;c.height=128;
+  const g=c.getContext('2d'); g.fillStyle='#d8ad7e'; g.fillRect(0,0,512,128);
+  for(let k=0;k<46;k++){
+    const y0=r()*128, amp=1+r()*4, f=0.004+r()*0.01, ph=r()*6;
+    g.strokeStyle=`rgba(${120+r()*40|0},${70+r()*30|0},${35+r()*20|0},${0.08+r()*0.22})`;
+    g.lineWidth=0.6+r()*2.2; g.beginPath();
+    for(let x=0;x<=512;x+=8){const y=y0+Math.sin(x*f+ph)*amp;x?g.lineTo(x,y):g.moveTo(x,y)} g.stroke();
+  }
+  const t=new THREE.CanvasTexture(c); t.encoding=THREE.sRGBEncoding; t.anisotropy=4; return t;
+}
+function endTex(seed){
+  const r=mulberry32(seed), c=document.createElement('canvas'); c.width=128;c.height=128;
+  const g=c.getContext('2d'); g.fillStyle='#c99a6a'; g.fillRect(0,0,128,128);
+  const cx=-40+r()*40, cy=150+r()*60;
+  for(let rad=10;rad<320;rad+=5+r()*6){g.strokeStyle=`rgba(130,80,40,${0.12+r()*0.18})`;g.lineWidth=1+r()*1.5;g.beginPath();g.arc(cx,cy,rad,0,7);g.stroke()}
+  const t=new THREE.CanvasTexture(c); t.encoding=THREE.sRGBEncoding; return t;
+}
+const grains=[1,2,3,4].map(grainTex), ends=[5,6].map(endTex);
+const geo=new THREE.BoxGeometry(BL-0.02,H-0.014,BW-2*G);
+
+const tower=new THREE.Group(); scene.add(tower);
+let meshes=[];
+function makeBlock(id){
+  const tint=new THREE.Color().setHSL(0.075+rnd()*0.02,0.3+rnd()*0.2,0.72+rnd()*0.16);
+  const side=new THREE.MeshStandardMaterial({map:grains[id%4],color:tint,roughness:0.7});
+  const end=new THREE.MeshStandardMaterial({map:ends[id%2],color:tint,roughness:0.8});
+  const m=new THREE.Mesh(geo,[end,end,side,side,side,side]);
+  m.castShadow=m.receiveShadow=true; m.userData.id=id; m.userData.mats=[side,end];
+  return m;
+}
+function placeMesh(m,i,j){const p=slotPose(i,j);m.position.set(p.x,p.y,p.z);m.rotation.set(0,p.ry,0)}
+function highlight(m,color){for(const mt of m.userData.mats){mt.emissive.set(color||0x000000);mt.emissiveIntensity=color?0.45:0}}
+
+function newGame(){
+  for(const m of meshes) tower.remove(m);
+  meshes=[]; levels=[]; let id=0;
+  for(let i=0;i<LEVELS0;i++){const row=[];for(let j=0;j<3;j++){const m=makeBlock(id);meshes[id]=m;tower.add(m);placeMesh(m,i,j);row.push(id++)}levels.push(row)}
+  turn=0; sel=null; anim=null; collapse=null; over=false; shake=0; busy=false;
+  tower.rotation.set(0,0,0);
+  if(!REEL){$('over').hidden=true; ui();}
+}
+
+// ---------- cámara orbital ----------
+let az=0.75, el=0.32, zoom=1, aspect=1;
+function resize(){
+  const w=REEL?1080:canvas.clientWidth, h=REEL?1920:canvas.clientHeight;
+  renderer.setSize(w,h,false); aspect=w/h; camera.aspect=aspect; camera.updateProjectionMatrix();
+}
+function updateCamera(){
+  const th=Math.max(levels.length,LEVELS0)*H;
+  const t=Math.tan(THREE.MathUtils.degToRad(camera.fov/2));
+  const dh=(th*0.62)/t, dw=(2.9)/(t*aspect);
+  const d=Math.max(dh,dw)*zoom*(REEL?1.32:1);
+  const ty=th*(REEL?0.56:0.48);
+  camera.position.set(Math.sin(az)*Math.cos(el)*d, ty+Math.sin(el)*d, Math.cos(az)*Math.cos(el)*d);
+  camera.lookAt(0,ty,0);
+}
+
+// ---------- animación de un movimiento ----------
+function slideSign(i){
+  const o=i%2, axis=o?new THREE.Vector3(0,0,1):new THREE.Vector3(1,0,0);
+  const toCam=new THREE.Vector3(camera.position.x,0,camera.position.z);
+  return axis.dot(toCam)>=0?1:-1;
+}
+function startMove(i,j){
+  const id=levels[i][j], p=risk(i,j), [ti,tj]=nextSlot();
+  if(sel) highlight(meshes[sel.id],null);
+  anim={id,i,j,ti,tj,p,t0:now(),sign:slideSign(i),from:slotPose(i,j),to:slotPose(ti,tj)};
+  highlight(meshes[id],turn===0?css('--p1')||'#2a6f97':css('--p2')||'#c8502a');
+  busy=true; sel=null; if(!REEL) ui();
+}
+const ease=x=>x<.5?2*x*x:1-Math.pow(-2*x+2,2)/2;
+function stepMove(){
+  const a=anim, m=meshes[a.id], el=now()-a.t0;
+  const SL=reduce?1:420, FL=reduce?1:620, dist=2.7;
+  const o=a.i%2, dx=o?0:a.sign*dist, dz=o?a.sign*dist:0;
+  if(el<SL){const k=ease(el/SL);m.position.set(a.from.x+dx*k,a.from.y,a.from.z+dz*k);return}
+  const k=Math.min(1,(el-SL)/FL), e=ease(k);
+  const sx=a.from.x+dx, sz=a.from.z+dz;
+  let rTo=a.to.ry; if(Math.abs(rTo-a.from.ry)>Math.PI/2+0.01) rTo-=Math.PI;
+  m.position.set(sx+(a.to.x-sx)*e, a.from.y+(a.to.y-a.from.y)*e+Math.sin(e*Math.PI)*1.6, sz+(a.to.z-sz)*e);
+  m.rotation.y=a.from.ry+(rTo-a.from.ry)*e;
+  if(k>=1) finishMove();
+}
+function finishMove(){
+  const a=anim; anim=null;
+  highlight(meshes[a.id],null);
+  levels[a.i][a.j]=null;
+  if(a.ti===levels.length) levels.push([null,null,null]);
+  levels[a.ti][a.tj]=a.id; placeMesh(meshes[a.id],a.ti,a.tj);
+  const fall=a.force!==undefined?a.force:rnd()<a.p;
+  if(fall){startCollapse(a.i);return}
+  if(a.p>0.03) shake=1;
+  turn=1-turn; busy=false;
+  if(!REEL){ui();maybeCpu()}
+}
+
+// ---------- derrumbe con física sencilla ----------
+function startCollapse(weak){
+  const ang=Math.atan2(camera.position.x,camera.position.z)+Math.PI/2+(rnd()-.5)*1.2;
+  const dir=new THREE.Vector3(Math.cos(ang),0,Math.sin(ang));
+  const axis=new THREE.Vector3(0,1,0).cross(dir).normalize();
+  const parts=[];
+  for(let i=0;i<levels.length;i++)for(let j=0;j<3;j++){
+    const id=levels[i][j]; if(id===null) continue;
+    const m=meshes[id], up=i-weak;
+    let v=new THREE.Vector3(), w=new THREE.Vector3();
+    if(up>=0){
+      v.copy(dir).multiplyScalar(1.2+up*0.55+rnd()*0.8);
+      v.x+=(rnd()-.5)*1.4; v.z+=(rnd()-.5)*1.4; v.y=0.5+rnd()*1.5;
+      w.copy(axis).multiplyScalar(2+rnd()*3); w.x+=(rnd()-.5)*3; w.y+=(rnd()-.5)*4; w.z+=(rnd()-.5)*3;
+    }else if(up>=-3){
+      v.set((rnd()-.5)*1.2,0.2,(rnd()-.5)*1.2); v.addScaledVector(dir,0.8);
+      w.set((rnd()-.5)*2,(rnd()-.5)*2,(rnd()-.5)*2);
+    }
+    parts.push({m,v,w,delay:up>=0?Math.max(0,(levels.length-i))*18:150+rnd()*200,live:up>=-3,rest:false});
+  }
+  collapse={parts,t0:now(),last:now()}; over=true; busy=true;
+  if(REEL) return;
+  const loser=turn, winner=1-turn; wins[winner]++;
+  setTimeout(()=>{
+    $('overT').textContent='¡Se cayó!';
+    $('overS').textContent=`${name(loser)} derribó la torre. Gana ${name(winner)}.`;
+    $('again').className='btn go'+(winner===1?' p2':'');
+    $('over').hidden=false; ui();
+  },reduce?300:1800);
+  ui();
+}
+function stepCollapse(){
+  const t=now(), dt=Math.min(0.05,(t-collapse.last)/1000); collapse.last=t;
+  const el=t-collapse.t0, q=new THREE.Quaternion();
+  for(const p of collapse.parts){
+    if(!p.live||p.rest||el<p.delay) continue;
+    p.v.y-=16*dt;
+    p.m.position.addScaledVector(p.v,dt);
+    const wl=p.w.length(); if(wl>0){q.setFromAxisAngle(p.w.clone().divideScalar(wl),wl*dt);p.m.quaternion.premultiply(q)}
+    const r=Math.hypot(p.m.position.x,p.m.position.z), floor=r<6.1?0.3:-4;
+    if(p.m.position.y<floor){
+      p.m.position.y=floor;
+      if(Math.abs(p.v.y)<1.2){p.v.multiplyScalar(0.85);p.v.y=0;p.w.multiplyScalar(0.8);if(p.v.length()<0.15&&p.w.length()<0.2)p.rest=true}
+      else{p.v.y=-p.v.y*0.28;p.v.x*=0.65;p.v.z*=0.65;p.w.multiplyScalar(0.6)}
+    }
+  }
+}
+
+// ---------- CPU ----------
+function moves(){const m=[];for(let i=0;i<=maxTakeLevel();i++)for(let j=0;j<3;j++)if(legal(i,j))m.push({i,j,p:risk(i,j)});return m}
+function maybeCpu(){
+  if(mode!=='cpu'||turn!==1||over) return;
+  busy=true; ui();
+  setTimeout(()=>{
+    const m=moves().sort((a,b)=>a.p-b.p); if(!m.length) return;
+    const safe=m.filter(x=>x.p<=m[0].p+0.005);
+    const pick=Math.random()<0.8?safe[Math.floor(Math.random()*safe.length)]:m[Math.floor(Math.random()*Math.min(4,m.length))];
+    selectBlock(pick.i,pick.j); ui();
+    setTimeout(()=>startMove(pick.i,pick.j),reduce?100:650);
+  },reduce?150:700);
+}
+function selectBlock(i,j){
+  if(sel) highlight(meshes[sel.id],null);
+  sel={i,j,id:levels[i][j]};
+  highlight(meshes[sel.id],turn===0?css('--p1'):css('--p2'));
+}
+
+// ---------- bucle ----------
+function render(){
+  if(rotTarget!==null){const d=rotTarget-az;az+=d*0.15;if(Math.abs(d)<0.002){az=rotTarget;rotTarget=null}}
+  updateCamera();
+  if(anim) stepMove();
+  if(collapse) stepCollapse();
+  if(shake>0){shake=Math.max(0,shake-0.025);const s=Math.sin(now()/30)*0.012*shake;tower.rotation.set(s,0,s*0.6)} else tower.rotation.set(0,0,0);
+  renderer.render(scene,camera);
+}
+
+// =================== MODO JUEGO ===================
+function name(k){return k===0?(mode==='cpu'?'Tú':'Jugador 1'):(mode==='cpu'?'La CPU':'Jugador 2')}
+function ui(){
+  $('n1').textContent=mode==='cpu'?'Tú':'Jugador 1';
+  $('n2').textContent=mode==='cpu'?'CPU':'Jugador 2';
+  $('w1').textContent=wins[0]; $('w2').textContent=wins[1];
+  $('pl1').classList.toggle('on',turn===0&&!over); $('pl2').classList.toggle('on',turn===1&&!over);
+  const tk=$('take'); tk.classList.toggle('p2',turn===1);
+  const cpuTurn=mode==='cpu'&&turn===1, st=$('status');
+  if(over){st.innerHTML='';tk.disabled=true;tk.textContent='Fin de la partida';return}
+  if(sel&&!cpuTurn){
+    const p=risk(sel.i,sel.j);
+    tk.disabled=busy; tk.innerHTML=`Sacar · <span class="risk">riesgo ${p>=1?'100':(p*100).toFixed(p<0.1?1:0).replace('.',',')} %</span>`;
+    st.innerHTML=`Piso ${sel.i+1}, bloque ${['de un lado','central','del otro lado'][sel.j]}<small>Toca otra vez o pulsa Sacar</small>`;
+  }else{
+    tk.disabled=true; tk.textContent=cpuTurn?'Piensa la CPU…':'Elige un bloque';
+    st.innerHTML=cpuTurn?'Turno de la CPU':`Turno de ${name(turn)}<small>${levels.length} pisos · ${holes()} huecos</small>`;
+  }
+}
+function setupGame(){
+  const ray=new THREE.Raycaster(), ptr=new THREE.Vector2();
+  const pts=new Map(); let moved=false, pinch0=0, zoom0=1;
+  canvas.addEventListener('pointerdown',e=>{canvas.setPointerCapture(e.pointerId);pts.set(e.pointerId,{x:e.clientX,y:e.clientY,sx:e.clientX,sy:e.clientY});moved=false;rotTarget=null;
+    if(pts.size===2){const [a,b]=[...pts.values()];pinch0=Math.hypot(a.x-b.x,a.y-b.y);zoom0=zoom}});
+  canvas.addEventListener('pointermove',e=>{
+    const p=pts.get(e.pointerId); if(!p) return;
+    const dx=e.clientX-p.x, dy=e.clientY-p.y; p.x=e.clientX;p.y=e.clientY;
+    if(Math.hypot(p.x-p.sx,p.y-p.sy)>6) moved=true;
+    if(pts.size===2){const [a,b]=[...pts.values()];const d=Math.hypot(a.x-b.x,a.y-b.y);zoom=THREE.MathUtils.clamp(zoom0*pinch0/d,0.55,1.6);return}
+    if(moved){az-=dx*0.009; el=THREE.MathUtils.clamp(el+dy*0.006,-0.05,1.25); $('hint').style.opacity=0}
+  });
+  const up=e=>{
+    const p=pts.get(e.pointerId); pts.delete(e.pointerId);
+    if(!p||moved||pts.size>0) return;
+    if(busy||over||(mode==='cpu'&&turn===1)) return;
+    const r=canvas.getBoundingClientRect();
+    ptr.set(((e.clientX-r.left)/r.width)*2-1,-((e.clientY-r.top)/r.height)*2+1);
+    ray.setFromCamera(ptr,camera);
+    const hit=ray.intersectObjects(meshes,false)[0];
+    if(!hit){if(sel)highlight(meshes[sel.id],null);sel=null;ui();return}
+    const id=hit.object.userData.id; let fi=-1,fj=-1;
+    levels.forEach((row,i)=>row.forEach((v,j)=>{if(v===id){fi=i;fj=j}}));
+    if(fi<0) return;
+    if(!legal(fi,fj)){if(sel)highlight(meshes[sel.id],null);sel=null;ui();$('status').innerHTML='Ese piso no se puede tocar<small>Los dos pisos de arriba están bloqueados</small>';return}
+    if(sel&&sel.id===id){startMove(fi,fj);return}
+    selectBlock(fi,fj); ui();
+  };
+  canvas.addEventListener('pointerup',up); canvas.addEventListener('pointercancel',e=>pts.delete(e.pointerId));
+  canvas.addEventListener('wheel',e=>{e.preventDefault();zoom=THREE.MathUtils.clamp(zoom*(1+e.deltaY*0.001),0.55,1.6)},{passive:false});
+  $('take').onclick=()=>{if(sel&&!busy)startMove(sel.i,sel.j)};
+  $('rot').onclick=()=>{rotTarget=(rotTarget??az)+Math.PI/2};
+  $('reset').onclick=newGame; $('again').onclick=newGame;
+  const setMode=m=>{mode=m;wins=[0,0];$('m-cpu').setAttribute('aria-pressed',m==='cpu');$('m-2p').setAttribute('aria-pressed',m==='2p');newGame()};
+  $('m-cpu').onclick=()=>setMode('cpu'); $('m-2p').onclick=()=>setMode('2p');
+  new ResizeObserver(resize).observe(canvas);
+  newGame(); resize();
+  (function loop(){render();requestAnimationFrame(loop)})();
+}
+
+// =================== MODO REEL (grabación determinista) ===================
+function setupReel(){
+  resize(); newGame(); zoom=0.92;
+  const P1='#3b8fc4', P2='#e2683c';
+  // guion: [instante ms, piso, slot]
+  const script=[[2700,5,1],[4500,3,0],[6300,7,2],[8100,2,1],[9900,8,0],[11700,5,0]];
+  const done=new Set();
+  const show=(el,on)=>{el.hidden=!on};
+  window.__reelDuration=19000;
+  window.__step=()=>{
+    clock+=1000/30;
+    const t=clock;
+    az=0.55+t*0.00028+(t>11700&&t<15000?(t-11700)*0.00006:0); el=0.34-Math.min(t,4000)*0.000015;
+    for(const [ts,i,j] of script){
+      if(t>=ts-600&&!done.has(ts+'s')&&!busy){done.add(ts+'s');sel={i,j,id:levels[i][j]};highlight(meshes[sel.id],turn===0?P1:P2);
+        const p=risk(i,j), r=$('rRisk'); r.textContent=p>=1?'¡Riesgo 100 %!':`Riesgo ${(p*100).toFixed(1).replace('.',',')} %`; r.style.background=turn===0?P1:P2; show(r,true)}
+      if(t>=ts&&!done.has(ts)&&!busy){done.add(ts);const last=ts===11700;startMove(i,j);anim.force=last;
+        highlight(meshes[anim.id],turn===0?P1:P2)}
+    }
+    if(!busy&&!over) show($('rRisk'),false);
+    if(over) show($('rRisk'),false);
+    const top=$('rTop'); top.style.opacity=t<2300?1:Math.max(0,1-(t-2300)/400);
+    const chip=$('rChip');
+    const cap=t<2600?null:t<6000?'Saca un bloque':t<9600?'Ponlo arriba':t<11600?'Gira la torre en 3D':t<13300?'¡Cuidado!':t<15000?'¡CRASH!':null;
+    show(chip,!!cap); if(cap) chip.textContent=cap;
+    show($('rEnd'),t>=15200); $('rEnd').style.opacity=Math.min(1,(t-15200)/400);
+    show($('rBrand'),t<15200);
+    render();
+    return t;
+  };
+  window.__ready=true;
+}
+
+if(REEL) setupReel(); else setupGame();
+})();
+</script>
+</body>
+</html>
