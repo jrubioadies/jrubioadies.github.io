@@ -1,0 +1,507 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#1b2747">
+<meta property="og:title" content="Sudoku de bolsillo">
+<meta property="og:description" content="Sudokus nuevos en cada partida, con notas, pistas y cuatro niveles. Gratis en el navegador.">
+<meta property="og:image" content="https://jrubioadies.github.io/sudoku/portada.jpg">
+<title>Sudoku de Bolsillo</title>
+<meta name="description" content="Sudoku para el móvil con cuatro niveles, notas, pistas y partida guardada. Por Adilco Tech Center, SL.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Figtree:wght@400;500;600;700&display=swap">
+<style>
+/* Cuaderno de pasatiempos: tinta azul marino sobre papel frío, marcador amarillo para la casilla activa */
+:root{
+  --paper:#eef1f6; --sheet:#fbfcfe; --ink:#1b2747; --muted:#5f6a83; --line:#c9d0de;
+  --pen:#2c56c9; --marker:#ffe45c; --tint:#e1e7f3; --same:#cdd8f2; --bad:#c8323b; --bad-bg:#fbe3e5;
+  --hint:#1f7a5b; --brand:#1F6F5B; --brand-ink:#ffffff;
+  --display:"Bricolage Grotesque","Avenir Next",system-ui,sans-serif;
+  --body:"Figtree",system-ui,-apple-system,"Segoe UI",sans-serif;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --paper:#11151f; --sheet:#1a2030; --ink:#e4e9f5; --muted:#97a1b8; --line:#2f3850;
+  --pen:#7ea2ff; --marker:#6b5b12; --tint:#222a3d; --same:#2c3a5e; --bad:#ff7b84; --bad-bg:#4a1f26;
+  --hint:#5fd0a5; --brand:#2f8f76; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --paper:#11151f; --sheet:#1a2030; --ink:#e4e9f5; --muted:#97a1b8; --line:#2f3850;
+  --pen:#7ea2ff; --marker:#6b5b12; --tint:#222a3d; --same:#2c3a5e; --bad:#ff7b84; --bad-bg:#4a1f26;
+  --hint:#5fd0a5; --brand:#2f8f76; color-scheme:dark}
+
+[hidden]{display:none!important}
+body{background:var(--paper);color:var(--ink);font-family:var(--body);margin:0;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));
+  -webkit-tap-highlight-color:transparent}
+.app{max-width:520px;margin:0 auto;display:flex;flex-direction:column;gap:14px;padding-block:14px 24px}
+header{display:flex;align-items:flex-end;justify-content:space-between;gap:10px;flex-wrap:wrap}
+h1{font-family:var(--display);font-weight:800;font-size:34px;line-height:.95;margin:0;letter-spacing:-.5px;text-wrap:balance}
+h1 em{font-style:normal;color:var(--pen)}
+.levels{display:flex;gap:2px;background:var(--tint);border-radius:999px;padding:3px}
+.levels button{border:0;background:transparent;color:var(--muted);font:600 13px var(--body);padding:7px 11px;border-radius:999px;cursor:pointer}
+.levels button[aria-pressed="true"]{background:var(--sheet);color:var(--ink);box-shadow:0 1px 2px rgba(0,0,0,.12)}
+
+.stats{display:flex;justify-content:space-between;align-items:center;font-size:13px;color:var(--muted);font-variant-numeric:tabular-nums}
+.stats b{color:var(--ink);font-weight:700}
+.stats .right{display:flex;gap:14px;align-items:center}
+.pause{border:0;background:var(--tint);color:var(--ink);width:30px;height:30px;border-radius:50%;cursor:pointer;font-size:12px}
+
+.wrap{position:relative}
+.board{container-type:inline-size;display:grid;grid-template-columns:repeat(9,1fr);aspect-ratio:1;width:100%;max-width:100%;
+  background:var(--sheet);border:3px solid var(--ink);border-radius:12px;overflow:hidden;box-sizing:border-box;user-select:none}
+.cell{position:relative;border:0;padding:0;margin:0;background:transparent;color:var(--ink);font:500 7cqw/1 var(--display);
+  border-right:1px solid var(--line);border-bottom:1px solid var(--line);cursor:pointer;display:grid;place-items:center;font-variant-numeric:tabular-nums}
+.cell.br{border-right:2.5px solid var(--ink)} .cell.bb{border-bottom:2.5px solid var(--ink)}
+.cell.c8{border-right:0} .cell.r8{border-bottom:0}
+.cell.given{font-weight:700}
+.cell.user{color:var(--pen)}
+.cell.hinted{color:var(--hint)}
+.cell.zone{background:var(--tint)}
+.cell.same{background:var(--same)}
+.cell.sel{background:var(--marker)}
+.cell.wrong{color:var(--bad);background:var(--bad-bg)}
+.cell.sel.wrong{background:var(--marker)}
+.cell:focus-visible{outline:3px solid var(--pen);outline-offset:-3px;z-index:1}
+.cell.pop{animation:pop .28s ease-out}
+@keyframes pop{0%{transform:scale(.6)}70%{transform:scale(1.12)}100%{transform:scale(1)}}
+.notes{position:absolute;inset:6%;display:grid;grid-template-columns:repeat(3,1fr);grid-template-rows:repeat(3,1fr);
+  font:600 2.7cqw/1 var(--body);color:var(--muted)}
+.notes span{display:grid;place-items:center}
+.notes span.hl{color:var(--pen);font-weight:800}
+.board.paused .cell{color:transparent!important}
+.board.paused .notes{visibility:hidden}
+.veil{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:12px;text-align:center;
+  background:color-mix(in srgb,var(--paper) 72%,transparent);backdrop-filter:blur(3px);border-radius:12px}
+.veil h2{font-family:var(--display);font-weight:800;font-size:34px;margin:0}
+.veil p{margin:0;color:var(--muted);font-variant-numeric:tabular-nums}
+.veil .best{color:var(--hint);font-weight:700}
+
+.tools{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.tool{border:0;background:transparent;color:var(--ink);font:600 12.5px var(--body);display:flex;flex-direction:column;align-items:center;gap:4px;padding:6px 0;cursor:pointer;border-radius:12px;position:relative}
+.tool .ic{width:44px;height:44px;border-radius:50%;background:var(--tint);display:grid;place-items:center}
+.tool .ic svg{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.tool[aria-pressed="true"] .ic{background:var(--pen);color:var(--sheet)}
+.tool .badge{position:absolute;top:2px;left:calc(50% + 10px);background:var(--pen);color:var(--sheet);font-size:11px;font-weight:700;min-width:18px;height:18px;border-radius:9px;display:grid;place-items:center;padding:0 4px;box-sizing:border-box}
+.tool:disabled{opacity:.4;cursor:default}
+
+.pad{display:grid;grid-template-columns:repeat(9,1fr);gap:6px}
+.num{border:0;background:var(--sheet);color:var(--pen);border-radius:12px;padding:10px 0 6px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:2px;box-shadow:0 1px 0 var(--line)}
+.num b{font:700 clamp(22px,6.4vw,30px)/1 var(--display)}
+.num small{font-size:11px;color:var(--muted);font-variant-numeric:tabular-nums}
+.num.done{visibility:hidden}
+.notesmode .num{color:var(--muted)}
+.btn{border:0;border-radius:12px;padding:12px 18px;font:700 15px var(--body);cursor:pointer;background:var(--pen);color:var(--sheet)}
+button:focus-visible{outline:3px solid var(--pen);outline-offset:2px}
+
+.rules{font-size:12.5px;color:var(--muted);line-height:1.5;margin:0}
+.promo{display:flex;align-items:center;gap:12px;background:var(--brand);color:var(--brand-ink);border-radius:14px;padding:12px 14px;text-decoration:none}
+.promo .logo{flex:none;width:40px;height:40px;border-radius:10px;background:rgba(255,255,255,.16);display:grid;place-items:center;font:800 22px var(--display)}
+.promo span{min-width:0}
+.promo b{display:block;font-size:15px}
+.promo small{display:block;font-size:12.5px;opacity:.85;margin-top:1px}
+.promo .arrow{margin-left:auto;font-weight:700;font-size:13px;white-space:nowrap}
+.links{font-size:12.5px;color:var(--muted);margin:0;text-align:center;line-height:1.7}
+.links a{color:var(--ink);font-weight:600}
+@media (max-width:460px){.promo .arrow{display:none}}
+@media (prefers-reduced-motion: reduce){.cell.pop{animation:none}}
+
+/* ---------- Modo reel (1080×1920, solo para grabar el vídeo) ---------- */
+#reel{display:none}
+body.reel{padding:0;overflow:hidden;background:var(--paper)}
+body.reel .app{display:none}
+body.reel #reel{display:block;position:fixed;left:0;top:0;width:1080px;height:1920px;overflow:hidden;
+  background:radial-gradient(80% 50% at 50% 42%,#ffffff 0%,var(--paper) 70%)}
+.rv-head{position:absolute;left:60px;right:60px;top:110px;display:flex;align-items:flex-end;justify-content:space-between}
+.rv-title{font:800 92px/.9 var(--display);letter-spacing:-2px;color:var(--ink)}
+.rv-title em{font-style:normal;color:var(--pen);display:block}
+.rv-meta{display:flex;flex-direction:column;align-items:flex-end;gap:6px;font:500 32px var(--body);color:var(--muted);font-variant-numeric:tabular-nums}
+.rv-meta b{color:var(--ink);font-weight:700}
+.rv-board{position:absolute;left:60px;top:380px;width:960px}
+body.reel .board{border-width:6px;border-radius:22px;box-shadow:0 30px 60px rgba(27,39,71,.16)}
+body.reel .cell.br{border-right-width:4px} body.reel .cell.bb{border-bottom-width:4px}
+body.reel .cell{border-right-width:1.5px;border-bottom-width:1.5px}
+.rv-cap{position:absolute;left:50%;top:1392px;transform:translateX(-50%);white-space:nowrap;background:var(--ink);color:#fff;
+  font:700 48px var(--body);padding:20px 40px;border-radius:999px;box-shadow:0 12px 30px rgba(27,39,71,.25)}
+.rv-cap.ok{background:var(--hint)} .rv-cap.bad{background:var(--bad)} .rv-cap.note{background:var(--pen)}
+.rv-pad{position:absolute;left:60px;right:60px;top:1530px}
+body.reel .pad{gap:12px}
+body.reel .num{border-radius:22px;padding:20px 0 12px;box-shadow:0 2px 0 var(--line)}
+body.reel .num b{font-size:66px}
+body.reel .num small{font-size:24px}
+body.reel .pad.notesmode .num{background:var(--tint)}
+.rv-brand{position:absolute;left:0;right:0;bottom:90px;display:flex;justify-content:center}
+.rv-brand div{display:flex;align-items:center;gap:20px;font:700 36px var(--body);color:var(--ink)}
+.rv-lg{width:66px;height:66px;border-radius:16px;background:var(--brand);color:#fff;display:grid;place-items:center;font:800 40px var(--display)}
+.rv-intro{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:28px;text-align:center;
+  background:color-mix(in srgb,var(--paper) 88%,transparent);backdrop-filter:blur(6px)}
+.rv-intro .big{font:800 230px/.85 var(--display);letter-spacing:-6px;color:var(--ink)}
+.rv-intro .big em{display:block;font-style:normal;color:var(--pen);font-size:140px;letter-spacing:-3px}
+.rv-intro .q{font:700 56px var(--body);color:var(--ink);background:var(--marker);padding:14px 34px;border-radius:16px;margin-top:30px}
+.rv-end{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:40px;text-align:center;background:var(--ink);color:#fff}
+.rv-end h2{font:800 120px/.95 var(--display);margin:0;letter-spacing:-3px}
+.rv-end h2 span{background:var(--marker);color:var(--ink);padding:0 18px;border-radius:14px}
+.rv-end .play{font:600 50px var(--body);opacity:.9}
+.rv-end .url{font:700 50px var(--body);background:#fff;color:var(--ink);padding:24px 38px;border-radius:22px}
+.rv-end .co{display:flex;align-items:center;gap:26px;margin-top:70px}
+.rv-end .co .rv-lg{width:110px;height:110px;border-radius:24px;font-size:66px}
+.rv-end .co b{display:block;font:700 52px var(--body);text-align:left}
+.rv-end .co small{display:block;font:500 38px var(--body);opacity:.8;text-align:left}
+.rv-end .more{font:600 34px var(--body);opacity:.7;margin-top:10px}
+</style>
+<style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}</style>
+</head>
+<body>
+<div class="app">
+  <header>
+    <h1>Sudoku <em>de bolsillo</em></h1>
+    <div class="levels" role="group" aria-label="Dificultad">
+      <button data-lv="facil">Fácil</button>
+      <button data-lv="medio">Medio</button>
+      <button data-lv="dificil">Difícil</button>
+      <button data-lv="experto">Experto</button>
+    </div>
+  </header>
+
+  <div class="stats">
+    <span>Errores <b id="errs">0</b></span>
+    <span class="right"><span>Tiempo <b id="time">00:00</b></span>
+      <button class="pause" id="pause" aria-label="Pausar">❚❚</button></span>
+  </div>
+
+  <div class="wrap">
+    <div class="board" id="board" role="grid" aria-label="Tablero de sudoku"></div>
+    <div class="veil" id="veil" hidden>
+      <h2 id="veilT">En pausa</h2>
+      <p id="veilS"></p>
+      <button class="btn" id="veilB">Seguir</button>
+    </div>
+  </div>
+
+  <div class="tools">
+    <button class="tool" id="undo"><span class="ic"><svg viewBox="0 0 24 24"><path d="M9 14 4 9l5-5"/><path d="M4 9h10.5a5.5 5.5 0 0 1 0 11H11"/></svg></span>Deshacer</button>
+    <button class="tool" id="erase"><span class="ic"><svg viewBox="0 0 24 24"><path d="m7 21-4.3-4.3a1 1 0 0 1 0-1.4l10-10a1 1 0 0 1 1.4 0l5.6 5.6a1 1 0 0 1 0 1.4L13 19"/><path d="M22 21H7"/><path d="m5 11 9 9"/></svg></span>Borrar</button>
+    <button class="tool" id="notes" aria-pressed="false"><span class="ic"><svg viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></span>Notas</button>
+    <button class="tool" id="hint"><span class="ic"><svg viewBox="0 0 24 24"><path d="M9 18h6"/><path d="M10 22h4"/><path d="M12 2a7 7 0 0 0-4 12.7c.6.5 1 1.2 1 2.3h6c0-1.1.4-1.8 1-2.3A7 7 0 0 0 12 2Z"/></svg></span>Pista<span class="badge" id="hintN">3</span></button>
+  </div>
+
+  <div class="pad" id="pad"></div>
+
+  <p class="rules">Rellena cada fila, columna y bloque de 3×3 con los números del 1 al 9 sin repetir. Con <b>Notas</b> activado apuntas candidatos. Tienes 3 pistas por partida y la partida se guarda sola. En ordenador puedes usar el teclado: flechas, números, Supr y N para notas.</p>
+
+  <a class="promo" href="https://adilcotech.com" target="_blank" rel="noopener">
+    <span class="logo" aria-hidden="true">A</span>
+    <span><b>Adilco Tech Center, SL</b><small>Consultoría ERP y soluciones tecnológicas a medida</small></span>
+    <span class="arrow">adilcotech.com →</span>
+  </a>
+  <p class="links">Más juegos: <a href="https://jrubioadies.github.io/othello/" target="_blank" rel="noopener">Othello</a> · <a href="https://jrubioadies.github.io/torre-tambaleante/" target="_blank" rel="noopener">Torre Tambaleante</a><br>
+  Hecho por Javier Rubio · <a href="https://jrubioadies.github.io" target="_blank" rel="noopener">jrubioadies.github.io</a> · <a href="https://github.com/jrubioadies/jrubioadies.github.io/tree/main/sudoku" target="_blank" rel="noopener">código en GitHub</a></p>
+</div>
+
+<div id="reel" aria-hidden="true">
+  <div class="rv-head"><div class="rv-title">Sudoku<em>de bolsillo</em></div>
+    <div class="rv-meta"><span>Nivel <b>Medio</b></span><span>Tiempo <b id="rvTime">00:00</b></span></div></div>
+  <div class="rv-board" id="rvBoard"></div>
+  <div class="rv-cap" id="rvCap" hidden></div>
+  <div class="rv-pad" id="rvPad"></div>
+  <div class="rv-brand"><div><span class="rv-lg">A</span>Adilco Tech Center, SL</div></div>
+  <div class="rv-intro" id="rvIntro"><div class="big">SUDOKU<em>de bolsillo</em></div><div class="q">¿Cuánto tardas tú?</div></div>
+  <div class="rv-end" id="rvEnd" hidden>
+    <h2>¿Lo <span>resuelves</span><br>tú?</h2>
+    <div class="play">Juega gratis en el navegador</div>
+    <div class="url">jrubioadies.github.io/sudoku</div>
+    <div class="co"><span class="rv-lg">A</span><span><b>Adilco Tech Center, SL</b><small>adilcotech.com</small></span></div>
+    <div class="more">Más juegos: Othello · Torre Tambaleante</div>
+  </div>
+</div>
+
+<script>
+(()=>{
+const REEL=new URLSearchParams(location.search).has('reel');
+if(REEL)document.body.classList.add('reel');
+function mulberry32(a){return function(){a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
+const rnd=REEL?mulberry32(20261028):Math.random;
+const $=id=>document.getElementById(id);
+const LV={facil:{n:'Fácil',clues:40},medio:{n:'Medio',clues:33},dificil:{n:'Difícil',clues:28},experto:{n:'Experto',clues:23}};
+const KEY='sudoku-bolsillo-v1', HINTS=3;
+const R=i=>(i/9)|0, C=i=>i%9, B=i=>((R(i)/3)|0)*3+((C(i)/3)|0);
+const PEERS=[...Array(81)].map((_,i)=>{const a=[];for(let j=0;j<81;j++)if(j!==i&&(R(j)===R(i)||C(j)===C(i)||B(j)===B(i)))a.push(j);return a});
+const pc=m=>{let n=0;while(m){m&=m-1;n++}return n};
+const shuffle=a=>{for(let i=a.length-1;i>0;i--){const j=Math.floor(rnd()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
+
+// ---------- solver / generador ----------
+function search(grid,limit,random){
+  const g=grid.slice(), rows=Array(9).fill(0), cols=Array(9).fill(0), boxes=Array(9).fill(0);
+  for(let i=0;i<81;i++)if(g[i]){const b=1<<g[i];rows[R(i)]|=b;cols[C(i)]|=b;boxes[B(i)]|=b}
+  let count=0, sol=null;
+  (function rec(){
+    let best=-1,bm=0,bn=10;
+    for(let i=0;i<81;i++)if(!g[i]){
+      const m=~(rows[R(i)]|cols[C(i)]|boxes[B(i)])&0x3FE, n=pc(m);
+      if(n<bn){bn=n;best=i;bm=m;if(n<=1)break}
+    }
+    if(best<0){count++;if(!sol)sol=g.slice();return count>=limit}
+    if(bn===0)return false;
+    const ds=[];for(let d=1;d<=9;d++)if(bm&(1<<d))ds.push(d);
+    if(random)shuffle(ds);
+    const r=R(best),c=C(best),b=B(best);
+    for(const d of ds){
+      const bit=1<<d; g[best]=d;rows[r]|=bit;cols[c]|=bit;boxes[b]|=bit;
+      if(rec())return true;
+      g[best]=0;rows[r]&=~bit;cols[c]&=~bit;boxes[b]&=~bit;
+    }
+    return false;
+  })();
+  return {count,sol};
+}
+function generate(level){
+  const solution=search(Array(81).fill(0),1,true).sol;
+  const g=solution.slice(); let clues=81;
+  for(const i of shuffle([...Array(81).keys()])){
+    if(clues<=LV[level].clues)break;
+    const v=g[i]; g[i]=0;
+    if(search(g,2,false).count!==1)g[i]=v; else clues--;
+  }
+  return {puzzle:g,solution};
+}
+
+// ---------- estado ----------
+let S=null, sel=-1, notesMode=false, hist=[], tick=null;
+function load(){try{const s=JSON.parse(localStorage.getItem(KEY));if(s&&s.puzzle&&s.puzzle.length===81)return s}catch(e){}return null}
+function save(){if(REEL)return;try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
+function bestOf(lv){try{return JSON.parse(localStorage.getItem(KEY+'-best')||'{}')[lv]}catch(e){return undefined}}
+function setBest(lv,t){try{const b=JSON.parse(localStorage.getItem(KEY+'-best')||'{}');if(!b[lv]||t<b[lv]){b[lv]=t;localStorage.setItem(KEY+'-best',JSON.stringify(b));return true}}catch(e){}return false}
+
+function newGame(level){
+  level=level||(S&&S.level)||'medio';
+  showVeil('Generando…','Preparando un sudoku '+LV[level].n.toLowerCase()+' con solución única',null);
+  setTimeout(()=>{
+    const {puzzle,solution}=generate(level);
+    S={level,puzzle,solution,values:puzzle.slice(),notes:Array(81).fill(0),hinted:Array(81).fill(0),errors:0,hints:HINTS,time:0,done:false,paused:false};
+    hist=[]; sel=puzzle.findIndex(v=>!v); notesMode=false;
+    $('veil').hidden=true; save(); render(); startClock();
+  },30);
+}
+
+// ---------- tablero ----------
+const board=$('board'), cells=[];
+for(let i=0;i<81;i++){
+  const b=document.createElement('button');
+  b.className='cell'+(C(i)%3===2&&C(i)<8?' br':'')+(R(i)%3===2&&R(i)<8?' bb':'')+(C(i)===8?' c8':'')+(R(i)===8?' r8':'');
+  b.setAttribute('role','gridcell'); b.tabIndex=-1;
+  b.addEventListener('click',()=>{sel=i;render()});
+  board.appendChild(b); cells.push(b);
+}
+const pad=$('pad'), nums=[];
+for(let d=1;d<=9;d++){
+  const b=document.createElement('button'); b.className='num';
+  b.innerHTML=`<b>${d}</b><small></small>`; b.setAttribute('aria-label','Número '+d);
+  b.addEventListener('click',()=>input(d)); pad.appendChild(b); nums.push(b);
+}
+
+function render(){
+  if(!S)return;
+  const selV=sel>=0?S.values[sel]:0;
+  for(let i=0;i<81;i++){
+    const v=S.values[i], el=cells[i], given=!!S.puzzle[i];
+    const wrong=v&&!given&&v!==S.solution[i];
+    let cls=el.className.replace(/ (given|user|hinted|zone|same|sel|wrong)/g,'');
+    if(given)cls+=' given'; else if(v)cls+=S.hinted[i]?' hinted':' user';
+    if(sel>=0&&i!==sel&&(R(i)===R(sel)||C(i)===C(sel)||B(i)===B(sel)))cls+=' zone';
+    if(selV&&v===selV&&i!==sel)cls+=' same';
+    if(i===sel)cls+=' sel';
+    if(wrong)cls+=' wrong';
+    el.className=cls;
+    if(v){ if(el.dataset.v!==String(v)){el.textContent=v;el.dataset.v=v} }
+    else{
+      const n=S.notes[i], key='n'+n+'-'+selV;
+      if(el.dataset.v!==key){
+        el.dataset.v=key;
+        el.innerHTML=n?'<span class="notes">'+[1,2,3,4,5,6,7,8,9].map(d=>`<span class="${selV===d&&(n&(1<<d))?'hl':''}">${n&(1<<d)?d:''}</span>`).join('')+'</span>':'';
+      }
+    }
+    el.setAttribute('aria-label',`Fila ${R(i)+1}, columna ${C(i)+1}: ${v||'vacía'}`);
+    el.tabIndex=i===sel?0:-1;
+  }
+  for(let d=1;d<=9;d++){
+    let placed=0;for(let i=0;i<81;i++)if(S.values[i]===d&&S.solution[i]===d)placed++;
+    nums[d-1].classList.toggle('done',placed>=9);
+    nums[d-1].querySelector('small').textContent=9-placed;
+  }
+  document.querySelectorAll('.levels button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.lv===S.level));
+  $('errs').textContent=S.errors; $('time').textContent=fmt(S.time);
+  $('hintN').textContent=S.hints; $('hint').disabled=S.hints<=0||S.done;
+  $('undo').disabled=!hist.length||S.done;
+  $('notes').setAttribute('aria-pressed',notesMode); pad.classList.toggle('notesmode',notesMode);
+  board.classList.toggle('paused',S.paused);
+}
+const fmt=t=>{const h=(t/3600)|0,m=((t%3600)/60)|0,s=t%60;return (h?h+':':'')+String(m).padStart(2,'0')+':'+String(s).padStart(2,'0')};
+
+// ---------- jugadas ----------
+function snapshot(){hist.push({v:S.values.slice(),n:S.notes.slice(),h:S.hinted.slice()});if(hist.length>300)hist.shift()}
+function editable(){return S&&!S.done&&!S.paused&&sel>=0&&!S.puzzle[sel]}
+function input(d){
+  if(!editable())return;
+  const i=sel;
+  if(S.hinted[i]&&S.values[i]===S.solution[i])return;
+  if(notesMode){
+    if(S.values[i])return;
+    snapshot(); S.notes[i]^=(1<<d);
+  }else{
+    if(S.values[i]===d)return;
+    snapshot(); S.values[i]=d; S.notes[i]=0;
+    if(d!==S.solution[i]) S.errors++;
+    else{ for(const j of PEERS[i]) S.notes[j]&=~(1<<d); pop(i); }
+  }
+  after();
+}
+function erase(){
+  if(!editable())return;
+  const i=sel; if(S.hinted[i]&&S.values[i]===S.solution[i])return;
+  if(!S.values[i]&&!S.notes[i])return;
+  snapshot(); S.values[i]=0; S.notes[i]=0; after();
+}
+function undo(){
+  if(!S||S.done||!hist.length)return;
+  const h=hist.pop(); S.values=h.v; S.notes=h.n; S.hinted=h.h; after();
+}
+function hint(){
+  if(!S||S.done||S.paused||S.hints<=0)return;
+  let i=sel;
+  if(i<0||S.puzzle[i]||S.values[i]===S.solution[i]){
+    const open=[];for(let k=0;k<81;k++)if(S.values[k]!==S.solution[k])open.push(k);
+    if(!open.length)return;
+    // la casilla con menos candidatos: la pista más útil
+    open.sort((a,b)=>cands(a)-cands(b)); i=open[0];
+  }
+  snapshot(); S.values[i]=S.solution[i]; S.notes[i]=0; S.hinted[i]=1; S.hints--;
+  for(const j of PEERS[i]) S.notes[j]&=~(1<<S.values[i]);
+  sel=i; pop(i); after();
+}
+function cands(i){let m=0x3FE;for(const j of PEERS[i]){const v=S.values[j];if(v&&v===S.solution[j])m&=~(1<<v)}return pc(m)}
+function pop(i){if(REEL)return;const el=cells[i];el.classList.remove('pop');void el.offsetWidth;el.classList.add('pop')}
+function after(){
+  if(S.values.every((v,i)=>v===S.solution[i])) win();
+  save(); render();
+}
+function win(){
+  S.done=true; stopClock();
+  if(REEL)return;
+  const rec=setBest(S.level,S.time), best=bestOf(S.level);
+  showVeil('¡Resuelto!',
+    `${LV[S.level].n} · ${fmt(S.time)} · ${S.errors} ${S.errors===1?'error':'errores'} · ${HINTS-S.hints} ${HINTS-S.hints===1?'pista':'pistas'}`
+    +(rec?'<br><span class="best">Nuevo récord en este nivel</span>':best?`<br>Tu mejor tiempo: ${fmt(best)}`:''),
+    'Otro sudoku',()=>newGame(S.level));
+}
+
+// ---------- reloj y pausa ----------
+function startClock(){stopClock();tick=setInterval(()=>{if(S&&!S.done&&!S.paused&&!document.hidden){S.time++;$('time').textContent=fmt(S.time);if(S.time%5===0)save()}},1000)}
+function stopClock(){if(tick)clearInterval(tick);tick=null}
+function showVeil(t,s,btn,fn){
+  $('veilT').textContent=t; $('veilS').innerHTML=s||'';
+  const b=$('veilB'); b.hidden=!btn; if(btn){b.textContent=btn;b.onclick=fn}
+  $('veil').hidden=false;
+}
+function togglePause(){
+  if(!S||S.done)return;
+  S.paused=!S.paused; save();
+  if(S.paused)showVeil('En pausa',`${LV[S.level].n} · ${fmt(S.time)}`,'Seguir',togglePause); else $('veil').hidden=true;
+  $('pause').textContent=S.paused?'▶':'❚❚'; $('pause').setAttribute('aria-label',S.paused?'Seguir':'Pausar');
+  render();
+}
+
+// ---------- controles ----------
+$('undo').onclick=undo; $('erase').onclick=erase; $('hint').onclick=hint; $('pause').onclick=togglePause;
+$('notes').onclick=()=>{notesMode=!notesMode;render()};
+document.querySelectorAll('.levels button').forEach(b=>b.onclick=()=>{
+  if(S&&S.level===b.dataset.lv&&!S.done&&S.values.some((v,i)=>v&&!S.puzzle[i])){
+    showVeil('¿Empezar otro?','Perderás la partida en curso.','Sí, nuevo sudoku',()=>newGame(b.dataset.lv));
+    const no=document.createElement('button');no.className='btn';no.style.background='var(--tint)';no.style.color='var(--ink)';
+    no.textContent='Seguir jugando';no.onclick=()=>{no.remove();$('veil').hidden=true};$('veil').appendChild(no);
+    return;
+  }
+  newGame(b.dataset.lv);
+});
+document.addEventListener('keydown',e=>{
+  if(!S||e.target.closest('a'))return;
+  const k=e.key;
+  if(/^[1-9]$/.test(k)){input(+k);e.preventDefault();return}
+  if(k==='Backspace'||k==='Delete'||k==='0'){erase();e.preventDefault();return}
+  if(k==='n'||k==='N'){notesMode=!notesMode;render();return}
+  if((e.ctrlKey||e.metaKey)&&k.toLowerCase()==='z'){undo();e.preventDefault();return}
+  const mv={ArrowUp:-9,ArrowDown:9,ArrowLeft:-1,ArrowRight:1}[k];
+  if(mv!==undefined){
+    if(sel<0)sel=0;else{
+      if(k==='ArrowLeft'&&C(sel)===0)sel+=8; else if(k==='ArrowRight'&&C(sel)===8)sel-=8;
+      else sel=(sel+mv+81)%81;
+    }
+    render(); cells[sel].focus(); e.preventDefault();
+  }
+});
+
+// ---------- modo reel: partida guionizada y determinista ----------
+function setupReel(){
+  $('rvBoard').appendChild(document.querySelector('.wrap'));
+  $('rvPad').appendChild(pad);
+  const {puzzle,solution}=generate('medio');
+  S={level:'medio',puzzle,solution,values:puzzle.slice(),notes:Array(81).fill(0),hinted:Array(81).fill(0),errors:0,hints:HINTS,time:0,done:false,paused:false};
+  hist=[]; sel=-1; render();
+  const mask=i=>{let m=0x3FE;for(const j of PEERS[i])if(S.values[j])m&=~(1<<S.values[j]);return m};
+  const open=()=>{const a=[];for(let i=0;i<81;i++)if(S.values[i]!==S.solution[i])a.push(i);return a};
+  const easiest=()=>open().sort((a,b)=>pc(mask(a))-pc(mask(b))||a-b)[0];
+  const wide=()=>open().filter(i=>pc(mask(i))>=3).sort((a,b)=>a-b)[4]??easiest();
+  const digits=m=>{const d=[];for(let k=1;k<=9;k++)if(m&(1<<k))d.push(k);return d};
+  const cap=(txt,cls)=>{const c=$('rvCap');c.hidden=!txt;if(txt){c.textContent=txt;c.className='rv-cap'+(cls?' '+cls:'')}};
+  const ev=[]; const at=(t,fn)=>ev.push({t,fn});
+  let target=-1, noteCell=-1, badCell=-1, badDigit=0;
+  at(2600,()=>cap('Elige una casilla y pon el número'));
+  for(let k=0;k<5;k++){
+    const t=2900+k*620;
+    at(t,()=>{target=easiest();sel=target;render()});
+    at(t+330,()=>input(S.solution[target]));
+  }
+  at(6000,()=>{cap('Apunta tus notas','note');noteCell=wide();sel=noteCell;notesMode=true;render()});
+  at(6250,()=>{});
+  [6400,6750,7100].forEach((t,k)=>at(t,()=>{const ds=digits(mask(noteCell));const pick=ds.includes(S.solution[noteCell])?[S.solution[noteCell],...ds.filter(d=>d!==S.solution[noteCell])]:ds;const d=pick.slice(0,3).sort((a,b)=>a-b)[k];if(d)input(d)}));
+  at(7600,()=>{notesMode=false;render()});
+  at(7900,()=>{cap('Los errores se marcan en rojo','bad');badCell=open().filter(i=>i!==noteCell&&digits(mask(i)).some(d=>d!==S.solution[i])).sort((a,b)=>pc(mask(a))-pc(mask(b))||a-b)[0];sel=badCell;render()});
+  at(8300,()=>{badDigit=digits(mask(badCell)).find(d=>d!==S.solution[badCell]);input(badDigit)});
+  at(9300,()=>erase());
+  at(9650,()=>input(S.solution[badCell]));
+  at(10100,()=>{cap('¿Atascado? Pide una pista','ok');sel=-1;render()});
+  at(10500,()=>hint());
+  at(11300,()=>cap('¡A por todas!'));
+  let fillAt=11500;
+  // el relleno rápido se programa al vuelo, una casilla cada 60 ms
+  at(fillAt,function fill(){
+    const i=easiest(); if(i===undefined)return;
+    sel=i; input(S.solution[i]);
+    if(!S.done) ev.push({t:clock+60,fn:fill}); else { ev.push({t:clock+200,fn:()=>{cap('¡Resuelto en '+$('rvTime').textContent+'!','ok');sel=-1;render()}}) }
+  });
+  at(15300,()=>{$('rvEnd').hidden=false;cap('')});
+  let clock=0;
+  const fmtFake=t=>fmt(Math.floor(t/1000*17));
+  window.__reelDuration=19000;
+  window.__step=()=>{
+    clock+=1000/30;
+    ev.sort((a,b)=>a.t-b.t);
+    while(ev.length&&ev[0].t<=clock){const e=ev.shift();e.fn()}
+    if(!S.done)$('rvTime').textContent=fmtFake(clock);
+    const intro=$('rvIntro'); intro.style.opacity=clock<2100?1:Math.max(0,1-(clock-2100)/400); intro.hidden=clock>2500;
+    return clock;
+  };
+  window.__ready=true;
+}
+
+// ---------- arranque ----------
+if(REEL){setupReel();return}
+S=load();
+if(S){
+  hist=[]; sel=S.values.findIndex((v,i)=>!S.puzzle[i]&&v!==S.solution[i]);
+  render(); startClock();
+  if(S.done) win();
+  else if(S.paused){S.paused=false;togglePause()}
+}else newGame('medio');
+})();
+</script>
+</body>
+</html>
