@@ -1,0 +1,357 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#1d7f9e">
+<meta property="og:title" content="2048 de Bolsillo">
+<meta property="og:description" content="Desliza, junta números iguales y llega al 2048. Gratis en el navegador.">
+<meta property="og:image" content="https://jrubioadies.github.io/2048/portada.jpg">
+<title>2048 de Bolsillo</title>
+<meta name="description" content="El 2048 para el móvil: desliza, junta números iguales y llega al 2048. Por Adilco Tech Center, SL.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Rubik:wght@600;700;800&family=Manrope:wght@500;600;700;800&display=swap">
+<style>
+/* Fichas que suben de temperatura: del menta al índigo, el magenta y el oro del 2048 */
+:root{
+  --bg:#e8efec; --card:#f7faf9; --ink:#14282a; --muted:#5b6d6c; --line:#cfdcd8;
+  --board:#bfd0cb; --cell:#d6e3df; --accent:#1d7f9e; --gold:#e8a317;
+  --t2:#f1f7f4; --t4:#dcefe6; --t8:#9fdcc1; --t16:#55c49f; --t32:#22a39a; --t64:#1d7f9e;
+  --t128:#2f5fb3; --t256:#4b47b8; --t512:#7a3bb5; --t1024:#b2338f; --t2048:#e8a317; --tbig:#1c1b2b;
+  --brand:#1F6F5B; --brand-ink:#ffffff;
+  --display:"Rubik","Arial Rounded MT Bold",system-ui,sans-serif;
+  --body:"Manrope",system-ui,-apple-system,"Segoe UI",sans-serif;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0f1617; --card:#182224; --ink:#e6f0ee; --muted:#93a6a4; --line:#283638;
+  --board:#1d2a2c; --cell:#253538; --accent:#4fb6d4; --t2:#34474a; --t4:#3d5a55; --brand:#2f8f76; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0f1617; --card:#182224; --ink:#e6f0ee; --muted:#93a6a4; --line:#283638;
+  --board:#1d2a2c; --cell:#253538; --accent:#4fb6d4; --t2:#34474a; --t4:#3d5a55; --brand:#2f8f76; color-scheme:dark}
+[hidden]{display:none!important}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);margin:0;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));
+  -webkit-tap-highlight-color:transparent}
+.app{max-width:500px;margin:0 auto;display:flex;flex-direction:column;gap:14px;padding-block:14px 24px}
+header{display:flex;align-items:center;justify-content:space-between;gap:10px}
+h1{font:800 46px/.85 var(--display);margin:0;letter-spacing:-1px}
+h1 em{display:block;font:700 18px var(--body);font-style:normal;color:var(--accent);letter-spacing:.02em;margin-top:6px}
+.scores{display:flex;gap:8px}
+.sc{background:var(--card);border-radius:14px;padding:7px 14px;min-width:74px;text-align:center;box-shadow:0 1px 0 var(--line)}
+.sc small{display:block;font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.1em}
+.sc b{display:block;font:700 22px/1.15 var(--display);font-variant-numeric:tabular-nums}
+.bar{display:flex;gap:8px;align-items:center}
+.bar p{margin:0;flex:1;font-size:13.5px;color:var(--muted);line-height:1.35}
+.btn{border:0;border-radius:12px;padding:10px 14px;font:700 14px var(--body);cursor:pointer;background:var(--card);color:var(--ink);box-shadow:0 1px 0 var(--line);display:inline-flex;gap:6px;align-items:center;white-space:nowrap}
+.btn.main{background:var(--accent);color:#fff}
+.btn:disabled{opacity:.4;cursor:default}
+.btn .n{background:var(--accent);color:#fff;border-radius:8px;font-size:11px;padding:1px 6px}
+button:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+
+.wrap{position:relative}
+.board{container-type:inline-size;position:relative;isolation:isolate;aspect-ratio:1;width:100%;max-width:100%;background:var(--board);border-radius:16px;touch-action:none;user-select:none;overflow:hidden}
+.cellbg{position:absolute;width:21.25%;height:21.25%;border-radius:10px;background:var(--cell)}
+.tile{position:absolute;width:21.25%;height:21.25%;border-radius:10px;display:grid;place-items:center;
+  font:700 11cqw/1 var(--display);font-variant-numeric:tabular-nums;color:var(--ink);will-change:left,top,transform}
+.tile.d3{font-size:9cqw} .tile.d4{font-size:7.2cqw} .tile.d5{font-size:5.8cqw}
+.tile.light{color:#fff}
+.tile.v2048{box-shadow:0 0 0 2px rgba(255,255,255,.5),0 0 28px 6px rgba(232,163,23,.6)}
+.veil{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:12px;text-align:center;
+  background:color-mix(in srgb,var(--bg) 72%,transparent);backdrop-filter:blur(3px);border-radius:16px;padding:20px}
+.veil h2{font:800 44px/1 var(--display);margin:0}
+.veil p{margin:0;color:var(--muted)}
+.veil .row{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
+.veil .best{color:var(--gold);font-weight:800}
+
+.rules{font-size:13px;color:var(--muted);line-height:1.5;margin:0}
+.promo{display:flex;align-items:center;gap:12px;background:var(--brand);color:var(--brand-ink);border-radius:14px;padding:12px 14px;text-decoration:none}
+.promo .logo{flex:none;width:40px;height:40px;border-radius:10px;background:rgba(255,255,255,.16);display:grid;place-items:center;font:800 22px var(--display)}
+.promo span{min-width:0}
+.promo b{display:block;font-size:15px}
+.promo small{display:block;font-size:12.5px;opacity:.85;margin-top:1px}
+.promo .arrow{margin-left:auto;font-weight:700;font-size:13px;white-space:nowrap}
+.links{font-size:12.5px;color:var(--muted);margin:0;text-align:center;line-height:1.7}
+.links a{color:var(--ink);font-weight:700}
+@media (max-width:460px){.promo .arrow{display:none}}
+@media (max-width:370px){h1{font-size:38px}.sc{min-width:62px;padding:6px 10px}}
+
+/* ---------- Modo reel (1080×1920, solo para grabar el vídeo) ---------- */
+#reel{display:none}
+body.reel{padding:0;overflow:hidden}
+body.reel .app{display:none}
+body.reel #reel{display:block;position:fixed;left:0;top:0;width:1080px;height:1920px;overflow:hidden;
+  background:radial-gradient(70% 45% at 50% 48%,#f6fbf9 0%,var(--bg) 75%)}
+.rv-head{position:absolute;left:70px;right:70px;top:120px;display:flex;align-items:flex-end;justify-content:space-between}
+.rv-title{font:800 150px/.8 var(--display);letter-spacing:-4px;color:var(--ink)}
+.rv-title em{display:block;font:800 48px var(--body);font-style:normal;color:var(--accent);letter-spacing:0;margin-top:16px}
+.rv-score{text-align:right;font:700 30px var(--body);color:var(--muted);text-transform:uppercase;letter-spacing:.12em}
+.rv-score b{display:block;font:800 104px/.95 var(--display);color:var(--ink);letter-spacing:-2px;font-variant-numeric:tabular-nums}
+.rv-board{position:absolute;left:70px;top:470px;width:940px}
+body.reel .board{border-radius:34px;box-shadow:0 30px 70px rgba(20,40,42,.18)}
+body.reel .cellbg,body.reel .tile{border-radius:22px}
+.rv-cap{position:absolute;left:50%;top:1480px;transform:translateX(-50%);white-space:nowrap;background:var(--ink);color:#fff;
+  font:800 50px var(--body);padding:22px 44px;border-radius:999px;box-shadow:0 12px 30px rgba(20,40,42,.3)}
+.rv-cap.acc{background:var(--accent)} .rv-cap.gold{background:var(--gold);color:#2b1c00}
+.rv-brand{position:absolute;left:0;right:0;bottom:100px;display:flex;justify-content:center}
+.rv-brand div{display:flex;align-items:center;gap:20px;font:700 38px var(--body);color:var(--ink)}
+.rv-lg{width:68px;height:68px;border-radius:16px;background:var(--brand);color:#fff;display:grid;place-items:center;font:800 42px var(--display)}
+.rv-intro{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:20px;text-align:center;
+  background:color-mix(in srgb,var(--bg) 88%,transparent);backdrop-filter:blur(8px)}
+.rv-intro .big{font:800 330px/.8 var(--display);letter-spacing:-12px;color:var(--ink)}
+.rv-intro .big span{color:var(--gold)}
+.rv-intro .sub{font:800 70px var(--body);color:var(--accent)}
+.rv-intro .q{font:800 58px var(--body);color:#fff;background:var(--ink);padding:16px 38px;border-radius:18px;margin-top:40px}
+.rv-win{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;pointer-events:none}
+.rv-win div{font:800 300px/1 var(--display);color:var(--gold);letter-spacing:-10px;text-shadow:0 10px 0 rgba(0,0,0,.12),0 0 80px rgba(232,163,23,.6)}
+.rv-end{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:40px;text-align:center;
+  background:radial-gradient(circle at 50% 35%,#1d4f5c,#0b1a1d 70%);color:#fff}
+.rv-end h2{font:800 130px/.9 var(--display);margin:0;letter-spacing:-3px}
+.rv-end h2 span{color:var(--gold)}
+.rv-end .play{font:700 50px var(--body);opacity:.9}
+.rv-end .url{font:800 50px var(--body);background:#fff;color:#14282a;padding:24px 38px;border-radius:22px}
+.rv-end .co{display:flex;align-items:center;gap:26px;margin-top:70px}
+.rv-end .co .rv-lg{width:110px;height:110px;border-radius:24px;font-size:66px}
+.rv-end .co b{display:block;font:800 52px var(--body);text-align:left}
+.rv-end .co small{display:block;font:600 38px var(--body);opacity:.8;text-align:left}
+.rv-end .more{font:700 32px var(--body);opacity:.7;margin-top:10px}
+</style>
+<style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}</style>
+</head>
+<body>
+<div class="app">
+  <header>
+    <h1>2048<em>de bolsillo</em></h1>
+    <div class="scores">
+      <div class="sc"><small>Puntos</small><b id="score">0</b></div>
+      <div class="sc"><small>Récord</small><b id="best">0</b></div>
+    </div>
+  </header>
+  <div class="bar">
+    <p>Desliza para mover las fichas. Dos iguales se suman. Llega al <b>2048</b>.</p>
+    <button class="btn" id="undo">↶ Deshacer <span class="n" id="undoN">3</span></button>
+    <button class="btn main" id="new">Nueva</button>
+  </div>
+
+  <div class="wrap">
+    <div class="board" id="board" aria-label="Tablero de 2048. Desliza o usa las flechas."></div>
+    <div class="veil" id="veil" hidden>
+      <h2 id="veilT"></h2>
+      <p id="veilS"></p>
+      <div class="row" id="veilR"></div>
+    </div>
+  </div>
+
+  <p class="rules">En móvil, desliza el dedo sobre el tablero; en ordenador, usa las flechas o W A S D. Tras cada jugada aparece un 2 (o, a veces, un 4). Tienes 3 deshacer por partida y la partida se guarda sola. Al llegar al 2048 puedes seguir jugando a por el 4096.</p>
+
+  <a class="promo" href="https://adilcotech.com" target="_blank" rel="noopener">
+    <span class="logo" aria-hidden="true">A</span>
+    <span><b>Adilco Tech Center, SL</b><small>Consultoría ERP y soluciones tecnológicas a medida</small></span>
+    <span class="arrow">adilcotech.com →</span>
+  </a>
+  <p class="links" id="more">Más juegos: <a href="https://jrubioadies.github.io/othello/" target="_blank" rel="noopener">Othello</a> · <a href="https://jrubioadies.github.io/torre-tambaleante/" target="_blank" rel="noopener">Torre Tambaleante</a> · <a href="https://jrubioadies.github.io/sudoku/" target="_blank" rel="noopener">Sudoku</a> · <a href="https://jrubioadies.github.io/solitario/" target="_blank" rel="noopener">Solitario</a> · <a href="https://jrubioadies.github.io/palabra/" target="_blank" rel="noopener">Palabra del día</a> · <a href="https://jrubioadies.github.io/cuatro-en-raya/" target="_blank" rel="noopener">Cuatro en raya</a><br>
+  Hecho por Javier Rubio · <a href="https://jrubioadies.github.io" target="_blank" rel="noopener">jrubioadies.github.io</a> · <a href="https://github.com/jrubioadies/jrubioadies.github.io/tree/main/2048" target="_blank" rel="noopener">código en GitHub</a></p>
+</div>
+
+<div id="reel" aria-hidden="true">
+  <div class="rv-head"><div class="rv-title">2048<em>de bolsillo</em></div>
+    <div class="rv-score">Puntos<b id="rvScore">0</b></div></div>
+  <div class="rv-board" id="rvBoard"></div>
+  <div class="rv-cap" id="rvCap" hidden></div>
+  <div class="rv-win" id="rvWin" hidden><div>2048</div></div>
+  <div class="rv-brand"><div><span class="rv-lg">A</span>Adilco Tech Center, SL</div></div>
+  <div class="rv-intro" id="rvIntro"><div class="big">20<span>48</span></div><div class="sub">de bolsillo</div><div class="q">¿Llegas al 2048?</div></div>
+  <div class="rv-end" id="rvEnd" hidden>
+    <h2>¿Llegas tú<br>al <span>2048</span>?</h2>
+    <div class="play">Juega gratis en el navegador</div>
+    <div class="url">jrubioadies.github.io/2048</div>
+    <div class="co"><span class="rv-lg">A</span><span><b>Adilco Tech Center, SL</b><small>adilcotech.com</small></span></div>
+    <div class="more">Más juegos: Othello · Sudoku · Solitario y más</div>
+  </div>
+</div>
+
+<script>
+(()=>{
+const REEL=new URLSearchParams(location.search).has('reel');
+if(REEL)document.body.classList.add('reel');
+const $=id=>document.getElementById(id);
+const KEY='dosmil48-v1', UNDOS=3;
+let clock=0; const now=()=>REEL?clock:performance.now();
+const reduce=!REEL&&matchMedia('(prefers-reduced-motion: reduce)').matches;
+const SLIDE=reduce?1:110, POP=reduce?1:150;
+
+// ---------- lógica ----------
+// líneas por dirección (0 arriba, 1 derecha, 2 abajo, 3 izquierda), desde el borde hacia dentro
+const LINES=[];
+for(let d=0;d<4;d++){const L=[];for(let k=0;k<4;k++){const line=[];for(let s=0;s<4;s++){let r,c;
+  if(d===0){c=k;r=s}else if(d===2){c=k;r=3-s}else if(d===3){r=k;c=s}else{r=k;c=3-s}line.push(r*4+c)}L.push(line)}LINES.push(L)}
+
+let S=null, tiles=new Map(), nextId=1, hist=[];
+// S.grid: 16 ids (0 = vacío); tiles: id -> {v, at, from, t0, born, merged, el}
+function load(){try{const s=JSON.parse(localStorage.getItem(KEY));if(s&&s.vals&&s.vals.length===16)return s}catch(e){}return null}
+function save(){if(REEL)return;try{localStorage.setItem(KEY,JSON.stringify({vals:S.grid.map(id=>id?tiles.get(id).v:0),score:S.score,undos:S.undos,won:S.won,over:S.over}))}catch(e){}}
+function getBest(){try{return +localStorage.getItem(KEY+'-best')||0}catch(e){return 0}}
+function setBest(v){try{localStorage.setItem(KEY+'-best',v)}catch(e){}}
+
+const board=$('board');
+for(let i=0;i<16;i++){const c=document.createElement('div');c.className='cellbg';const [x,y]=pos(i);c.style.left=x+'%';c.style.top=y+'%';board.appendChild(c)}
+function pos(i){const r=(i/4)|0,c=i%4;return [3+c*24.25,3+r*24.25]}
+
+function makeTile(v,at,born){
+  const id=nextId++;const el=document.createElement('div');el.className='tile';board.appendChild(el);
+  const t={id,v,at,from:at,t0:-1e9,born:born?now():-1e9,merged:-1e9,el,dead:-1};
+  tiles.set(id,t);paint(t);return t;
+}
+function paint(t){
+  const v=t.v, d=String(v).length;
+  t.el.textContent=v;
+  t.el.className='tile'+(d>=3?' d'+Math.min(d,5):'')+(v>=16?' light':'')+(v===2048?' v2048':'');
+  t.el.style.background=v<=2048?`var(--t${v})`:'var(--tbig)';
+  if(v>4&&v<16)t.el.style.color='#0d2a22';else t.el.style.color='';
+}
+function reset(vals){
+  tiles.forEach(t=>t.el.remove());tiles.clear();
+  S.grid=Array(16).fill(0);
+  vals.forEach((v,i)=>{if(v){const t=makeTile(v,i,false);S.grid[i]=t.id}});
+}
+function empties(){const e=[];for(let i=0;i<16;i++)if(!S.grid[i])e.push(i);return e}
+function spawn(at,v){const t=makeTile(v,at,true);S.grid[at]=t.id}
+function randomSpawn(){const e=empties();if(!e.length)return;spawn(e[Math.floor(Math.random()*e.length)],Math.random()<.9?2:4)}
+function canMove(){
+  if(empties().length)return true;
+  for(let i=0;i<16;i++){const v=tiles.get(S.grid[i]).v;if(i%4<3&&tiles.get(S.grid[i+1]).v===v)return true;if(i<12&&tiles.get(S.grid[i+4]).v===v)return true}
+  return false;
+}
+function move(d,animate=true){
+  const t0=now(); let moved=false, gain=0; const ng=Array(16).fill(0);
+  for(const line of LINES[d]){
+    const ids=line.map(i=>S.grid[i]).filter(Boolean); let s=0, last=null;
+    for(const id of ids){
+      const t=tiles.get(id);
+      if(last&&last.v===t.v&&!last.justMerged){
+        // t se desliza sobre last y desaparece; last dobla su valor
+        t.from=t.at;t.at=last.at;t.t0=animate?t0:-1e9;t.dead=animate?t0+SLIDE:0;
+        last.v*=2;last.justMerged=true;last.merged=animate?t0+SLIDE:-1e9;gain+=last.v;moved=true;
+      }else{
+        const to=line[s++];if(t.at!==to)moved=true;
+        t.from=t.at;t.at=to;t.t0=animate?t0:-1e9;ng[to]=id;last=t;t.justMerged=false;
+      }
+    }
+  }
+  if(!moved)return false;
+  tiles.forEach(t=>{t.justMerged=false});
+  S.grid=ng;S.score+=gain;
+  if(!animate){tiles.forEach(t=>{if(t.dead>=0){t.el.remove();tiles.delete(t.id)}else paint(t)})}
+  return true;
+}
+function frame(){
+  const t=now();
+  tiles.forEach(tl=>{
+    if(tl.dead>=0&&t>=tl.dead){tl.el.remove();tiles.delete(tl.id);return}
+    const k=Math.min(1,Math.max(0,(t-tl.t0)/SLIDE)), e=1-Math.pow(1-k,3);
+    const [x0,y0]=pos(tl.from),[x1,y1]=pos(tl.at);
+    tl.el.style.left=(x0+(x1-x0)*e)+'%';tl.el.style.top=(y0+(y1-y0)*e)+'%';
+    let sc=1;
+    const kb=(t-tl.born-SLIDE*.6)/POP; if(kb<0)sc=0;else if(kb<1)sc=kb<.6?kb/.6*1.08:1.08-.08*(kb-.6)/.4;
+    const km=(t-tl.merged)/POP; if(km>=0&&km<1){sc*=1+.18*Math.sin(Math.PI*km);if(tl.el.textContent!=String(tl.v))paint(tl)}
+    if(km>=1&&tl.el.textContent!=String(tl.v))paint(tl);
+    tl.el.style.transform=sc===1?'':`scale(${sc})`;
+    tl.el.style.zIndex=tl.dead>=0?1:2;
+  });
+}
+
+// ---------- partida ----------
+function newGame(){
+  S={grid:Array(16).fill(0),score:0,undos:UNDOS,won:false,over:false};hist=[];
+  reset(Array(16).fill(0));randomSpawn();randomSpawn();$('veil').hidden=true;save();ui();
+}
+function play(d){
+  if(!S||S.over||!$('veil').hidden)return;
+  const snap={vals:S.grid.map(id=>id?tiles.get(id).v:0),score:S.score};
+  if(!move(d))return;
+  hist.push(snap);if(hist.length>UNDOS)hist.shift();
+  randomSpawn();
+  const best=getBest();if(S.score>best)setBest(S.score);
+  const has2048=[...tiles.values()].some(t=>t.v>=2048&&t.dead<0);
+  if(has2048&&!S.won){S.won=true;setTimeout(()=>veil('¡2048!','Lo has conseguido con '+S.score.toLocaleString('es-ES')+' puntos.',[['Seguir jugando',()=>{$('veil').hidden=true}],['Nueva partida',newGame,1]]),SLIDE+POP)}
+  else if(!canMove()){S.over=true;setTimeout(()=>veil('Sin movimientos',S.score.toLocaleString('es-ES')+' puntos'+(S.score>=best&&S.score>0?' · <span class="best">nuevo récord</span>':''),[['Otra partida',newGame,1]]),SLIDE+POP+200)}
+  save();ui();
+}
+function undo(){
+  if(!hist.length||S.undos<=0)return;
+  const h=hist.pop();S.undos--;S.over=false;$('veil').hidden=true;reset(h.vals);S.score=h.score;save();ui();
+}
+function veil(t,s,btns){
+  $('veilT').textContent=t;$('veilS').innerHTML=s;const r=$('veilR');r.innerHTML='';
+  btns.forEach(([txt,fn,main])=>{const b=document.createElement('button');b.className='btn'+(main?' main':'');b.textContent=txt;b.onclick=fn;r.appendChild(b)});
+  $('veil').hidden=false;
+}
+function ui(){
+  const best=Math.max(getBest(),S.score);
+  $('score').textContent=S.score.toLocaleString('es-ES');$('best').textContent=best.toLocaleString('es-ES');
+  $('undoN').textContent=S.undos;$('undo').disabled=!hist.length||S.undos<=0;
+  if(REEL)$('rvScore').textContent=S.score.toLocaleString('es-ES');
+}
+
+// ---------- controles ----------
+const KEYS={ArrowUp:0,ArrowRight:1,ArrowDown:2,ArrowLeft:3,w:0,d:1,s:2,a:3,W:0,D:1,S:2,A:3};
+document.addEventListener('keydown',e=>{if(e.key in KEYS&&!e.target.closest('a')){e.preventDefault();play(KEYS[e.key])}});
+let sx=0,sy=0,sid=null;
+board.addEventListener('pointerdown',e=>{sid=e.pointerId;sx=e.clientX;sy=e.clientY;board.setPointerCapture(e.pointerId)});
+board.addEventListener('pointerup',e=>{
+  if(e.pointerId!==sid)return;sid=null;const dx=e.clientX-sx,dy=e.clientY-sy;
+  if(Math.max(Math.abs(dx),Math.abs(dy))<24)return;
+  play(Math.abs(dx)>Math.abs(dy)?(dx>0?1:3):(dy>0?2:0));
+});
+board.addEventListener('pointercancel',()=>{sid=null});
+$('new').onclick=()=>{if(S.score>0&&!S.over&&$('veil').hidden){veil('¿Empezar otra?','Perderás la partida en curso.',[['Seguir jugando',()=>{$('veil').hidden=true}],['Sí, nueva',newGame,1]])}else newGame()};
+$('undo').onclick=undo;
+
+// ---------- modo reel: partida real grabada por un jugador automático ----------
+const REC_START=[[10,2],[7,4]];
+const REC='0fa27a36b25a31a33a37a09a23a02a26a33a3aa2aa0ca3db06a05a38a14a3ba08a3ba36b0ca36a0fb3bb3eb07a0ea3ea3fa07a0fa1da09a39a0ca3aa0ea08a37a07a0ca09a07a39a1ca3ba36a09b2fa10a04b15a28a12a0da15a20a15a1da2ca18a05a19a22b0fa18a04a19a06a39a0aa1ca15a0da10a0ca36a0aa0ca18a35b3aa0ca10a05a18a08a1fa04a0da0ca0ea04b1fa0ea19a0ca1ca09b0da18a0da18a1ca14a0aa1da1ca1ea0eb14a1ca0aa37a0ba0ba3da0ba10a1da0ea00a1da1db08b1da18a09a05b3ca1aa21a1da00a15b25a10a04a1fa0aa25a14a19a28a16a08a0fa0fa1aa20a19a04a1ea04a1da22a05b18a25a18a26a04a1ea1eb1ca0ca0cb19b20a11a24a26a19b14a15a08b0ca19a18a19a19a19a00a19a0ca04a14a1aa09a04a0cb18a0aa22a18a24a22a0cb0ea1ca10a1ea24a1da29a18a10a0da19a08a0da04a1ca28a12a28a26a0ea1ca14a0ca18a08a1cb10b08a09a09a09a1ea20a14a19a04a1ca0da10a09b1da08a1ca0ca08a1ea0ca1da0ea21a1ca04a1da0da0da14a04a10a05a20a18a1da0ea24a10a08a0ea22b19a1ca0ca14a11a0aa2ca10a05a04a29b05a19a0ea10a08a0ca15a22a15a09a10a08a1da11b0cb14b04a14a10a04a18a08a04a18a1da19b0da0ea14a24a20a18a14a1cb26b28a12a28a14a0fb10a19a11a09a19b0aa1ea0ca0da0db1ea20a08b18a05a08a08a18a14a14a14a19a24b12a25a14a24a04a19a10a25a04b10a28a10a0ca14a22b19a05a14a10a0fa22a19a28b16a26a08a0ea18b20a25b20a11b10a0ca1aa00a18a28a26b12b15a22a08a25a28a22a19a24a26a18b28a11a22a21a21a20a22a16a24a21a21b11b0da18a10a0da15a25a1ca28a15a15a0eb1da24a21a04a1ca0ea0da15b04a04a0ca0da0ea18a1ca1ca1ca08a08a08a10a08a1da18b18a0ea1da18a15a21a18b21a18a05a1ea09b00a10a18a09a08b14a1ca1ca14a0da08a08a09a18a1ca0da0ca18b21a14a28a1ca28a1ca20a15a28a24a11a20a14a20a21b21a15a25a0ab10a0ea05a24a04a18a18a1ca18a1da0da04a24a18a25a14a11a24a10a25a25a21a08a10a04a18b24a08a18a1da0ca18a0da08a14a3ba0ea1da08a1fa08a14a3fa09a37a3ea0eb39a07a3bb39a07b3ba3fa0da1da1aa1eb15a14b0da3ba0ba3ea3da3aa0cb1ca0ea38a0ba39a0aa3ca18a3da07a3ba0da0ba1ca18a0ea1aa3fa1da08a08a19a3ba09a1fb08b19a1fa0ea1ca0cb36a08a1da04a3aa0ca36a0da0ba37a1ab08a09a08b1ca0da08a14a37a08a3da0ca3aa0da3aa0fa3da0ba3fa0da0aa3ba0aa09a0aa3fa3aa35a3fa3da0da0da07a3fa0fa3fa3aa3fa37b0fa3ea18a0ca1aa3da1ea09a0ea37a0ba18a3ba0ca1cb0da3ea0fa1aa09a1da3ea0aa0da39a1ea0fa37a3ba0ea18a3da0da0aa3ea0fa0ea3ab0ea3aa3aa07a37a14a1db3eb0aa19a09a0bb37a18a3ea0ca3aa0ba0ea0fa3aa1ca0da3da0ca3ea0da1da0fa0ea0fa14a0db08a0fb3fa1da0da19a0da1da0da0ea1da1ca1ca0ca3aa0ba08a1ca0da18a1ca0ca3da3ea19b0da1cb0ca1cb0da1da19a18a0fa1ca0da1ca0ea08a3fb0ca1ea14a0da1ca08a3da0ea08a1da3ea0da3da0ca1da0da0da1da18a1da0ea18a1da0ea1cb0da1da1ca08a3fa0ca18a0da0ea1da3ea0ca1db1cb3ea0fa18a3fa0aa1ca18a09a3ba0fa0da3ea15a08a0ca3aa1ca09a3db1ea0da0db0db0fa1ea3ea0da1cb08a18a18a1ca09a18a0ca1da0ca0db1ca0ca0ca0da0da14b3fa0ca0ea1da18a1ca1ca1ca3fa1ca0da1ca0ea3ea1ca3fa0ca1ca18a1da0ca1cb0da0ca1ca0ca0ca3ea0da0ba3eb0ea3da3aa0ba37a0ea3ba3ba1ca08a0ea0da39a06a3aa0fa1ea0ca3da3ba0fa0ea0da0ba3ca1db3aa37a0fa0aa3da3ea15a0fa1ea1da0fa3ea18a1eb1ca0da0ba0da14a0ca18a08a0da37a3fa0da37a1ea3ea3aa3fa0da3fa3ba37b0fa0ea3da3aa1ea0ea18a0ca1ea1ca0ca0ca18a1da0da3aa0da3ba3ea19a08a1ea1ea3ba0ea1db0fa3fa3ea3ea0fa3ba1da08a3ea0da1ea09b1da18a';
+function setupReel(){
+  $('rvBoard').appendChild(document.querySelector('.wrap'));
+  S={grid:Array(16).fill(0),score:0,undos:0,won:false,over:false};
+  reset(Array(16).fill(0));REC_START.forEach(([i,v])=>spawn(i,v));
+  tiles.forEach(t=>t.born=-1e9);
+  const moves=[];for(let k=0;k<REC.length;k+=3)moves.push([+REC[k],parseInt(REC[k+1],16),REC[k+2]==='a'?2:4]);
+  const N=moves.length;let mi=0;
+  const step=(anim)=>{const [d,i,v]=moves[mi++];move(d,anim);if(anim)spawn(i,v);else{const t=makeTile(v,i,false);S.grid[i]=t.id}ui()};
+  const cap=(txt,cls)=>{const c=$('rvCap');c.hidden=!txt;if(txt){c.textContent=txt;c.className='rv-cap'+(cls?' '+cls:'')}};
+  const ev=[];const at=(t,fn)=>ev.push({t,fn});
+  at(2600,()=>cap('Desliza para mover las fichas'));
+  let t=2800;
+  for(let k=0;k<12;k++){at(t,()=>step(true));t+=k<6?430:340}
+  at(5400,()=>cap('Dos iguales se suman','acc'));
+  const ffStart=t+100, ffEnd=12300, lastSlow=8, ffN=N-12-lastSlow;
+  at(ffStart,()=>cap('⏩ Y así, jugada a jugada…'));
+  const frames=Math.round((ffEnd-ffStart)/(1000/30));
+  for(let f=0;f<frames;f++){const upto=Math.round(12+ffN*(f+1)/frames);at(ffStart+f*(1000/30)+1,()=>{while(mi<upto)step(false)})}
+  at(ffEnd+50,()=>cap('¡Ya casi!','acc'));
+  let t2=ffEnd+200;
+  for(let k=0;k<lastSlow;k++){at(t2,()=>{if(mi<N)step(true)});t2+=260}
+  at(t2+150,()=>{cap('¡Conseguido!','gold');$('rvWin').hidden=false});
+  at(16300,()=>{$('rvEnd').hidden=false;$('rvWin').hidden=true;cap('')});
+  window.__reelDuration=19500;
+  window.__step=()=>{
+    clock+=1000/30;
+    ev.sort((a,b)=>a.t-b.t);
+    while(ev.length&&ev[0].t<=clock){const e=ev.shift();e.fn()}
+    frame();
+    const w=$('rvWin');if(!w.hidden){const k=Math.min(1,(clock-(t2+150))/350);w.style.opacity=k;w.firstChild.style.transform=`scale(${.6+.4*k})`}
+    const intro=$('rvIntro');intro.style.opacity=clock<2100?1:Math.max(0,1-(clock-2100)/400);intro.hidden=clock>2500;
+    return clock;
+  };
+  window.__ready=true;
+}
+
+// ---------- arranque ----------
+if(REEL){setupReel();return}
+(function loop(){frame();requestAnimationFrame(loop)})();
+const saved=load();
+if(saved){S={grid:Array(16).fill(0),score:saved.score,undos:saved.undos,won:saved.won,over:false};reset(saved.vals);if(!canMove()){S.over=true}ui();if(S.over)veil('Sin movimientos',S.score.toLocaleString('es-ES')+' puntos',[['Otra partida',newGame,1]])}
+else newGame();
+})();
+</script>
+</body>
+</html>

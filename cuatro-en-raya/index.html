@@ -1,0 +1,371 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#e2a72e">
+<meta property="og:title" content="Cuatro en Raya">
+<meta property="og:description" content="Contra la CPU con tres niveles o a dos jugadores. Gratis en el navegador.">
+<meta property="og:image" content="https://jrubioadies.github.io/cuatro-en-raya/portada.jpg">
+<title>Cuatro en Raya</title>
+<meta name="description" content="Cuatro en raya para el móvil: contra la CPU con tres niveles o a dos jugadores. Por Adilco Tech Center, SL.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=DM+Sans:wght@400;500;600;700;800&display=swap">
+<style>
+/* Tablero de feria en amarillo ocre; fichas tomate y azul petróleo que caen por detrás de la placa */
+:root{
+  --bg:#e6ecef; --card:#f8fafb; --ink:#17232b; --muted:#5d6b74; --line:#cdd6db; --tint:#d8e1e6;
+  --plate:#e2a72e; --plate2:#c98d16; --hole:#e6ecef;
+  --red:#d7383b; --red2:#9f1f24; --blue:#1d5677; --blue2:#0f344a;
+  --brand:#1F6F5B; --brand-ink:#ffffff;
+  --display:"Fredoka","Arial Rounded MT Bold",system-ui,sans-serif;
+  --body:"DM Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#11171b; --card:#1a2329; --ink:#e8eef1; --muted:#9aa8b0; --line:#2a353c; --tint:#222d34;
+  --blue:#3d86b0; --blue2:#1d5677; --brand:#2f8f76; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#11171b; --card:#1a2329; --ink:#e8eef1; --muted:#9aa8b0; --line:#2a353c; --tint:#222d34;
+  --blue:#3d86b0; --blue2:#1d5677; --brand:#2f8f76; color-scheme:dark}
+[hidden]{display:none!important}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);margin:0;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));
+  -webkit-tap-highlight-color:transparent}
+.app{max-width:520px;margin:0 auto;display:flex;flex-direction:column;gap:12px;padding-block:14px 24px}
+header{display:flex;align-items:flex-end;justify-content:space-between;gap:10px;flex-wrap:wrap}
+h1{font:700 34px/.9 var(--display);margin:0}
+h1 em{font-style:normal;color:var(--red)}
+.seg{display:flex;gap:2px;background:var(--tint);border-radius:999px;padding:3px}
+.seg button{border:0;background:transparent;color:var(--muted);font:700 13px var(--body);padding:7px 11px;border-radius:999px;cursor:pointer}
+.seg button[aria-pressed="true"]{background:var(--card);color:var(--ink);box-shadow:0 1px 2px rgba(0,0,0,.12)}
+.opts{display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap}
+.players{display:grid;grid-template-columns:1fr auto 1fr;gap:8px;align-items:center}
+.pl{display:flex;align-items:center;gap:10px;padding:8px 12px;border-radius:14px;background:var(--card);border:2px solid transparent;transition:border-color .2s}
+.pl.r{flex-direction:row-reverse;text-align:right}
+.pl .dot{flex:none;width:26px;height:26px;border-radius:50%}
+.pl.p0 .dot{background:radial-gradient(circle at 35% 30%,#ff8a7d,var(--red) 55%,var(--red2))}
+.pl.p1 .dot{background:radial-gradient(circle at 35% 30%,#8cc9ea,var(--blue) 55%,var(--blue2))}
+.pl .nm{font:700 14px var(--body);line-height:1.1}
+.pl .nm small{display:block;font-weight:500;color:var(--muted);font-size:12px}
+.pl .w{margin-left:auto;font:700 24px var(--display);font-variant-numeric:tabular-nums}
+.pl.r .w{margin-left:0;margin-right:auto}
+.pl.on.p0{border-color:var(--red)} .pl.on.p1{border-color:var(--blue)}
+.vs{font:600 12px var(--body);color:var(--muted);text-transform:uppercase;letter-spacing:.1em}
+.status{text-align:center;font:600 15px var(--body);min-height:24px}
+.status .res{font:700 20px var(--display)}
+.status .res.p0{color:var(--red)} .status .res.p1{color:var(--blue)}
+
+.wrap{position:relative;padding-top:11%}
+.stage{position:relative;aspect-ratio:7/6;width:100%;max-width:100%;touch-action:manipulation}
+.discs{position:absolute;inset:0;border-radius:18px;overflow:visible}
+.disc{position:absolute;width:12.4%;height:14.4%;border-radius:50%;transform:translate(-50%,-50%)}
+.disc.p0{background:radial-gradient(circle at 50% 50%,transparent 52%,rgba(0,0,0,.18) 53% 60%,transparent 61%),radial-gradient(circle at 35% 30%,#ff8a7d,var(--red) 55%,var(--red2))}
+.disc.p1{background:radial-gradient(circle at 50% 50%,transparent 52%,rgba(0,0,0,.2) 53% 60%,transparent 61%),radial-gradient(circle at 35% 30%,#8cc9ea,var(--blue) 55%,var(--blue2))}
+.disc.ghost{opacity:.45}
+.marks{position:absolute;inset:0;pointer-events:none}
+.ring{position:absolute;width:12.4%;height:14.4%;border-radius:50%;transform:translate(-50%,-50%);box-shadow:0 0 0 4px #fff,0 0 0 7px rgba(23,35,43,.35),0 0 22px 8px rgba(255,255,255,.8)}
+.plate{position:absolute;inset:0;border-radius:18px;pointer-events:none;
+  background:linear-gradient(180deg,var(--plate),var(--plate2));
+  -webkit-mask:radial-gradient(circle,transparent 39%,#000 41%) 0 0/calc(100%/7) calc(100%/6);
+          mask:radial-gradient(circle,transparent 39%,#000 41%) 0 0/calc(100%/7) calc(100%/6);
+  box-shadow:0 14px 30px rgba(120,80,0,.25)}
+.rim{position:absolute;inset:0;border-radius:18px;pointer-events:none;box-shadow:inset 0 3px 0 rgba(255,255,255,.35),inset 0 -5px 0 rgba(0,0,0,.15)}
+.cols{position:absolute;left:0;right:0;top:-18%;bottom:0;display:grid;grid-template-columns:repeat(7,1fr)}
+.cols button{border:0;background:transparent;cursor:pointer;padding:0;border-radius:12px}
+.cols button:focus-visible{outline:3px solid var(--ink);outline-offset:-3px}
+
+.tools{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}
+.btn{border:0;border-radius:12px;padding:12px 14px;font:700 15px var(--body);cursor:pointer;background:var(--card);color:var(--ink);box-shadow:0 1px 0 var(--line)}
+.btn.main{background:var(--ink);color:var(--bg)}
+.btn:disabled{opacity:.4;cursor:default}
+button:focus-visible{outline:3px solid var(--blue);outline-offset:2px}
+
+.rules{font-size:13px;color:var(--muted);line-height:1.5;margin:0}
+.promo{display:flex;align-items:center;gap:12px;background:var(--brand);color:var(--brand-ink);border-radius:14px;padding:12px 14px;text-decoration:none}
+.promo .logo{flex:none;width:40px;height:40px;border-radius:10px;background:rgba(255,255,255,.16);display:grid;place-items:center;font:700 22px var(--display)}
+.promo span{min-width:0}
+.promo b{display:block;font-size:15px}
+.promo small{display:block;font-size:12.5px;opacity:.85;margin-top:1px}
+.promo .arrow{margin-left:auto;font-weight:700;font-size:13px;white-space:nowrap}
+.links{font-size:12.5px;color:var(--muted);margin:0;text-align:center;line-height:1.7}
+.links a{color:var(--ink);font-weight:700}
+@media (max-width:460px){.promo .arrow{display:none}}
+
+/* ---------- Modo reel (1080×1920, solo para grabar el vídeo) ---------- */
+#reel{display:none}
+body.reel{padding:0;overflow:hidden}
+body.reel .app{display:none}
+body.reel #reel{display:block;position:fixed;left:0;top:0;width:1080px;height:1920px;overflow:hidden;
+  background:radial-gradient(70% 45% at 50% 50%,#f6f9fa 0%,var(--bg) 75%)}
+.rv-head{position:absolute;left:70px;right:70px;top:110px;text-align:left}
+.rv-title{font:700 132px/.85 var(--display);color:var(--ink)}
+.rv-title em{font-style:normal;color:var(--red)}
+.rv-who{position:absolute;left:70px;right:70px;top:420px;display:flex;justify-content:space-between;font:700 40px var(--body);color:var(--ink)}
+.rv-who span{display:flex;align-items:center;gap:16px;padding:12px 24px;border-radius:999px;border:4px solid transparent}
+.rv-who i{width:46px;height:46px;border-radius:50%;display:block}
+.rv-who .a i{background:radial-gradient(circle at 35% 30%,#ff8a7d,var(--red) 55%,var(--red2))}
+.rv-who .b i{background:radial-gradient(circle at 35% 30%,#8cc9ea,var(--blue) 55%,var(--blue2))}
+.rv-who .a.on{border-color:var(--red);background:#fff} .rv-who .b.on{border-color:var(--blue);background:#fff}
+.rv-board{position:absolute;left:60px;top:540px;width:960px}
+body.reel .plate,body.reel .discs,body.reel .rim{border-radius:36px}
+body.reel .ring{box-shadow:0 0 0 10px #fff,0 0 0 16px rgba(23,35,43,.35),0 0 50px 18px rgba(255,255,255,.85)}
+.rv-cap{position:absolute;left:50%;top:1540px;transform:translateX(-50%);white-space:nowrap;background:var(--ink);color:#fff;
+  font:800 50px var(--body);padding:22px 44px;border-radius:999px;box-shadow:0 12px 30px rgba(23,35,43,.3)}
+.rv-cap.red{background:var(--red)} .rv-cap.blue{background:var(--blue)}
+.rv-brand{position:absolute;left:0;right:0;bottom:100px;display:flex;justify-content:center}
+.rv-brand div{display:flex;align-items:center;gap:20px;font:700 38px var(--body);color:var(--ink)}
+.rv-lg{width:68px;height:68px;border-radius:16px;background:var(--brand);color:#fff;display:grid;place-items:center;font:700 42px var(--display)}
+.rv-intro{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:24px;text-align:center;
+  background:color-mix(in srgb,var(--bg) 88%,transparent);backdrop-filter:blur(8px)}
+.rv-intro .big{font:700 210px/.82 var(--display);color:var(--ink)}
+.rv-intro .big em{font-style:normal;color:var(--red);display:block}
+.rv-intro .dots{display:flex;gap:22px}
+.rv-intro .dots i{width:110px;height:110px;border-radius:50%;display:block;background:radial-gradient(circle at 35% 30%,#ff8a7d,var(--red) 55%,var(--red2))}
+.rv-intro .q{font:800 58px var(--body);color:#fff;background:var(--ink);padding:16px 38px;border-radius:18px;margin-top:30px}
+.rv-end{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:40px;text-align:center;
+  background:radial-gradient(circle at 50% 35%,#1d4258,#0c1820 70%);color:#fff}
+.rv-end h2{font:700 136px/.9 var(--display);margin:0}
+.rv-end h2 span{color:#ffb04a}
+.rv-end .play{font:700 50px var(--body);opacity:.9}
+.rv-end .url{font:800 46px var(--body);background:#fff;color:#17232b;padding:24px 34px;border-radius:22px}
+.rv-end .co{display:flex;align-items:center;gap:26px;margin-top:70px}
+.rv-end .co .rv-lg{width:110px;height:110px;border-radius:24px;font-size:66px}
+.rv-end .co b{display:block;font:800 52px var(--body);text-align:left}
+.rv-end .co small{display:block;font:600 38px var(--body);opacity:.8;text-align:left}
+.rv-end .more{font:700 32px var(--body);opacity:.7;margin-top:10px}
+</style>
+<style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}</style>
+</head>
+<body>
+<div class="app">
+  <header>
+    <h1>Cuatro <em>en raya</em></h1>
+    <div class="seg" role="group" aria-label="Rival">
+      <button data-mode="cpu">vs CPU</button>
+      <button data-mode="2p">2 jugadores</button>
+    </div>
+  </header>
+  <div class="opts" id="lvRow">
+    <div class="seg" role="group" aria-label="Nivel de la CPU">
+      <button data-lv="1">Fácil</button><button data-lv="2">Medio</button><button data-lv="3">Difícil</button>
+    </div>
+  </div>
+  <div class="players">
+    <div class="pl p0" id="pl0"><span class="dot"></span><span class="nm" id="n0">Tú<small>Rojas</small></span><b class="w" id="w0">0</b></div>
+    <span class="vs">vs</span>
+    <div class="pl p1 r" id="pl1"><span class="dot"></span><span class="nm" id="n1">CPU<small>Azules</small></span><b class="w" id="w1">0</b></div>
+  </div>
+  <div class="status" id="status"></div>
+
+  <div class="wrap">
+    <div class="stage" id="stage">
+      <div class="discs" id="discs"></div>
+      <div class="plate"></div><div class="rim"></div>
+      <div class="marks" id="marks"></div>
+      <div class="cols" id="cols"></div>
+    </div>
+  </div>
+
+  <div class="tools">
+    <button class="btn" id="undo">↶ Deshacer</button>
+    <button class="btn main" id="new">Nueva partida</button>
+  </div>
+  <p class="rules">Toca una columna para soltar tu ficha: cae hasta el hueco libre más bajo. Gana quien junte cuatro del mismo color en horizontal, vertical o diagonal. Se turnan para empezar cada partida. En ordenador también puedes usar las teclas 1 a 7.</p>
+
+  <a class="promo" href="https://adilcotech.com" target="_blank" rel="noopener">
+    <span class="logo" aria-hidden="true">A</span>
+    <span><b>Adilco Tech Center, SL</b><small>Consultoría ERP y soluciones tecnológicas a medida</small></span>
+    <span class="arrow">adilcotech.com →</span>
+  </a>
+  <p class="links">Más juegos: <a href="https://jrubioadies.github.io/othello/" target="_blank" rel="noopener">Othello</a> · <a href="https://jrubioadies.github.io/torre-tambaleante/" target="_blank" rel="noopener">Torre Tambaleante</a> · <a href="https://jrubioadies.github.io/sudoku/" target="_blank" rel="noopener">Sudoku</a> · <a href="https://jrubioadies.github.io/solitario/" target="_blank" rel="noopener">Solitario</a> · <a href="https://jrubioadies.github.io/2048/" target="_blank" rel="noopener">2048</a> · <a href="https://jrubioadies.github.io/palabra/" target="_blank" rel="noopener">Palabra del día</a><br>
+  Hecho por Javier Rubio · <a href="https://jrubioadies.github.io" target="_blank" rel="noopener">jrubioadies.github.io</a> · <a href="https://github.com/jrubioadies/jrubioadies.github.io/tree/main/cuatro-en-raya" target="_blank" rel="noopener">código en GitHub</a></p>
+</div>
+
+<div id="reel" aria-hidden="true">
+  <div class="rv-head"><div class="rv-title">Cuatro<br><em>en raya</em></div></div>
+  <div class="rv-who"><span class="a" id="rvA"><i></i>Tú</span><span class="b" id="rvB">CPU<i></i></span></div>
+  <div class="rv-board" id="rvBoard"></div>
+  <div class="rv-cap" id="rvCap" hidden></div>
+  <div class="rv-brand"><div><span class="rv-lg">A</span>Adilco Tech Center, SL</div></div>
+  <div class="rv-intro" id="rvIntro"><div class="dots"><i></i><i></i><i></i><i></i></div><div class="big">Cuatro<em>en raya</em></div><div class="q">¿Le ganas a la CPU?</div></div>
+  <div class="rv-end" id="rvEnd" hidden>
+    <h2>¿Le ganas<br>a la <span>CPU</span>?</h2>
+    <div class="play">Tres niveles · o reta a un amigo</div>
+    <div class="url">jrubioadies.github.io/cuatro-en-raya</div>
+    <div class="co"><span class="rv-lg">A</span><span><b>Adilco Tech Center, SL</b><small>adilcotech.com</small></span></div>
+    <div class="more">Más juegos: Othello · Sudoku · 2048 y más</div>
+  </div>
+</div>
+
+<script>
+(()=>{
+const REEL=new URLSearchParams(location.search).has('reel');
+if(REEL)document.body.classList.add('reel');
+const $=id=>document.getElementById(id);
+const KEY='cuatro-en-raya-v1', W=7, H=6;
+let clock=0; const now=()=>REEL?clock:performance.now();
+const reduce=!REEL&&matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+// ---------- motor: casilla = fila*7+col, fila 0 abajo ----------
+const WINDOWS=[];
+for(let r=0;r<H;r++)for(let c=0;c<W;c++)for(const [dr,dc] of [[0,1],[1,0],[1,1],[1,-1]]){
+  const cells=[];for(let k=0;k<4;k++){const rr=r+dr*k,cc=c+dc*k;if(rr<0||rr>=H||cc<0||cc>=W){cells.length=0;break}cells.push(rr*W+cc)}
+  if(cells.length===4)WINDOWS.push(cells)}
+const BYCELL=Array.from({length:W*H},()=>[]);WINDOWS.forEach(w=>w.forEach(i=>BYCELL[i].push(w)));
+const ORDER=[3,2,4,1,5,0,6];
+function heightOf(b,c){for(let r=0;r<H;r++)if(b[r*W+c]<0)return r;return H}
+function winAt(b,i){const p=b[i];for(const w of BYCELL[i])if(b[w[0]]===p&&b[w[1]]===p&&b[w[2]]===p&&b[w[3]]===p)return w;return null}
+function evaluate(b,p){
+  let s=0;const o=1-p;
+  for(let r=0;r<H;r++){if(b[r*W+3]===p)s+=3;else if(b[r*W+3]===o)s-=3}
+  for(const w of WINDOWS){let m=0,e=0,t=0;for(const i of w){if(b[i]===p)m++;else if(b[i]<0)e++;else t++}
+    if(m&&t)continue;if(m===3&&e===1)s+=5;else if(m===2&&e===2)s+=2;else if(t===3&&e===1)s-=6;else if(t===2&&e===2)s-=1}
+  return s;
+}
+function negamax(b,depth,alpha,beta,p,filled){
+  if(filled===W*H)return 0;
+  if(depth===0)return evaluate(b,p);
+  let best=-1e9;
+  for(const c of ORDER){const r=heightOf(b,c);if(r>=H)continue;const i=r*W+c;b[i]=p;
+    let v;if(winAt(b,i))v=100000+depth;else v=-negamax(b,depth-1,-beta,-alpha,1-p,filled+1);
+    b[i]=-1;if(v>best)best=v;if(best>alpha)alpha=best;if(alpha>=beta)break}
+  return best;
+}
+function bestMove(b,p,depth,rnd=Math.random,noise=0){
+  const filled=b.filter(x=>x>=0).length;let best=-1e9,move=-1;const scored=[];
+  for(const c of ORDER){const r=heightOf(b,c);if(r>=H)continue;const i=r*W+c;b[i]=p;
+    const v=winAt(b,i)?100000+depth:-negamax(b,depth-1,-1e9,1e9,1-p,filled+1);b[i]=-1;scored.push([c,v]);if(v>best){best=v;move=c}}
+  if(noise&&rnd()<noise){const ok=scored.filter(([,v])=>v>-50000);if(ok.length)return ok[Math.floor(rnd()*ok.length)][0]}
+  return move;
+}
+const LEVELS={1:{depth:2,noise:.35,name:'Fácil'},2:{depth:4,noise:0,name:'Medio'},3:{depth:7,noise:0,name:'Difícil'}};
+
+// ---------- estado ----------
+let S=null, anims=[], discEls={}, thinking=false, hoverCol=-1;
+function store(){try{return JSON.parse(localStorage.getItem(KEY))||null}catch(e){return null}}
+function save(){if(REEL)return;try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
+function fresh(keep){return {mode:keep?keep.mode:'cpu',lv:keep?keep.lv:2,wins:keep?keep.wins:[0,0],starter:keep?1-keep.starter:0,
+  board:Array(W*H).fill(-1),moves:[],turn:keep?1-keep.starter:0,over:false,win:null}}
+
+// ---------- dibujo ----------
+const discs=$('discs'), cols=$('cols');
+for(let c=0;c<W;c++){const b=document.createElement('button');b.setAttribute('aria-label','Columna '+(c+1));
+  b.addEventListener('click',()=>human(c));b.addEventListener('pointerenter',()=>{hoverCol=c});b.addEventListener('pointerleave',()=>{if(hoverCol===c)hoverCol=-1});cols.appendChild(b)}
+const cx=c=>(c+.5)/W*100, cy=r=>(H-1-r+.5)/H*100;
+const ghost=document.createElement('div');ghost.className='disc ghost';discs.appendChild(ghost);
+function rebuild(){
+  Object.values(discEls).forEach(e=>e.remove());discEls={};anims=[];
+  S.board.forEach((p,i)=>{if(p>=0)addDisc(i,p,false)});
+}
+function addDisc(i,p,animate){
+  const el=document.createElement('div');el.className='disc p'+p;discs.insertBefore(el,ghost);discEls[i]=el;
+  const r=(i/W)|0,c=i%W;el.style.left=cx(c)+'%';
+  if(animate){const y0=-9, y1=cy(r);anims.push({el,y0,y1,t0:now()});el.style.top=y0+'%'}else el.style.top=cy(r)+'%';
+}
+function tick(){
+  if(!S)return;
+  const t=now();
+  anims=anims.filter(a=>{
+    // caída con gravedad y un rebote pequeño
+    const fall=Math.sqrt((a.y1-a.y0)/100)*330, el=t-a.t0;
+    let y;if(reduce||el>=fall+170){y=a.y1}else if(el<fall){const k=el/fall;y=a.y0+(a.y1-a.y0)*k*k}else{const k=(el-fall)/170;y=a.y1-Math.sin(Math.PI*k)*2.2}
+    a.el.style.top=y+'%';return !(reduce||el>=fall+170);
+  });
+  const myTurn=S&&!S.over&&!thinking&&(S.mode==='2p'||S.turn===0);
+  if(myTurn&&hoverCol>=0&&heightOf(S.board,hoverCol)<H&&!REEL){ghost.hidden=false;ghost.className='disc ghost p'+S.turn;ghost.style.left=cx(hoverCol)+'%';ghost.style.top='-9%'}else ghost.hidden=true;
+  const mk=$('marks'), want=S.win&&!anims.length?S.win:[];
+  if(mk.childElementCount!==want.length){mk.innerHTML='';want.forEach(i=>{const d=document.createElement('div');d.className='ring';d.style.left=cx(i%W)+'%';d.style.top=cy((i/W)|0)+'%';mk.appendChild(d)})}
+  if(want.length){const k=1+.06*Math.sin(t/180);[...mk.children].forEach(d=>d.style.transform=`translate(-50%,-50%) scale(${k})`)}
+}
+function names(){return S.mode==='cpu'?['Tú','CPU']:['Jugador 1','Jugador 2']}
+function resultText(){const n=names();if(!S.win)return '<b class="res">¡Empate! Tablero lleno.</b>';const p=S.board[S.win[0]];return `<b class="res p${p}">${S.mode==='cpu'?(p===0?'¡Has ganado!':'Gana la CPU'):'¡Gana '+n[p]+'!'}</b> · ${S.wins[0]} – ${S.wins[1]}`}
+function ui(){
+  const n=names();
+  $('n0').innerHTML=`${n[0]}<small>Rojas</small>`;$('n1').innerHTML=`${n[1]}<small>Azules${S.mode==='cpu'?' · '+LEVELS[S.lv].name:''}</small>`;
+  $('w0').textContent=S.wins[0];$('w1').textContent=S.wins[1];
+  $('pl0').classList.toggle('on',!S.over&&S.turn===0);$('pl1').classList.toggle('on',!S.over&&S.turn===1);
+  document.querySelectorAll('[data-mode]').forEach(b=>b.setAttribute('aria-pressed',b.dataset.mode===S.mode));
+  document.querySelectorAll('[data-lv]').forEach(b=>b.setAttribute('aria-pressed',+b.dataset.lv===S.lv));
+  $('lvRow').style.visibility=S.mode==='cpu'?'visible':'hidden';
+  $('status').innerHTML=S.over?resultText():thinking?'La CPU está pensando…':S.mode==='cpu'?(S.turn===0?'Tu turno':'Turno de la CPU'):`Turno de ${n[S.turn]}`;
+  $('undo').disabled=!S.moves.length||thinking;
+  if(REEL){$('rvA').classList.toggle('on',!S.over&&S.turn===0);$('rvB').classList.toggle('on',!S.over&&S.turn===1)}
+}
+
+// ---------- jugadas ----------
+function drop(c){
+  const r=heightOf(S.board,c);if(r>=H)return false;
+  const i=r*W+c,p=S.turn;S.board[i]=p;S.moves.push(c);addDisc(i,p,true);
+  const w=winAt(S.board,i);
+  if(w){S.over=true;S.win=w;S.wins[p]++;setTimeout(()=>endMsg(p),REEL?0:650)}
+  else if(S.moves.length===W*H){S.over=true;setTimeout(()=>endMsg(-1),REEL?0:650)}
+  else S.turn=1-p;
+  save();ui();return true;
+}
+function human(c){
+  if(!S||S.over||thinking)return;
+  if(S.mode==='cpu'&&S.turn!==0)return;
+  if(drop(c))cpu();
+}
+function cpu(){
+  if(S.mode!=='cpu'||S.over||S.turn!==1)return;
+  thinking=true;ui();
+  setTimeout(()=>{const L=LEVELS[S.lv];const c=bestMove(S.board.slice(),1,L.depth,Math.random,L.noise);thinking=false;drop(c)},420);
+}
+function endMsg(p){ui()}
+function newGame(){S=fresh(S);rebuild();save();ui();cpu()}
+function undo(){
+  if(thinking||!S.moves.length)return;
+  if(S.over&&S.win)S.wins[S.board[S.win[0]]]--;
+  const turnAfter=()=>S.moves.length%2===0?S.starter:1-S.starter;
+  do{const c=S.moves.pop();const r=heightOf(S.board,c)-1;S.board[r*W+c]=-1}
+  while(S.mode==='cpu'&&S.moves.length&&turnAfter()!==0);
+  S.over=false;S.win=null;S.turn=turnAfter();rebuild();save();ui();cpu();
+}
+
+// ---------- controles ----------
+document.querySelectorAll('[data-mode]').forEach(b=>b.onclick=()=>{if(S.mode===b.dataset.mode)return;S.mode=b.dataset.mode;S.wins=[0,0];S.starter=1;newGame()});
+document.querySelectorAll('[data-lv]').forEach(b=>b.onclick=()=>{S.lv=+b.dataset.lv;S.wins=[0,0];S.starter=1;newGame()});
+$('new').onclick=newGame;$('undo').onclick=undo;
+document.addEventListener('keydown',e=>{if(/^[1-7]$/.test(e.key))human(+e.key-1)});
+
+// ---------- modo reel ----------
+function setupReel(){
+  $('rvBoard').appendChild(document.querySelector('.wrap'));
+  S=fresh(null);S.mode='cpu';
+  // partida calculada de antemano con el propio motor
+  // partida real calculada con este mismo motor (rojas nivel 4 contra azules nivel 3): gana rojas en diagonal
+  const seq=[...'3232332232352454544'].map(Number);
+  rebuild();ui();
+  const cap=(txt,cls)=>{const c=$('rvCap');c.hidden=!txt;if(txt){c.textContent=txt;c.className='rv-cap'+(cls?' '+cls:'')}};
+  const ev=[];const at=(t,fn)=>ev.push({t,fn});
+  at(2600,()=>cap('Suelta tu ficha en una columna','red'));
+  const first=2800,last=12600,slow=4,gS=700,gF=(last-first-slow*gS)/Math.max(1,seq.length-slow);
+  let t=first;
+  seq.forEach((c,k)=>{at(t,()=>drop(c));
+    if(k===4)at(t-60,()=>cap('La CPU intenta bloquearte','blue'));
+    if(k===10)at(t-60,()=>cap('Junta cuatro antes que ella'));
+    t+=k<slow?gS:Math.min(560,gF)});
+  at(t+500,()=>cap('¡Cuatro en raya!','red'));
+  at(16000,()=>{$('rvEnd').hidden=false;cap('')});
+  window.__reelDuration=19500;
+  window.__step=()=>{
+    clock+=1000/30;ev.sort((a,b)=>a.t-b.t);
+    while(ev.length&&ev[0].t<=clock){const e=ev.shift();e.fn()}
+    tick();
+    const intro=$('rvIntro');intro.style.opacity=clock<2100?1:Math.max(0,1-(clock-2100)/400);intro.hidden=clock>2500;
+    return clock;
+  };
+  window.__seq=seq;window.__ready=true;
+}
+
+// ---------- arranque ----------
+if(REEL){setupReel();return}
+(function loop(){tick();requestAnimationFrame(loop)})();
+const saved=store();
+if(saved&&saved.board&&saved.board.length===W*H){S=saved;rebuild();ui();if(!S.over)cpu()}
+else{S=fresh(null);rebuild();save();ui()}
+})();
+</script>
+</body>
+</html>
