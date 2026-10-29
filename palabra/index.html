@@ -405,5 +405,40 @@ setMode(s0.mode&&['dia','fin','libre'].includes(s0.mode)?s0.mode:'dia');
 if(!s0.games)showHelp();
 })();
 </script>
+
+<!-- Demo: versión completa en https://games.adilcotech.com -->
+<style>
+#jb-demo{position:fixed;left:0;right:0;bottom:0;z-index:2147483000;display:flex;align-items:center;gap:10px;justify-content:space-between;
+  padding:10px max(14px,env(safe-area-inset-right,0px)) calc(10px + env(safe-area-inset-bottom,0px)) max(14px,env(safe-area-inset-left,0px));
+  background:#13261f;color:#fff;font:600 14px/1.2 system-ui,-apple-system,"Segoe UI",sans-serif;box-shadow:0 -6px 20px rgba(0,0,0,.18)}
+#jb-demo b{font-variant-numeric:tabular-nums}
+#jb-demo a{flex:none;background:#e2a72e;color:#1b1300;text-decoration:none;font-weight:800;padding:9px 14px;border-radius:10px}
+#jb-fin{position:fixed;inset:0;z-index:2147483001;display:flex;align-items:center;justify-content:center;padding:24px;background:rgba(10,20,16,.82);backdrop-filter:blur(4px)}
+#jb-fin div{max-width:360px;background:#fff;color:#13261f;border-radius:20px;padding:24px;text-align:center;font:500 16px/1.45 system-ui,-apple-system,"Segoe UI",sans-serif;display:flex;flex-direction:column;gap:12px}
+#jb-fin h2{margin:0;font-size:26px;line-height:1.1}
+#jb-fin a{background:#1F6F5B;color:#fff;text-decoration:none;font-weight:800;padding:13px;border-radius:12px}
+#jb-fin small{color:#5d6a64}
+[hidden]{display:none!important}
+</style>
+<div id="jb-demo" role="status"><span>Prueba gratis · quedan <b id="jb-t">10:00</b> hoy</span><a id="jb-a" href="https://games.adilcotech.com/?juego=palabra&amp;comprar=1">Completo por 1 €</a></div>
+<div id="jb-fin" hidden><div><h2>Se acabó la prueba de hoy</h2><p>Mañana tienes otros 10 minutos gratis. O desbloquea el juego completo para siempre, sin límites.</p><a href="https://games.adilcotech.com/?juego=palabra&amp;comprar=1">Desbloquear por 1 €</a><small>Tarjeta, Apple Pay, Google Pay o WeChat Pay</small></div></div>
+<script>
+(()=>{
+  const K='jb-demo-palabra', LIM=600;
+  const hoy=new Date().toDateString();
+  let s; try{s=JSON.parse(localStorage.getItem(K))}catch(e){}
+  if(!s||s.dia!==hoy)s={dia:hoy,usado:0};
+  const t=document.getElementById('jb-t'), fin=document.getElementById('jb-fin');
+  document.body.style.paddingBottom='64px';
+  let ultimo=Date.now();
+  ['pointerdown','keydown','touchstart'].forEach(e=>addEventListener(e,()=>{ultimo=Date.now()},{capture:true,passive:true}));
+  const pinta=()=>{const r=Math.max(0,LIM-s.usado);t.textContent=String(r/60|0).padStart(2,'0')+':'+String(r%60).padStart(2,'0');fin.hidden=r>0};
+  pinta();
+  setInterval(()=>{
+    if(document.hidden||Date.now()-ultimo>60000||s.usado>=LIM)return;   // sin contar si no se está jugando
+    s.usado++;try{localStorage.setItem(K,JSON.stringify(s))}catch(e){}pinta();
+  },1000);
+})();
+</script>
 </body>
 </html>

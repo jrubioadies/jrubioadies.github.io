@@ -55,7 +55,7 @@ footer a{color:var(--ink);font-weight:700}
   <header>
     <span class="eyebrow">Adilco Tech Center · juegos para el móvil</span>
     <h1>Juegos <span>de bolsillo</span></h1>
-    <p class="lead">Siete clásicos para jugar en el navegador del móvil, gratis y sin instalar nada. Cada uno guarda tu partida y tu récord.</p>
+    <p class="lead">Siete clásicos para jugar en el navegador del móvil. Pruébalos gratis 10 minutos al día y consigue la versión completa por 1 € en <a href="https://games.adilcotech.com" style="color:var(--brand);font-weight:700">games.adilcotech.com</a>.</p>
   </header>
 
   <main class="grid" id="grid"></main>
@@ -81,7 +81,7 @@ document.getElementById('grid').innerHTML=GAMES.map(([f,n,d])=>`
   <article class="game">
     <a class="shot" href="../${f}/" aria-label="Jugar a ${n}"><img src="img/${f}.jpg" alt="Captura de ${n}" loading="lazy" width="480" height="480"></a>
     <div class="body"><h2>${n}</h2><p>${d}</p>
-      <div class="row"><a class="btn" href="../${f}/">Jugar</a><a class="btn ghost" href="https://github.com/jrubioadies/jrubioadies.github.io/tree/main/${f}" target="_blank" rel="noopener">Código</a></div></div>
+      <div class="row"><a class="btn" href="../${f}/">Probar</a><a class="btn" style="background:var(--accent);color:#241800" href="https://games.adilcotech.com/?juego=${f}&comprar=1">1 €</a><a class="btn ghost" href="https://github.com/jrubioadies/jrubioadies.github.io/tree/main/${f}" target="_blank" rel="noopener">Código</a></div></div>
   </article>`).join('');
 </script>
 </body>
