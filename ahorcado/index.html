@@ -1,0 +1,612 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#1F6F5B">
+<meta property="og:title" content="El ahorcado de bolsillo">
+<meta property="og:description" content="Adivina la palabra letra a letra antes de que se complete el dibujo.">
+<meta property="og:image" content="https://jrubioadies.github.io/ahorcado/portada.jpg">
+<title>El ahorcado de bolsillo</title>
+<meta name="description" content="El ahorcado para el móvil: adivina la palabra letra a letra antes de completar el dibujo. Seis categorías, pistas y modo 2 jugadores. Por Adilco Tech Center, SL.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Patrick+Hand&family=Sora:wght@400;600;700;800&display=swap">
+<style>
+/* Libreta cuadriculada: bolígrafo azul, lápiz rojo para los fallos y verde de corrector para los aciertos */
+:root{
+  --bg:#e7edf4; --paper:#fbfcfe; --grid:#e3eaf3; --margin:#efb3ae; --ink:#1b2440; --muted:#5d6a80; --line:#cfd8e5;
+  --pen:#2546a6; --ok:#1d8656; --bad:#cf3f33; --hint:#b7791f; --key:#dce3ed; --ghost:#c9d3e1;
+  --accent:#2546a6; --brand:#1F6F5B; --brand-ink:#ffffff;
+  --display:"Patrick Hand","Comic Sans MS","Segoe Print",cursive;
+  --body:"Sora",system-ui,-apple-system,"Segoe UI",sans-serif;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0e131d; --paper:#161e2d; --grid:#1d2739; --margin:#4a2a33; --ink:#e6ebf5; --muted:#919db4; --line:#26314a;
+  --pen:#9dbcff; --ok:#3cb37c; --bad:#ff6c5f; --hint:#e3a640; --key:#243049; --ghost:#2f3c56; --accent:#7ea4ff; --brand:#2f8f76; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0e131d; --paper:#161e2d; --grid:#1d2739; --margin:#4a2a33; --ink:#e6ebf5; --muted:#919db4; --line:#26314a;
+  --pen:#9dbcff; --ok:#3cb37c; --bad:#ff6c5f; --hint:#e3a640; --key:#243049; --ghost:#2f3c56; --accent:#7ea4ff; --brand:#2f8f76; color-scheme:dark}
+[hidden]{display:none!important}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);margin:0;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));
+  -webkit-tap-highlight-color:transparent}
+.app{max-width:500px;margin:0 auto;display:flex;flex-direction:column;gap:12px;padding-block:14px 24px}
+header{display:flex;align-items:center;justify-content:space-between;gap:10px}
+h1{font:400 44px/.8 var(--display);margin:0;color:var(--ink);white-space:nowrap}
+h1 em{display:block;font:700 12.5px var(--body);font-style:normal;color:var(--pen);letter-spacing:.14em;text-transform:uppercase;margin-top:8px}
+.hr{display:flex;gap:6px;align-items:center}
+.ib{border:0;background:var(--paper);color:var(--ink);width:42px;height:42px;border-radius:12px;cursor:pointer;display:grid;place-items:center;box-shadow:0 1px 0 var(--line);padding:0}
+.ib svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.sc{background:var(--paper);border-radius:12px;padding:5px 12px;min-width:58px;text-align:center;box-shadow:0 1px 0 var(--line)}
+.sc small{display:block;font-size:10.5px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.1em}
+.sc b{display:block;font:700 20px/1.1 var(--body);font-variant-numeric:tabular-nums}
+.bar{display:flex;gap:8px;align-items:center}
+.selw{position:relative;flex:1;min-width:0}
+.selw select{appearance:none;-webkit-appearance:none;width:100%;border:0;border-radius:12px;background:var(--paper);color:var(--ink);font:600 14px var(--body);padding:11px 34px 11px 14px;box-shadow:0 1px 0 var(--line);cursor:pointer;text-overflow:ellipsis}
+.selw::after{content:"";position:absolute;right:14px;top:50%;width:8px;height:8px;border:solid var(--muted);border-width:0 2px 2px 0;transform:translateY(-70%) rotate(45deg);pointer-events:none}
+.btn{border:0;border-radius:12px;padding:11px 14px;font:700 14px var(--body);cursor:pointer;background:var(--paper);color:var(--ink);box-shadow:0 1px 0 var(--line);white-space:nowrap}
+.btn.main{background:var(--pen);color:#fff}
+:root[data-theme="dark"] .btn.main{color:#0e131d}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .btn.main{color:#0e131d}}
+.btn:disabled{opacity:.4;cursor:default}
+button:focus-visible,select:focus-visible,input:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+
+/* hoja de libreta */
+.wrap{position:relative}
+.card{position:relative;isolation:isolate;overflow:hidden;border-radius:18px;background-color:var(--paper);
+  background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);
+  background-size:22px 22px;background-position:-1px -1px;box-shadow:0 1px 0 var(--line),0 10px 30px rgba(27,36,64,.07)}
+.card::before{content:"";position:absolute;left:30px;top:0;bottom:0;width:2px;background:var(--margin);z-index:-1}
+.ctop{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:10px 12px 0 42px}
+.cat{font:700 12px var(--body);text-transform:uppercase;letter-spacing:.12em;color:var(--muted);min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.cat b{color:var(--pen)}
+.hintb{border:1.5px dashed var(--hint);background:transparent;color:var(--hint);font:700 13px var(--body);border-radius:10px;padding:6px 10px;cursor:pointer;white-space:nowrap}
+.hintb:disabled{opacity:.35;cursor:default}
+.draw{position:relative;height:216px}
+.draw svg{display:block;height:100%;margin:0 auto;overflow:visible}
+.ghost path{fill:none;stroke:var(--ghost);stroke-width:2.2;stroke-linecap:round;stroke-dasharray:2 6}
+.ink path{fill:none;stroke:var(--pen);stroke-width:5.5;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:1 1}
+.ink .face path{stroke:var(--bad);stroke-width:4}
+.fails{position:absolute;right:14px;top:4px;text-align:right;line-height:1}
+.fails b{display:block;font:400 40px/1 var(--display);font-variant-numeric:tabular-nums;color:var(--ink);transform-origin:right center}
+.fails b.hot{color:var(--bad)}
+.fails small{font:700 10.5px var(--body);text-transform:uppercase;letter-spacing:.12em;color:var(--muted)}
+.wordw{padding:4px 14px 18px 40px}
+.word{display:flex;flex-wrap:wrap;justify-content:center;row-gap:12px;column-gap:calc(var(--s,30px)*.7);--g:4px}
+.w{display:flex;gap:var(--g)}
+.slot{width:var(--s,30px);height:calc(var(--s,30px)*1.22);border-bottom:3px solid var(--ink);display:flex;align-items:flex-end;justify-content:center;
+  font:400 calc(var(--s,30px)*1.08)/1 var(--display);color:var(--pen);box-sizing:border-box}
+.slot i{font-style:normal;display:block;transform-origin:50% 80%;padding-bottom:2px}
+.slot.sep{border-bottom-color:transparent;color:var(--muted)}
+.slot.hint{color:var(--hint)} .slot.miss{color:var(--bad)}
+.toast{position:absolute;left:50%;top:48px;transform:translateX(-50%);background:var(--ink);color:var(--bg);font:700 13px var(--body);padding:8px 13px;border-radius:10px;white-space:nowrap;pointer-events:none;z-index:4}
+.veil{position:absolute;left:0;right:0;top:0;z-index:3;height:calc(216px + 40px);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;text-align:center;
+  background:color-mix(in srgb,var(--paper) 74%,transparent);backdrop-filter:blur(2px);padding:14px 20px;box-sizing:border-box}
+.veil h2{font:400 46px/.9 var(--display);margin:0}
+.veil h2.win{color:var(--ok)} .veil h2.lose{color:var(--bad)}
+.veil p{margin:0;color:var(--muted);font-size:14px;line-height:1.4}
+.veil p b{color:var(--ink)}
+.veil .row{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
+
+/* teclado */
+.kb{display:flex;flex-direction:column;gap:6px;user-select:none}
+.kr{display:flex;gap:5px;justify-content:center}
+.key{flex:1;max-width:44px;height:50px;border:0;border-radius:9px;background:var(--key);color:var(--ink);font:700 16px var(--body);cursor:pointer;padding:0;display:grid;place-items:center;position:relative}
+.key.ok{background:var(--ok);color:#fff}
+.key.hint{background:var(--hint);color:#fff}
+.key.no{background:transparent;color:var(--bad);box-shadow:inset 0 0 0 2px color-mix(in srgb,var(--bad) 45%,transparent)}
+.key.no::after{content:"";position:absolute;left:22%;right:22%;top:50%;height:2px;background:var(--bad);transform:rotate(-28deg)}
+.key.press{transform:scale(.9);filter:brightness(.92)}
+
+.modal{position:fixed;inset:0;z-index:20;display:flex;align-items:center;justify-content:center;background:rgba(10,14,24,.5);
+  padding:max(16px,env(safe-area-inset-top,0px)) max(16px,env(safe-area-inset-right,0px)) max(16px,env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px))}
+.sheet{background:var(--paper);border-radius:18px;padding:20px;width:100%;max-width:400px;max-height:100%;overflow:auto;display:flex;flex-direction:column;gap:14px;box-sizing:border-box}
+.sheet h2{font:400 36px/1 var(--display);margin:0}
+.sheet p{margin:0;font-size:14px;line-height:1.5;color:var(--muted)}
+.sheet label{display:flex;flex-direction:column;gap:6px;font:700 12px var(--body);text-transform:uppercase;letter-spacing:.1em;color:var(--muted)}
+.inrow{display:flex;gap:6px}
+.sheet input{flex:1;min-width:0;border:2px solid var(--line);border-radius:12px;background:var(--bg);color:var(--ink);font:600 17px var(--body);padding:11px 12px;letter-spacing:.06em}
+.sheet .err{color:var(--bad);font-weight:700;font-size:13.5px}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;text-align:center}
+.stats b{display:block;font:400 34px/1 var(--display);font-variant-numeric:tabular-nums}
+.stats small{font-size:11px;color:var(--muted)}
+.dist{display:flex;flex-direction:column;gap:4px;font-size:13px;font-variant-numeric:tabular-nums}
+.dist div{display:flex;align-items:center;gap:8px}
+.dist span{width:14px;text-align:right;color:var(--muted);font-weight:700}
+.dist i{display:block;height:20px;min-width:24px;background:var(--key);color:var(--ink);font-style:normal;font-weight:700;text-align:right;padding:0 7px;border-radius:5px;line-height:20px;box-sizing:border-box}
+.dist i.me{background:var(--ok);color:#fff}
+.row2{display:flex;gap:8px;flex-wrap:wrap}
+.row2 .btn{flex:1}
+
+.rules{font-size:13px;color:var(--muted);line-height:1.5;margin:0}
+.promo{display:flex;align-items:center;gap:12px;background:var(--brand);color:var(--brand-ink);border-radius:14px;padding:12px 14px;text-decoration:none}
+.promo .logo{flex:none;width:40px;height:40px;border-radius:10px;background:rgba(255,255,255,.16);display:grid;place-items:center;font:800 22px var(--body)}
+.promo span{min-width:0}
+.promo b{display:block;font-size:15px}
+.promo small{display:block;font-size:12.5px;opacity:.85;margin-top:1px}
+.promo .arrow{margin-left:auto;font-weight:700;font-size:13px;white-space:nowrap}
+.links{font-size:12.5px;color:var(--muted);margin:0;text-align:center;line-height:1.7}
+.links a{color:var(--ink);font-weight:700}
+@media (max-width:460px){.promo .arrow{display:none}}
+@media (max-width:370px){h1{font-size:38px}.ib{width:38px;height:38px}.key{height:46px;font-size:14px}.kr{gap:4px}}
+
+/* ---------- Modo reel (1080×1920, solo para grabar el vídeo) ---------- */
+#reel{display:none}
+body.reel{padding:0;overflow:hidden}
+body.reel .app{display:none}
+body.reel #reel{display:block;position:fixed;left:0;top:0;width:1080px;height:1920px;overflow:hidden;background-color:var(--bg);
+  background-image:linear-gradient(color-mix(in srgb,var(--line) 55%,transparent) 2px,transparent 2px),linear-gradient(90deg,color-mix(in srgb,var(--line) 55%,transparent) 2px,transparent 2px);background-size:60px 60px}
+.rv-head{position:absolute;left:70px;right:70px;top:96px;display:flex;align-items:flex-end;justify-content:space-between}
+.rv-title{font:400 150px/.78 var(--display);color:var(--ink)}
+.rv-title em{display:block;font:800 40px var(--body);font-style:normal;color:var(--pen);letter-spacing:.14em;text-transform:uppercase;margin-top:22px}
+.rv-score{text-align:right;font:700 30px var(--body);color:var(--muted);text-transform:uppercase;letter-spacing:.12em}
+.rv-score b{display:block;font:400 130px/.9 var(--display);color:var(--ink);letter-spacing:0;font-variant-numeric:tabular-nums}
+.rv-board{position:absolute;left:70px;top:340px;width:940px}
+body.reel .card{border-radius:40px;background-size:46px 46px;box-shadow:0 30px 70px rgba(27,36,64,.16)}
+body.reel .card::before{left:66px;width:4px}
+body.reel .ctop{padding:30px 34px 0 96px}
+body.reel .cat{font-size:32px}
+body.reel .hintb{font-size:32px;padding:14px 26px;border-radius:20px;border-width:3px}
+body.reel .draw{height:600px}
+body.reel .ghost path{stroke-width:3}
+body.reel .fails{right:40px;top:16px}
+body.reel .fails b{font-size:110px}
+body.reel .fails small{font-size:26px}
+body.reel .wordw{padding:16px 40px 56px 96px}
+body.reel .word{--g:10px;row-gap:26px}
+body.reel .slot{border-bottom-width:7px}
+.rv-cap{position:absolute;left:50%;top:1268px;transform:translateX(-50%);white-space:nowrap;background:var(--ink);color:#fff;
+  font:800 44px var(--body);padding:20px 42px;border-radius:999px;box-shadow:0 12px 30px rgba(27,36,64,.25)}
+.rv-cap.acc{background:var(--pen)} .rv-cap.bad{background:var(--bad)} .rv-cap.ok{background:var(--ok)} .rv-cap.gold{background:var(--hint);color:#2a1a00}
+.rv-kb{position:absolute;left:40px;right:40px;top:1400px}
+body.reel .kb{gap:14px}
+body.reel .kr{gap:10px}
+body.reel .key{max-width:none;height:104px;border-radius:18px;font-size:42px}
+body.reel .key.no{box-shadow:inset 0 0 0 4px color-mix(in srgb,var(--bad) 45%,transparent)}
+body.reel .key.no::after{height:5px}
+.rv-brand{position:absolute;left:0;right:0;bottom:70px;display:flex;justify-content:center}
+.rv-brand div{display:flex;align-items:center;gap:20px;font:700 36px var(--body);color:var(--ink)}
+.rv-lg{width:64px;height:64px;border-radius:16px;background:var(--brand);color:#fff;display:grid;place-items:center;font:800 38px var(--body)}
+.rv-intro{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:24px;text-align:center;
+  background:color-mix(in srgb,var(--bg) 92%,transparent);backdrop-filter:blur(8px)}
+.rv-intro .slots{display:flex;gap:18px;margin-bottom:20px}
+.rv-intro .slots span{width:92px;height:118px;border-bottom:8px solid var(--ink);font:400 120px/1 var(--display);color:var(--pen);display:flex;align-items:flex-end;justify-content:center}
+.rv-intro .big{font:400 250px/.8 var(--display);color:var(--ink)}
+.rv-intro .sub{font:800 52px var(--body);color:var(--pen);letter-spacing:.14em;text-transform:uppercase}
+.rv-intro .q{font:800 58px var(--body);color:#fff;background:var(--bad);padding:18px 40px;border-radius:20px;margin-top:40px}
+.rv-end{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:40px;text-align:center;
+  background:radial-gradient(circle at 50% 35%,#24356b,#0c1120 72%);color:#fff}
+.rv-end h2{font:400 150px/.88 var(--display);margin:0}
+.rv-end h2 span{color:#ff8a7e}
+.rv-end .play{font:700 50px var(--body);opacity:.9}
+.rv-end .url{font:800 48px var(--body);background:#fff;color:#1b2440;padding:24px 38px;border-radius:22px}
+.rv-end .co{display:flex;align-items:center;gap:26px;margin-top:70px}
+.rv-end .co .rv-lg{width:110px;height:110px;border-radius:24px;font-size:62px}
+.rv-end .co b{display:block;font:800 50px var(--body);text-align:left}
+.rv-end .co small{display:block;font:600 38px var(--body);opacity:.8;text-align:left}
+.rv-end .more{font:700 32px var(--body);opacity:.7;margin-top:10px}
+</style>
+<style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}</style>
+</head>
+<body>
+<div class="app">
+  <header>
+    <h1>El ahorcado<em>de bolsillo</em></h1>
+    <div class="hr">
+      <button class="ib" id="twoB" aria-label="Modo 2 jugadores" title="2 jugadores"><svg viewBox="0 0 24 24"><circle cx="8.5" cy="8" r="3.2"/><path d="M2.5 20c0-3.6 2.7-6 6-6s6 2.4 6 6"/><circle cx="16.5" cy="7" r="2.7"/><path d="M16 12.6c3.2-.3 5.6 1.9 5.6 5.4"/></svg></button>
+      <button class="ib" id="statsB" aria-label="Estadísticas" title="Estadísticas"><svg viewBox="0 0 24 24"><path d="M5 20V12M12 20V5M19 20v-9"/><path d="M3 20.5h18"/></svg></button>
+      <div class="sc"><small>Racha</small><b id="streak">0</b></div>
+    </div>
+  </header>
+  <div class="bar">
+    <div class="selw"><select id="catSel" aria-label="Categoría">
+      <option value="azar">Categoría al azar</option>
+      <option value="animales">Animales</option>
+      <option value="paises">Países</option>
+      <option value="comida">Comida</option>
+      <option value="profesiones">Profesiones</option>
+      <option value="cine">Cine y series</option>
+      <option value="finanzas">Finanzas y empresa</option>
+    </select></div>
+    <button class="btn main" id="newB">Nueva palabra</button>
+  </div>
+
+  <div class="wrap">
+    <div class="card" id="card">
+      <div class="ctop"><div class="cat" id="cat"></div><button class="hintb" id="hintB" title="Revela una letra a cambio de un fallo">Pista · −1 fallo</button></div>
+      <div class="draw">
+        <svg viewBox="0 0 200 220" id="svg" aria-hidden="true">
+          <g class="ghost" id="ghost"></g>
+          <g class="ink" id="ink"></g>
+        </svg>
+        <div class="fails"><b id="fails">0/7</b><small>fallos</small></div>
+      </div>
+      <div class="wordw"><div class="word" id="word" aria-live="polite"></div></div>
+      <div class="toast" id="toast" hidden></div>
+      <div class="veil" id="veil" hidden>
+        <h2 id="veilT"></h2>
+        <p id="veilS"></p>
+        <div class="row" id="veilR"></div>
+      </div>
+    </div>
+  </div>
+  <div class="kb" id="kb" aria-label="Teclado"></div>
+
+  <p class="rules">Adivina la palabra o expresión pulsando letras. Cada letra que no está añade un trazo al dibujo: con 7 fallos, ahorcado. Las tildes no cuentan (la A descubre también la Á), pero la Ñ es una letra propia; los espacios y guiones ya se ven. La pista descubre una letra a cambio de un fallo. Con el botón de las dos personas, un jugador escribe una palabra en secreto y el otro la adivina. Puedes usar el teclado del ordenador, y la partida, la racha y las estadísticas se guardan solas.</p>
+
+  <a class="promo" href="https://adilcotech.com" target="_blank" rel="noopener">
+    <span class="logo" aria-hidden="true">A</span>
+    <span><b>Adilco Tech Center, SL</b><small>Consultoría ERP y soluciones tecnológicas a medida</small></span>
+    <span class="arrow">adilcotech.com →</span>
+  </a>
+  <p class="links">Más juegos: <a href="https://jrubioadies.github.io/othello/" target="_blank" rel="noopener">Othello</a> · <a href="https://jrubioadies.github.io/torre-tambaleante/" target="_blank" rel="noopener">Torre Tambaleante</a> · <a href="https://jrubioadies.github.io/sudoku/" target="_blank" rel="noopener">Sudoku</a> · <a href="https://jrubioadies.github.io/solitario/" target="_blank" rel="noopener">Solitario</a> · <a href="https://jrubioadies.github.io/2048/" target="_blank" rel="noopener">2048</a> · <a href="https://jrubioadies.github.io/palabra/" target="_blank" rel="noopener">Palabra del día</a> · <a href="https://jrubioadies.github.io/cuatro-en-raya/" target="_blank" rel="noopener">Cuatro en raya</a> · <a href="https://jrubioadies.github.io/damas/" target="_blank" rel="noopener">Damas</a> · <a href="https://jrubioadies.github.io/hundir-la-flota/" target="_blank" rel="noopener">Hundir la flota</a> · <a href="https://jrubioadies.github.io/parchis/" target="_blank" rel="noopener">Parchís</a> · <a href="https://jrubioadies.github.io/buscaminas/" target="_blank" rel="noopener">Buscaminas</a> · <a href="https://jrubioadies.github.io/descifra-el-codigo/" target="_blank" rel="noopener">Descifra el código</a> · <a href="https://jrubioadies.github.io/nonogramas/" target="_blank" rel="noopener">Nonogramas</a> · <a href="https://jrubioadies.github.io/puzle-15/" target="_blank" rel="noopener">Puzle 15</a> · <a href="https://jrubioadies.github.io/sopa-de-letras/" target="_blank" rel="noopener">Sopa de letras</a> · <a href="https://jrubioadies.github.io/serpiente/" target="_blank" rel="noopener">Serpiente</a> · <a href="https://jrubioadies.github.io/rompeladrillos/" target="_blank" rel="noopener">Rompeladrillos</a> · <a href="https://jrubioadies.github.io/memoria-de-colores/" target="_blank" rel="noopener">Memoria de colores</a> · <a href="https://jrubioadies.github.io/parejas/" target="_blank" rel="noopener">Parejas</a><br>
+  Hecho por Javier Rubio · <a href="https://jrubioadies.github.io" target="_blank" rel="noopener">jrubioadies.github.io</a> · <a href="https://github.com/jrubioadies/jrubioadies.github.io/tree/main/ahorcado" target="_blank" rel="noopener">código en GitHub</a></p>
+</div>
+
+<div class="modal" id="modal" hidden><div class="sheet" id="sheet" role="dialog" aria-modal="true"></div></div>
+
+<div id="reel" aria-hidden="true">
+  <div class="rv-head"><div class="rv-title">El ahorcado<em>de bolsillo</em></div>
+    <div class="rv-score">Racha<b id="rvStreak">0</b></div></div>
+  <div class="rv-board" id="rvBoard"></div>
+  <div class="rv-cap" id="rvCap" hidden></div>
+  <div class="rv-kb" id="rvKb"></div>
+  <div class="rv-brand"><div><span class="rv-lg">A</span>Adilco Tech Center, SL</div></div>
+  <div class="rv-intro" id="rvIntro">
+    <div class="slots"><span>A</span><span></span><span>O</span><span></span><span>C</span><span>A</span><span></span><span>O</span></div>
+    <div class="big">El ahorcado</div><div class="sub">de bolsillo</div><div class="q">¿Te salvas con 7 fallos?</div></div>
+  <div class="rv-end" id="rvEnd" hidden>
+    <h2>¿Te salvas tú<br>de la <span>horca</span>?</h2>
+    <div class="play">Juega gratis en el navegador</div>
+    <div class="url">jrubioadies.github.io/ahorcado</div>
+    <div class="co"><span class="rv-lg">A</span><span><b>Adilco Tech Center, SL</b><small>adilcotech.com</small></span></div>
+    <div class="more">Más juegos: 2048 · Sudoku · Palabra del día y más</div>
+  </div>
+</div>
+
+<script>
+(()=>{
+const REEL=new URLSearchParams(location.search).has('reel');
+if(REEL)document.body.classList.add('reel');
+const $=id=>document.getElementById(id);
+const KEY='ahorcado-v1', MAXF=7;
+let clock=0; const now=()=>REEL?clock:performance.now();
+const reduce=!REEL&&matchMedia('(prefers-reduced-motion: reduce)').matches;
+const DRAW=reduce?1:540, POP=reduce?1:280;
+function mulberry32(a){return()=>{a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
+const rnd=REEL?mulberry32(20261029):Math.random;
+const clamp=x=>x<0?0:x>1?1:x;
+
+// ---------- palabras ----------
+const L=s=>s.split(',').map(x=>x.trim()).filter(Boolean);
+const CATS={
+  animales:{n:'Animales',w:L('perro,gato,elefante,jirafa,cocodrilo,murciélago,hipopótamo,rinoceronte,canguro,pingüino,delfín,ballena,tiburón,águila,búho,lechuza,mariposa,hormiga,caracol,tortuga,serpiente,camaleón,leopardo,guepardo,gorila,chimpancé,oso panda,oso polar,lobo,zorro,ardilla,conejo,erizo,caballo,burro,cebra,camello,dromedario,flamenco,pavo real,gaviota,cigüeña,pulpo,medusa,cangrejo,salamandra,lince ibérico,jabalí,ciervo,mapache,koala,nutria,morsa,foca,saltamontes,escarabajo,golondrina,cabra montés')},
+  paises:{n:'Países',w:L('España,Portugal,Francia,Italia,Alemania,Reino Unido,Irlanda,Noruega,Suecia,Finlandia,Dinamarca,Islandia,Grecia,Turquía,Marruecos,Egipto,Nigeria,Kenia,Sudáfrica,Etiopía,Argentina,Chile,Perú,Colombia,Venezuela,Ecuador,Uruguay,Paraguay,Bolivia,México,Cuba,Costa Rica,Panamá,República Dominicana,Estados Unidos,Canadá,Brasil,Japón,China,India,Tailandia,Vietnam,Filipinas,Australia,Nueva Zelanda,Arabia Saudí,Rusia,Ucrania,Polonia,Hungría,Rumanía,Croacia,Bélgica,Países Bajos,Suiza,Austria,Luxemburgo,Corea del Sur,Indonesia,Guinea-Bisáu,Timor Oriental,Madagascar')},
+  comida:{n:'Comida',w:L('paella,tortilla de patatas,gazpacho,salmorejo,croquetas,cocido madrileño,fabada,pulpo a la gallega,jamón ibérico,chorizo,morcilla,lentejas,albóndigas,empanada,churros,chocolate,flan,natillas,arroz con leche,crema catalana,turrón,polvorón,ensaladilla rusa,patatas bravas,pimientos de padrón,migas,pisto,calamares,boquerones,gambas al ajillo,sobrasada,queso manchego,berenjena,alcachofa,espárragos,aguacate,mandarina,sandía,melocotón,frambuesa,macarrones,lasaña,hamburguesa,espaguetis,cuscús,magdalena,ensaimada,torrijas,rosquillas,champiñón,zanahoria,bocadillo')},
+  profesiones:{n:'Profesiones',w:L('médico,enfermero,bombera,policía,carpintero,fontanero,electricista,albañil,arquitecta,ingeniero,profesora,periodista,fotógrafo,peluquera,cocinero,camarero,panadero,carnicera,pescadero,farmacéutica,veterinario,dentista,fisioterapeuta,psicóloga,astronauta,piloto,azafata,taxista,camionero,cartera,jardinero,agricultora,ganadero,pescador,marinero,socorrista,traductora,bibliotecario,programadora,diseñador,contable,economista,notaria,juez,actriz,cantante,bailarín,pintora,escultor,mecánico,relojero,cerrajero,sastre,zapatero,consultora,auditor,cirujana')},
+  cine:{n:'Cine y series',w:L('El padrino,Titanic,Regreso al futuro,Parque jurásico,El rey león,Toy Story,Buscando a Nemo,Frozen,Shrek,Matrix,Gladiator,Avatar,Tiburón,Casablanca,Psicosis,El señor de los anillos,Harry Potter,La guerra de las galaxias,Indiana Jones,Piratas del Caribe,El mago de Oz,Mary Poppins,Forrest Gump,Rocky,Grease,Ciudadano Kane,El laberinto del fauno,Mar adentro,Volver,Los otros,Ocho apellidos vascos,Campeones,Torrente,La casa de papel,El ministerio del tiempo,Cuéntame cómo pasó,Aquí no hay quien viva,Los Serrano,Verano azul,Juego de tronos,Los Simpson,Friends,Stranger Things,Breaking Bad,Los Soprano,Perdidos,Élite,Médico de familia,Física o química,Spider-Man,Los Goonies,Las chicas del cable,Mortadelo y Filemón')},
+  finanzas:{n:'Finanzas y empresa',w:L('balance,activo,pasivo,patrimonio neto,amortización,factura,albarán,conciliación bancaria,cuenta de resultados,flujo de caja,libro mayor,libro diario,asiento contable,fondo de comercio,cierre contable,centro de coste,proveedor,remesa,pagaré,tesorería,presupuesto,auditoría,dividendo,accionista,capital social,inventario,nómina,beneficio,margen bruto,rentabilidad,liquidez,solvencia,apalancamiento,préstamo,hipoteca,interés compuesto,inflación,bolsa de valores,factoring,leasing,renting,facturación,punto muerto,plan de negocio,valor añadido,gastos generales,cuenta corriente,transferencia,contabilidad analítica,impuesto de sociedades,año fiscal,retención,plusvalía,autónomo,sociedad limitada,consejo de administración,junta de accionistas,fusión,cotización,partida doble,debe y haber,tipo de cambio,prima de riesgo,ejercicio económico')},
+};
+const CKEYS=Object.keys(CATS);
+
+// tildes fuera, la Ñ se queda
+const normCh=c=>{c=c.toUpperCase();if(c==='Ñ')return 'Ñ';return c.normalize('NFD').replace(/[̀-ͯ]/g,'')};
+const isLet=c=>/^[A-ZÑ]$/.test(normCh(c));
+
+// ---------- estado y guardado ----------
+let G=null, A=null, P={cat:'azar',recent:{}}, ST=null, slots=[], veilPending=false, veilCancel=null;
+const blankStats=()=>({played:0,won:0,streak:0,best:0,dist:[0,0,0,0,0,0,0]});
+function load(){try{const s=JSON.parse(localStorage.getItem(KEY));if(s&&typeof s==='object')return s}catch(e){}return null}
+function save(){if(REEL)return;try{localStorage.setItem(KEY,JSON.stringify({G,P}))}catch(e){}}
+function loadStats(){try{const s=JSON.parse(localStorage.getItem(KEY+'-stats'));if(s&&Array.isArray(s.dist))return Object.assign(blankStats(),s)}catch(e){}return blankStats()}
+function saveStats(){if(REEL)return;try{localStorage.setItem(KEY+'-stats',JSON.stringify(ST))}catch(e){}}
+
+const need=()=>{const s=new Set();for(const c of G.word)if(isLet(c))s.add(normCh(c));return s};
+const tried=l=>G.tries.find(t=>t[0]===l);
+const revealed=l=>G.hinted.includes(l)||(tried(l)&&tried(l)[1]===1);
+const freshAnim=()=>({partAt:[],letterAt:{},keyAt:{},missAt:-1e9,endAt:-1e9,hintAt:-1e9,toastAt:-1e9});
+
+function pickWord(cat){
+  const c=cat==='azar'?CKEYS[Math.floor(rnd()*CKEYS.length)]:cat;
+  const list=CATS[c].w, rec=(P.recent[c]=P.recent[c]||[]);
+  let pool=list.filter(w=>!rec.includes(w));if(!pool.length){rec.length=0;pool=list}
+  const w=pool[Math.floor(rnd()*pool.length)];rec.push(w);if(rec.length>Math.min(25,list.length-5))rec.shift();
+  return {c,w};
+}
+function start(opts){
+  G=Object.assign({mode:'1p',cat:'',word:'',clue:'',tries:[],hinted:[],misses:0,state:'play'},opts);
+  G.word=G.word.toUpperCase();
+  A=freshAnim();veilPending=false;closeVeil();build();save();ui();
+}
+function start1p(){const {c,w}=pickWord(P.cat);start({mode:'1p',cat:c,word:w})}
+
+// ---------- dibujo de la horca (7 partes) ----------
+const PARTS=[
+  ['M18 208 H122','M48 208 V18','M44 18 H146','M48 54 L84 18'],      // 1 horca
+  ['M140 18 V46'],                                                   // 2 cuerda
+  ['M140 46 a17 17 0 1 1 -0.01 0'],                                  // 3 cabeza
+  ['M140 80 V140'],                                                  // 4 cuerpo
+  ['M140 96 L114 124','M140 96 L166 124'],                           // 5 brazos
+  ['M140 140 L118 182','M140 140 L162 182'],                         // 6 piernas
+  ['M131 57 l6 6 m0 -6 l-6 6','M143 57 l6 6 m0 -6 l-6 6','M132 75 q8 -6 16 0'] // 7 cara: ahorcado
+];
+const NS='http://www.w3.org/2000/svg', parts=[];
+PARTS.forEach((ds,i)=>{
+  const g=document.createElementNS(NS,'g');if(i===6)g.setAttribute('class','face');
+  const ps=ds.map(d=>{const p=document.createElementNS(NS,'path');p.setAttribute('d',d);p.setAttribute('pathLength','1');g.appendChild(p);
+    const q=document.createElementNS(NS,'path');q.setAttribute('d',d);$('ghost').appendChild(q);return p});
+  $('ink').appendChild(g);parts.push(ps);
+});
+
+// ---------- palabra ----------
+function build(){
+  const el=$('word');el.innerHTML='';slots=[];
+  G.word.split(' ').filter(Boolean).forEach(grp=>{
+    const w=document.createElement('div');w.className='w';
+    for(const ch of grp){const s=document.createElement('span');const i=document.createElement('i');s.appendChild(i);
+      const let_=isLet(ch);s.className='slot'+(let_?'':' sep');if(!let_)i.textContent=ch;
+      w.appendChild(s);slots.push({el:s,i,L:let_?normCh(ch):null,ch,cls:'',txt:let_?'':ch})}
+    el.appendChild(w)});
+  el.setAttribute('aria-label','');fit();
+}
+function fit(){
+  if(!G)return;const el=$('word');const W=el.getBoundingClientRect().width;if(!W)return;
+  const max=Math.max(...G.word.split(' ').map(g=>g.length));const gap=REEL?10:4, cap=REEL?82:40;
+  // si cabe en una sola línea sin encoger mucho, mejor en una línea; si no, cada palabra en su renglón
+  const grs=G.word.split(' ').filter(Boolean), n=grs.join('').length;
+  const s2=Math.min(cap,Math.floor((W-(max-1)*gap)/max)), s1=Math.floor((W-(n-grs.length)*gap-2)/(n+.7*(grs.length-1)));
+  const s=Math.max(12,s1>=s2*.8?Math.min(cap,s1):s2);el.style.setProperty('--s',s+'px');
+}
+addEventListener('resize',fit);
+
+// ---------- jugar ----------
+const busy=()=>!$('veil').hidden||!$('modal').hidden;
+function guess(l){
+  if(!G||G.state!=='play'||busy())return;
+  A.keyAt[l]=now();
+  if(tried(l)||G.hinted.includes(l)){toast(`Ya has probado la ${l}`);return}
+  const ok=need().has(l);G.tries.push([l,ok?1:0]);
+  if(ok)A.letterAt[l]=now();else{G.misses++;A.partAt[G.misses-1]=now();A.missAt=now()}
+  check();save();ui();
+}
+function hint(){
+  if(!G||G.state!=='play'||busy())return;
+  if(G.misses>=MAXF-1){toast('No te quedan fallos para pistas');return}
+  const rest=[...need()].filter(l=>!revealed(l));if(!rest.length)return;
+  const l=rest[Math.floor(rnd()*rest.length)];
+  G.hinted.push(l);G.misses++;const t=now();A.partAt[G.misses-1]=t;A.missAt=t;A.letterAt[l]=t;A.keyAt[l]=t;A.hintAt=t;
+  check();save();ui();
+}
+function check(){
+  if([...need()].every(revealed))finish(true);else if(G.misses>=MAXF)finish(false);
+}
+function finish(win){
+  G.state=win?'win':'lose';A.endAt=now();veilPending=!REEL;
+  if(G.mode==='1p'){ST.played++;if(win){ST.won++;ST.streak++;ST.best=Math.max(ST.best,ST.streak);ST.dist[G.misses]++}else ST.streak=0;saveStats()}
+}
+function abandon(){if(G&&G.mode==='1p'&&G.state==='play'&&(G.tries.length||G.hinted.length)){ST.played++;ST.streak=0;saveStats()}}
+function inProgress(){return G&&G.state==='play'&&(G.tries.length||G.hinted.length)}
+function askNew(fn){
+  if(inProgress())veil('¿Otra palabra?',G.mode==='1p'?'Si dejas esta a medias, <b>cuenta como perdida</b> y se corta la racha.':'Se perderá la palabra que escribió el otro jugador.',
+    [['Seguir con esta',closeVeil],['Sí, otra',()=>{abandon();fn()},1]],'',closeVeil);
+  else fn();
+}
+
+// ---------- superposiciones ----------
+function veil(t,s,btns,cls,cancel){
+  const h=$('veilT');h.textContent=t;h.className=cls||'';$('veilS').innerHTML=s;const r=$('veilR');r.innerHTML='';
+  btns.forEach(([txt,fn,main])=>{const b=document.createElement('button');b.className='btn'+(main?' main':'');b.textContent=txt;b.onclick=fn;r.appendChild(b)});
+  veilCancel=cancel||null;$('veil').hidden=false;
+}
+function closeVeil(){$('veil').hidden=true;veilCancel=null}
+function endVeil(){
+  veilPending=false;
+  const word=`<b>${esc(G.word)}</b>`;
+  const again=G.mode==='2p'?[['Otra en 2 jugadores',openTwo,1],['Volver a 1 jugador',start1p]]:[['Otra palabra',start1p,1],['Estadísticas',showStats]];
+  if(G.state==='win'){
+    const t=G.misses===MAXF-1?'¡Por los pelos!':G.misses===0?'¡Impecable!':'¡Salvado!';
+    const s=(G.misses===0?'Sin un solo fallo':`Con ${G.misses} ${G.misses===1?'fallo':'fallos'}`)+(G.mode==='1p'?` · racha de <b>${ST.streak}</b>`:'');
+    veil(t,s,again,'win');
+  }else veil('Ahorcado',`Era ${word}`+(G.mode==='1p'&&ST.best>0?` · mejor racha <b>${ST.best}</b>`:''),again,'lose');
+}
+const esc=s=>s.replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+function toast(msg){if(REEL)return;const t=$('toast');t.textContent=msg;t.hidden=false;A.toastAt=now()}
+function openModal(html){$('sheet').innerHTML=html;$('modal').hidden=false;
+  $('sheet').querySelectorAll('[data-close]').forEach(b=>b.onclick=closeModal);const f=$('sheet').querySelector('input,.btn.main');if(f)f.focus()}
+function closeModal(){$('modal').hidden=true}
+$('modal').addEventListener('click',e=>{if(e.target===$('modal'))closeModal()});
+
+function showStats(){
+  const pct=ST.played?Math.round(ST.won*100/ST.played):0, mx=Math.max(1,...ST.dist);
+  const me=G&&G.mode==='1p'&&G.state==='win'?G.misses:-1;
+  openModal(`<h2>Estadísticas</h2>
+    <div class="stats"><div><b>${ST.played}</b><small>Jugadas</small></div><div><b>${pct}</b><small>% ganadas</small></div><div><b>${ST.streak}</b><small>Racha</small></div><div><b>${ST.best}</b><small>Mejor racha</small></div></div>
+    <p>Victorias según los fallos</p>
+    <div class="dist">${ST.dist.map((n,i)=>`<div><span>${i}</span><i class="${i===me?'me':''}" style="width:${Math.max(8,n*100/mx)}%">${n}</i></div>`).join('')}</div>
+    <p>Solo cuentan las partidas de 1 jugador. Dejar una palabra a medias cuenta como perdida.</p>
+    <div class="row2"><button class="btn main" data-close>Cerrar</button></div>`);
+}
+function openTwo(){
+  const warn=inProgress()&&G.mode==='1p'?'<p class="err" style="color:var(--hint)">La palabra en curso contará como perdida.</p>':'';
+  openModal(`<h2>2 jugadores</h2>
+    <p>Jugador 1: escribe una palabra o expresión sin que la vea el otro. Luego pasa el móvil.</p>
+    <label>Palabra secreta<span class="inrow"><input id="sec" type="password" maxlength="30" autocomplete="off" autocapitalize="characters" autocorrect="off" spellcheck="false"><button class="btn" id="peek" type="button">Ver</button></span></label>
+    <label>Pista para el otro (opcional)<input id="clue" type="text" maxlength="24" autocomplete="off" placeholder="p. ej. Película"></label>
+    ${warn}<p class="err" id="err" hidden></p>
+    <div class="row2"><button class="btn" data-close>Cancelar</button><button class="btn main" id="go">¡A adivinar!</button></div>`);
+  const sec=$('sec');sec.addEventListener('input',()=>{$('err').hidden=true});
+  $('peek').onclick=()=>{const v=sec.type==='password';sec.type=v?'text':'password';$('peek').textContent=v?'Ocultar':'Ver'};
+  const go=()=>{
+    const raw=sec.value.trim().replace(/\s+/g,' '), err=$('err');let m='';
+    const chars=[...raw];
+    if(!raw)m='Escribe una palabra o expresión.';
+    else if(!chars.every(c=>c===' '||c==='-'||isLet(c)))m='Solo letras, espacios y guiones.';
+    else if(chars.filter(isLet).length<2)m='Tiene que tener al menos 2 letras.';
+    else if(raw.split(' ').some(w=>w.length>16))m='Alguna palabra es demasiado larga (máximo 16).';
+    if(m){err.textContent=m;err.hidden=false;sec.focus();return}
+    abandon();closeModal();start({mode:'2p',cat:'',word:raw,clue:$('clue').value.trim().slice(0,24)});
+  };
+  $('go').onclick=go;
+  [sec,$('clue')].forEach(i=>i.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();go()}}));
+}
+
+// ---------- pintar (reloj propio) ----------
+function ui(){
+  if(!G)return;
+  $('streak').textContent=ST.streak;
+  if(REEL)$('rvStreak').textContent=ST.streak;
+  $('cat').innerHTML=G.mode==='2p'?'<b>2 jugadores</b>'+(G.clue?' · '+esc(G.clue):''):`<b>${CATS[G.cat]?CATS[G.cat].n:''}</b>`;
+}
+function frame(){
+  if(!G||!A)return;
+  const t=now();
+  // letras
+  slots.forEach((s,k)=>{
+    if(!s.L)return;
+    let show=false,cls='slot',sc=1,ty=0;
+    if(revealed(s.L)){show=true;if(G.hinted.includes(s.L))cls+=' hint';
+      const kk=(t-(A.letterAt[s.L]??-1e9))/POP;if(kk<1)sc=kk<.55?Math.max(0,kk/.55)*1.18:1.18-.18*(kk-.55)/.45}
+    else if(G.state==='lose'){const kk=(t-A.endAt-500-k*55)/POP;if(kk>=0){show=true;cls+=' miss';if(kk<1)sc=kk<.55?kk/.55*1.18:1.18-.18*(kk-.55)/.45}}
+    if(G.state==='win'){const kw=(t-A.endAt-150-k*60)/380;if(kw>0&&kw<1)ty=-Math.sin(Math.PI*kw)*32}
+    const txt=show?s.ch:'';
+    if(s.txt!==txt){s.i.textContent=txt;s.txt=txt}
+    if(s.cls!==cls){s.el.className=cls;s.cls=cls}
+    const tr=(sc!==1||ty)?`translateY(${ty}%) scale(${sc})`:'';
+    if(s.i.style.transform!==tr)s.i.style.transform=tr;
+  });
+  // teclado
+  for(const l in keys){
+    const tr=tried(l), hn=G.hinted.includes(l);
+    const cls='key'+(hn?' hint':tr?(tr[1]?' ok':' no'):'')+(t-(A.keyAt[l]??-1e9)<130?' press':'');
+    if(keys[l].className!==cls)keys[l].className=cls;
+  }
+  // dibujo: cada parte se traza línea a línea
+  parts.forEach((ps,i)=>{
+    let k;if(i>=G.misses)k=0;else{const t0=A.partAt[i];k=t0==null?1:clamp((t-t0)/DRAW)}
+    const n=ps.length;
+    ps.forEach((p,j)=>{const pj=clamp(k*n-j);const off=String(1-pj);if(p.style.strokeDashoffset!==off)p.style.strokeDashoffset=off;const v=pj<=0?'hidden':'';if(p.style.visibility!==v)p.style.visibility=v});
+  });
+  const f=$('fails'), ft=G.misses+'/'+MAXF;if(f.textContent!==ft)f.textContent=ft;
+  f.className=G.misses>=MAXF-1?'hot':'';
+  const km=(t-A.missAt)/320;f.style.transform=km>=0&&km<1?`scale(${1+.35*Math.sin(Math.PI*km)})`:'';
+  const hb=$('hintB');const hd=G.state!=='play'||G.misses>=MAXF-1;if(hb.disabled!==hd)hb.disabled=hd;
+  const kh=(t-A.hintAt)/220;hb.style.transform=kh>=0&&kh<1?`scale(${1-.12*Math.sin(Math.PI*kh)})`:'';
+  const to=$('toast');if(!to.hidden&&t-A.toastAt>1400)to.hidden=true;
+  if(veilPending&&G.state!=='play'&&t>=A.endAt+(G.state==='win'?1100:1500))endVeil();
+}
+
+// ---------- teclado ----------
+const kb=$('kb'), keys={};
+['QWERTYUIOP','ASDFGHJKLÑ','ZXCVBNM'].forEach(line=>{const r=document.createElement('div');r.className='kr';
+  for(const ch of line){const b=document.createElement('button');b.className='key';b.textContent=ch;b.dataset.k=ch;b.type='button';
+    b.addEventListener('click',()=>guess(ch));r.appendChild(b);keys[ch]=b}
+  kb.appendChild(r)});
+document.addEventListener('keydown',e=>{
+  if(e.ctrlKey||e.metaKey||e.altKey)return;
+  if(!$('modal').hidden){if(e.key==='Escape')closeModal();return}
+  if(e.target.closest&&e.target.closest('input,select,textarea'))return;
+  if(!$('veil').hidden){
+    if(e.key==='Enter'){const b=$('veilR').querySelector('.main');if(b){e.preventDefault();b.click()}}
+    else if(e.key==='Escape'&&veilCancel)veilCancel();
+    return;
+  }
+  if(e.key.length===1){const l=normCh(e.key);if(/^[A-ZÑ]$/.test(l)){e.preventDefault();guess(l)}}
+});
+$('hintB').onclick=hint;
+$('newB').onclick=()=>askNew(start1p);
+$('twoB').onclick=openTwo;
+$('statsB').onclick=showStats;
+$('catSel').onchange=e=>{P.cat=e.target.value;save();e.target.blur();askNew(start1p)};
+
+// ---------- modo reel: dos partidas guionizadas ----------
+function setupReel(){
+  $('rvBoard').appendChild(document.querySelector('.wrap'));$('rvKb').appendChild(kb);
+  ST=blankStats();
+  start({mode:'1p',cat:'animales',word:'murciélago'});
+  const cap=(txt,cls)=>{const c=$('rvCap');c.hidden=!txt;if(txt){c.textContent=txt;c.className='rv-cap'+(cls?' '+cls:'')}};
+  const ev=[];const at=(t,fn)=>ev.push({t,fn});
+  // partida 1: se salva con 6 fallos
+  at(2600,()=>cap('Adivina el animal, letra a letra'));
+  const g1=[[2800,'A'],[3350,'E'],[3950,'S'],[4400,'T'],[4850,'O'],[5250,'N'],[5650,'R'],[6000,'P'],[6350,'D'],[6700,'B'],[7300,'I'],[7650,'L'],[7950,'C'],[8250,'G'],[8550,'M'],[8850,'U']];
+  g1.forEach(([t,l])=>at(t,()=>guess(l)));
+  at(3420,()=>cap('Las tildes no cuentan: E = É','acc'));
+  at(4020,()=>cap('Cada fallo, un trazo más','bad'));
+  at(5300,()=>cap('Siete fallos y estás ahorcado','bad'));
+  at(6780,()=>cap('¡6 fallos! Solo te queda uno','bad'));
+  at(7700,()=>cap('Ahora o nunca…'));
+  at(8950,()=>cap('¡Salvado por los pelos!','ok'));
+  // partida 2: rápida, con la Ñ y una pista
+  const SW=10050;
+  at(SW,()=>{start({mode:'1p',cat:'finanzas',word:'año fiscal'});cap('Otra, rápida: Finanzas y empresa','acc')});
+  [[10500,'A'],[10800,'O'],[11100,'Ñ'],[11550,'S'],[11850,'I']].forEach(([t,l])=>at(t,()=>guess(l)));
+  at(11180,()=>cap('La Ñ es una letra propia','acc'));
+  at(12250,()=>{hint();cap('Pista: una letra por un fallo','gold')});
+  [[12950,'C'],[13250,'L'],[13550,'F']].forEach(([t,l])=>at(t,()=>{if(G.state==='play'&&!revealed(l))guess(l)}));
+  at(13800,()=>cap('¡Resuelta con 1 fallo!','ok'));
+  at(14700,()=>cap('Y en modo 2 jugadores, con amigos'));
+  at(16000,()=>{$('rvEnd').hidden=false;cap('')});
+  window.__reelDuration=19500;
+  window.__step=()=>{
+    clock+=1000/30;ev.sort((a,b)=>a.t-b.t);
+    while(ev.length&&ev[0].t<=clock){const e=ev.shift();e.fn()}
+    frame();
+    // fundido al cambiar de partida
+    const d=clock-SW, card=$('card');card.style.opacity=d>-260&&d<260?String(Math.min(1,Math.abs(d)/260)):'';
+    const intro=$('rvIntro');intro.style.opacity=clock<2100?1:Math.max(0,1-(clock-2100)/400);intro.hidden=clock>2500;
+    return clock;
+  };
+  fit();frame();window.__ready=true;
+}
+
+// ---------- arranque ----------
+if(REEL){setupReel();return}
+ST=loadStats();
+const s0=load();
+if(s0&&s0.P&&typeof s0.P==='object'){P=Object.assign(P,s0.P);if(!P.recent||typeof P.recent!=='object')P.recent={}}
+if(P.cat!=='azar'&&!CATS[P.cat])P.cat='azar';
+$('catSel').value=P.cat;
+const g0=s0&&s0.G;
+if(g0&&typeof g0.word==='string'&&Array.isArray(g0.tries)&&Array.isArray(g0.hinted)&&[...g0.word].some(isLet)){
+  G=Object.assign({mode:'1p',cat:'',clue:'',misses:0,state:'play'},g0);A=freshAnim();build();ui();
+  if(G.state!=='play')endVeil();
+}else start1p();
+(function loop(){frame();requestAnimationFrame(loop)})();
+})();
+</script>
+
+<!-- Demo: versión completa en https://games.adilcotech.com -->
+<style>
+#jb-demo{position:fixed;left:0;right:0;bottom:0;z-index:2147483000;display:flex;align-items:center;gap:10px;justify-content:space-between;
+  padding:10px max(14px,env(safe-area-inset-right,0px)) calc(10px + env(safe-area-inset-bottom,0px)) max(14px,env(safe-area-inset-left,0px));
+  background:#13261f;color:#fff;font:600 14px/1.2 system-ui,-apple-system,"Segoe UI",sans-serif;box-shadow:0 -6px 20px rgba(0,0,0,.18)}
+#jb-demo b{font-variant-numeric:tabular-nums}
+#jb-demo a{flex:none;background:#e2a72e;color:#1b1300;text-decoration:none;font-weight:800;padding:9px 14px;border-radius:10px}
+#jb-fin{position:fixed;inset:0;z-index:2147483001;display:flex;align-items:center;justify-content:center;padding:24px;background:rgba(10,20,16,.82);backdrop-filter:blur(4px)}
+#jb-fin div{max-width:360px;background:#fff;color:#13261f;border-radius:20px;padding:24px;text-align:center;font:500 16px/1.45 system-ui,-apple-system,"Segoe UI",sans-serif;display:flex;flex-direction:column;gap:12px}
+#jb-fin h2{margin:0;font-size:26px;line-height:1.1}
+#jb-fin a{background:#1F6F5B;color:#fff;text-decoration:none;font-weight:800;padding:13px;border-radius:12px}
+#jb-fin small{color:#5d6a64}
+[hidden]{display:none!important}
+</style>
+<div id="jb-demo" role="status"><span>Prueba gratis · quedan <b id="jb-t">10:00</b> hoy</span><a id="jb-a" href="https://games.adilcotech.com/?juego=ahorcado&amp;comprar=1">Completo por 1 €</a></div>
+<div id="jb-fin" hidden><div><h2>Se acabó la prueba de hoy</h2><p>Mañana tienes otros 10 minutos gratis. O desbloquea el juego completo para siempre, sin límites.</p><a href="https://games.adilcotech.com/?juego=ahorcado&amp;comprar=1">Desbloquear por 1 €</a><small>Tarjeta, Apple Pay, Google Pay o WeChat Pay</small></div></div>
+<script>
+(()=>{
+  const K='jb-demo-ahorcado', LIM=600;
+  const hoy=new Date().toDateString();
+  let s; try{s=JSON.parse(localStorage.getItem(K))}catch(e){}
+  if(!s||s.dia!==hoy)s={dia:hoy,usado:0};
+  const t=document.getElementById('jb-t'), fin=document.getElementById('jb-fin');
+  document.body.style.paddingBottom='64px';
+  let ultimo=Date.now();
+  ['pointerdown','keydown','touchstart'].forEach(e=>addEventListener(e,()=>{ultimo=Date.now()},{capture:true,passive:true}));
+  const pinta=()=>{const r=Math.max(0,LIM-s.usado);t.textContent=String(r/60|0).padStart(2,'0')+':'+String(r%60).padStart(2,'0');fin.hidden=r>0};
+  pinta();
+  setInterval(()=>{
+    if(document.hidden||Date.now()-ultimo>60000||s.usado>=LIM)return;   // sin contar si no se está jugando
+    s.usado++;try{localStorage.setItem(K,JSON.stringify(s))}catch(e){}pinta();
+  },1000);
+})();
+</script>
+</body>
+</html>
