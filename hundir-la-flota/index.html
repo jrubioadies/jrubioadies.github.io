@@ -1,0 +1,726 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#1F6F5B">
+<meta property="og:title" content="Hundir la Flota">
+<meta property="og:description" content="Coloca tu flota y húndele los barcos a la CPU.">
+<meta property="og:image" content="https://jrubioadies.github.io/hundir-la-flota/portada.jpg">
+<title>Hundir la Flota</title>
+<meta name="description" content="Hundir la flota para el móvil: coloca tus barcos y hunde la flota de la CPU en tres niveles. Por Adilco Tech Center, SL.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=Lexend:wght@400;500;600;700;800&display=swap">
+<style>
+/* Carta náutica de noche: mar azul de Prusia, cascos de acero, bengala naranja para los impactos y amarillo de bandera de señales */
+:root{
+  --bg:#dce6ec; --card:#f3f7f9; --ink:#0f2233; --muted:#55697a; --line:#c1d0da; --tint:#cad8e1;
+  --frame:#12324a; --water:#2a6f9b; --water2:#2e77a5; --grid:rgba(255,255,255,.16); --label:#a9c7da;
+  --ship:#d6e0e7; --ship-edge:#7f97a8; --deck:#9eb2c0; --sunk:#3a1f22; --sunk-edge:#c4513a;
+  --hit:#ff5a36; --hit-bg:rgba(255,90,54,.3); --miss:#e8f4fb;
+  --navy:#12324a; --navy-ink:#ffffff; --signal:#f2b01e; --signal-ink:#2a1d00;
+  --brand:#1F6F5B; --brand-ink:#ffffff;
+  --display:"Chakra Petch","Arial Narrow",system-ui,sans-serif;
+  --body:"Lexend",system-ui,-apple-system,"Segoe UI",sans-serif;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#08131c; --card:#102131; --ink:#e2edf4; --muted:#8aa2b4; --line:#1c3345; --tint:#152a3c;
+  --frame:#0b2131; --water:#174b6d; --water2:#1a527a; --grid:rgba(255,255,255,.1); --label:#7ea5bf;
+  --ship:#b7c6d1; --ship-edge:#5f7788; --deck:#8297a6;
+  --navy:#2a6f9b; --brand:#2f8f76; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#08131c; --card:#102131; --ink:#e2edf4; --muted:#8aa2b4; --line:#1c3345; --tint:#152a3c;
+  --frame:#0b2131; --water:#174b6d; --water2:#1a527a; --grid:rgba(255,255,255,.1); --label:#7ea5bf;
+  --ship:#b7c6d1; --ship-edge:#5f7788; --deck:#8297a6;
+  --navy:#2a6f9b; --brand:#2f8f76; color-scheme:dark}
+[hidden]{display:none!important}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);margin:0;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));
+  -webkit-tap-highlight-color:transparent}
+.app{max-width:500px;margin:0 auto;display:flex;flex-direction:column;gap:12px;padding-block:14px 24px}
+header{display:flex;align-items:center;justify-content:space-between;gap:10px}
+h1{font:700 38px/.86 var(--display);margin:0;text-transform:uppercase;letter-spacing:-.5px}
+h1 em{display:block;font-style:normal;color:var(--hit);font-size:22px;letter-spacing:.14em;margin-top:5px}
+.hctl{display:flex;gap:8px;align-items:center}
+.chip{font:600 12px var(--body);color:var(--muted);background:var(--card);border-radius:999px;padding:6px 11px;box-shadow:0 1px 0 var(--line);white-space:nowrap}
+.btn{border:0;border-radius:12px;padding:10px 14px;font:700 14px var(--body);cursor:pointer;background:var(--card);color:var(--ink);box-shadow:0 1px 0 var(--line);display:inline-flex;gap:6px;align-items:center;justify-content:center;white-space:nowrap}
+.btn.main{background:var(--navy);color:var(--navy-ink)}
+.btn.go{background:var(--signal);color:var(--signal-ink);font-size:16px;padding:13px 16px;width:100%}
+.btn:disabled{opacity:.4;cursor:default}
+button:focus-visible,canvas:focus-visible{outline:3px solid var(--signal);outline-offset:2px}
+.status{display:flex;flex-direction:column;gap:2px;min-height:60px;justify-content:center;font-size:14px;line-height:1.35}
+.status .t{font:600 12px var(--display);text-transform:uppercase;letter-spacing:.16em;color:var(--muted)}
+.status b.h{color:var(--hit)} .status b.w{color:var(--water)}
+.log{display:flex;gap:14px;flex-wrap:wrap;font-variant-numeric:tabular-nums}
+.log span{white-space:nowrap}
+.log i{font-style:normal;color:var(--muted)}
+
+.stage{position:relative}
+.bwrap{position:relative;container-type:inline-size;isolation:isolate}
+.bwrap canvas{display:block;width:100%;aspect-ratio:1;border-radius:14px;touch-action:none;user-select:none;-webkit-user-select:none}
+body.ph-battle #cvE{touch-action:manipulation;cursor:crosshair}
+.toast{position:absolute;left:50%;top:50%;pointer-events:none;text-align:center;white-space:nowrap;opacity:0;z-index:2;
+  font:700 9cqw/1 var(--display);text-transform:uppercase;color:#fff;background:var(--hit);padding:2.4cqw 4.4cqw;border-radius:3cqw;
+  box-shadow:0 2cqw 5cqw rgba(0,0,0,.35)}
+.toast small{display:block;font:600 3.6cqw var(--body);text-transform:none;opacity:.92;margin-top:1.2cqw}
+.toast.agua{background:#e8f4fb;color:#12324a;font-size:7cqw}
+.toast.tocado{background:var(--signal);color:var(--signal-ink);font-size:8cqw}
+.veil{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:12px;text-align:center;z-index:5;
+  background:color-mix(in srgb,var(--bg) 78%,transparent);backdrop-filter:blur(3px);border-radius:14px;padding:20px}
+.veil h2{font:700 44px/1 var(--display);margin:0;text-transform:uppercase}
+.veil h2.win{color:var(--hit)}
+.veil p{margin:0;color:var(--muted);max-width:300px}
+.veil .row{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
+.veil .rec{color:var(--ink);font-weight:700}
+
+.seg{display:flex;gap:2px;background:var(--tint);border-radius:999px;padding:3px}
+.seg button{flex:1;border:0;background:transparent;color:var(--muted);font:600 13px var(--body);padding:8px 10px;border-radius:999px;cursor:pointer}
+.seg button[aria-pressed="true"]{background:var(--navy);color:var(--navy-ink)}
+.lvhint{font-size:12.5px;color:var(--muted);margin:-4px 2px 0}
+.dock{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.ship{display:flex;align-items:center;justify-content:space-between;gap:8px;border:2px solid transparent;background:var(--card);border-radius:12px;padding:9px 11px;cursor:grab;touch-action:none;user-select:none;-webkit-user-select:none;color:var(--ink);font:600 13.5px var(--body);text-align:left;box-shadow:0 1px 0 var(--line)}
+.ship .segs{display:flex;gap:2px;flex:none}
+.ship .segs i{width:10px;height:12px;border-radius:3px;background:var(--navy)}
+.ship.placed{color:var(--muted)}
+.ship.placed .segs i{background:var(--ship-edge);opacity:.6}
+.ship.sel{border-color:var(--signal)}
+.ship small{display:block;font-weight:500;font-size:11.5px;color:var(--muted)}
+.prow{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+
+.mini{display:grid;grid-template-columns:44% 1fr;gap:12px;align-items:start}
+.mini .bwrap canvas{border-radius:10px;cursor:default}
+.mini .cap{font:600 11px var(--display);text-transform:uppercase;letter-spacing:.14em;color:var(--muted);margin:0 0 5px}
+.fleet{display:flex;flex-direction:column;gap:9px;min-width:0}
+.fl h3{margin:0 0 5px;font:600 11px var(--display);text-transform:uppercase;letter-spacing:.14em;color:var(--muted);display:flex;justify-content:space-between}
+.fl h3 b{color:var(--ink);font-size:13px;font-variant-numeric:tabular-nums}
+.pips{display:flex;flex-wrap:wrap;gap:5px 6px}
+.pip{display:flex;gap:2px}
+.pip i{width:7px;height:11px;border-radius:2px;background:var(--navy)}
+.pip i.h{background:var(--hit)}
+.pip.sunk i{background:var(--hit);opacity:.35}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;background:var(--card);border-radius:12px;padding:8px 6px;box-shadow:0 1px 0 var(--line);text-align:center}
+.stats small{display:block;font-size:9.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.02em}
+.stats b{display:block;font:700 19px/1.1 var(--display);font-variant-numeric:tabular-nums}
+.recl{font-size:12px;color:var(--muted);margin:0;font-variant-numeric:tabular-nums}
+
+.rules{font-size:13px;color:var(--muted);line-height:1.5;margin:0}
+.promo{display:flex;align-items:center;gap:12px;background:var(--brand);color:var(--brand-ink);border-radius:14px;padding:12px 14px;text-decoration:none}
+.promo .logo{flex:none;width:40px;height:40px;border-radius:10px;background:rgba(255,255,255,.16);display:grid;place-items:center;font:700 22px var(--display)}
+.promo span{min-width:0}
+.promo b{display:block;font-size:15px}
+.promo small{display:block;font-size:12.5px;opacity:.85;margin-top:1px}
+.promo .arrow{margin-left:auto;font-weight:700;font-size:13px;white-space:nowrap}
+.links{font-size:12.5px;color:var(--muted);margin:0;text-align:center;line-height:1.7}
+.links a{color:var(--ink);font-weight:700}
+@media (max-width:460px){.promo .arrow{display:none}}
+@media (max-width:370px){h1{font-size:32px}h1 em{font-size:18px}.ship{font-size:12.5px;padding:8px}.ship .segs i{width:8px}}
+
+/* ---------- Modo reel (1080×1920, solo para grabar el vídeo) ---------- */
+#reel{display:none}
+body.reel{padding:0;overflow:hidden}
+body.reel .app{display:none}
+body.reel #reel{display:block;position:fixed;left:0;top:0;width:1080px;height:1920px;overflow:hidden;
+  background:radial-gradient(80% 50% at 50% 42%,#eef4f8 0%,var(--bg) 78%)}
+.rv-head{position:absolute;left:90px;right:90px;top:96px;display:flex;align-items:flex-end;justify-content:space-between}
+.rv-title{font:700 150px/.8 var(--display);text-transform:uppercase;letter-spacing:-3px;color:var(--ink)}
+.rv-title em{display:block;font:700 62px var(--display);font-style:normal;color:var(--hit);letter-spacing:.16em;margin-top:18px}
+.rv-score{text-align:right;font:700 28px var(--body);color:var(--muted);text-transform:uppercase;letter-spacing:.12em}
+.rv-score b{display:block;font:700 120px/.9 var(--display);color:var(--ink);font-variant-numeric:tabular-nums}
+.rv-board{position:absolute;left:90px;top:370px;width:900px}
+body.reel .bwrap canvas{border-radius:30px;box-shadow:0 30px 70px rgba(15,34,51,.22)}
+.rv-mini{position:absolute;left:90px;top:1420px;width:300px}
+body.reel .rv-mini canvas{border-radius:16px;box-shadow:0 14px 34px rgba(15,34,51,.2)}
+.rv-side{position:absolute;left:430px;right:90px;top:1430px;display:flex;flex-direction:column;gap:26px}
+.rv-side .lb{font:700 28px var(--display);text-transform:uppercase;letter-spacing:.14em;color:var(--muted)}
+.rv-pips{display:flex;flex-wrap:wrap;gap:16px 22px;margin-top:12px}
+.rv-pips .pip{gap:5px} .rv-pips .pip i{width:22px;height:30px;border-radius:6px}
+.rv-acc{font:700 38px var(--body);color:var(--ink);font-variant-numeric:tabular-nums}
+.rv-acc b{font:700 64px var(--display);color:var(--hit)}
+.rv-cap{position:absolute;left:50%;top:1300px;transform:translateX(-50%);white-space:nowrap;background:var(--ink);color:#fff;
+  font:800 48px var(--body);padding:20px 42px;border-radius:999px;box-shadow:0 12px 30px rgba(15,34,51,.3)}
+.rv-cap.hit{background:var(--hit)} .rv-cap.sig{background:var(--signal);color:var(--signal-ink)}
+.rv-brand{position:absolute;left:0;right:0;bottom:70px;display:flex;justify-content:center}
+.rv-brand div{display:flex;align-items:center;gap:20px;font:700 36px var(--body);color:var(--ink)}
+.rv-lg{width:64px;height:64px;border-radius:16px;background:var(--brand);color:#fff;display:grid;place-items:center;font:700 40px var(--display)}
+.rv-intro{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:22px;text-align:center;
+  background:radial-gradient(circle at 50% 40%,#1d4f73,#0a1c2b 72%);color:#fff}
+.rv-intro svg{width:300px;height:300px;margin-bottom:20px}
+.rv-intro .big{font:700 230px/.82 var(--display);text-transform:uppercase;letter-spacing:-6px}
+.rv-intro .big em{display:block;font-style:normal;color:var(--hit);font-size:120px;letter-spacing:.12em;margin-top:24px}
+.rv-intro .q{font:800 58px var(--body);color:var(--signal-ink);background:var(--signal);padding:18px 40px;border-radius:20px;margin-top:50px}
+.rv-win{position:absolute;left:0;right:0;top:640px;display:flex;justify-content:center;pointer-events:none}
+.rv-win div{font:700 190px/1 var(--display);text-transform:uppercase;color:#fff;letter-spacing:-2px;background:var(--hit);padding:26px 56px;border-radius:40px;box-shadow:0 30px 80px rgba(0,0,0,.4)}
+.rv-end{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:40px;text-align:center;
+  background:radial-gradient(circle at 50% 35%,#1d4f73,#0a1c2b 70%);color:#fff}
+.rv-end h2{font:700 140px/.9 var(--display);margin:0;text-transform:uppercase;letter-spacing:-3px}
+.rv-end h2 span{color:var(--hit)}
+.rv-end .play{font:700 50px var(--body);opacity:.9}
+.rv-end .url{font:800 42px var(--body);background:#fff;color:#0f2233;padding:24px 36px;border-radius:22px}
+.rv-end .co{display:flex;align-items:center;gap:26px;margin-top:70px}
+.rv-end .co .rv-lg{width:110px;height:110px;border-radius:24px;font-size:66px}
+.rv-end .co b{display:block;font:800 52px var(--body);text-align:left}
+.rv-end .co small{display:block;font:600 38px var(--body);opacity:.8;text-align:left}
+.rv-end .more{font:700 32px var(--body);opacity:.7;margin-top:10px}
+</style>
+<style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}</style>
+</head>
+<body>
+<div class="app">
+  <header>
+    <h1>Hundir<em>la flota</em></h1>
+    <div class="hctl"><span class="chip" id="lvl">Normal</span><button class="btn main" id="new">Nueva</button></div>
+  </header>
+
+  <div class="status" id="status" aria-live="polite"></div>
+
+  <div id="placeUI">
+    <div class="seg" id="seg" role="group" aria-label="Nivel de la CPU">
+      <button data-l="easy">Fácil</button><button data-l="normal">Normal</button><button data-l="hard">Difícil</button>
+    </div>
+  </div>
+  <p class="lvhint" id="lvhint"></p>
+
+  <div class="stage" id="big">
+    <div class="bwrap" id="wEnemy"><canvas id="cvE" tabindex="0" aria-label="Mar enemigo. Toca una casilla o usa las flechas y Intro para disparar."></canvas><div class="toast" id="tE"></div></div>
+    <div class="bwrap" id="wOwn"><canvas id="cvO" tabindex="0" aria-label="Tu mar"></canvas><div class="toast" id="tO"></div></div>
+    <div class="veil" id="veil" hidden><h2 id="veilT"></h2><p id="veilS"></p><div class="row" id="veilR"></div></div>
+  </div>
+
+  <div id="placePanel">
+    <div class="dock" id="dock"></div>
+    <div class="prow" style="margin-top:8px">
+      <button class="btn" id="rot">⟳ Girar</button>
+      <button class="btn" id="shuffle">Barajar</button>
+      <button class="btn" id="clear">Vaciar</button>
+    </div>
+    <div style="margin-top:8px"><button class="btn go" id="start" disabled>¡A la batalla!</button></div>
+  </div>
+
+  <div id="battlePanel" hidden>
+    <div class="mini">
+      <div><p class="cap">Tu flota</p><div id="miniSlot"></div></div>
+      <div class="fleet" id="fleet">
+        <div class="fl"><h3>Flota enemiga <b id="eLeft">5/5</b></h3><div class="pips" id="ePips"></div></div>
+        <div class="fl"><h3>Tu flota <b id="mLeft">5/5</b></h3><div class="pips" id="mPips"></div></div>
+        <div class="stats"><div><small>Disparos</small><b id="sShots">0</b></div><div><small>Aciertos</small><b id="sHits">0</b></div><div><small>Precisión</small><b id="sAcc">–</b></div></div>
+        <p class="recl" id="recl"></p>
+      </div>
+    </div>
+  </div>
+
+  <p class="rules">Coloca tus cinco barcos: portaaviones (5), acorazado (4), crucero (3), submarino (3) y destructor (2). No pueden tocarse, ni siquiera en diagonal. Toca un barco y luego el mar para colocarlo, arrástralo para moverlo y tócalo otra vez (o pulsa «Girar») para girarlo; «Barajar» los coloca al azar. En la batalla, toca una casilla del mar enemigo para disparar: agua, tocado o tocado y hundido. Después dispara la CPU. Gana quien hunda antes la flota contraria. Con teclado: flechas para apuntar e Intro para disparar; al colocar, flechas para mover y R para girar. La partida se guarda sola.</p>
+
+  <a class="promo" href="https://adilcotech.com" target="_blank" rel="noopener">
+    <span class="logo" aria-hidden="true">A</span>
+    <span><b>Adilco Tech Center, SL</b><small>Consultoría ERP y soluciones tecnológicas a medida</small></span>
+    <span class="arrow">adilcotech.com →</span>
+  </a>
+  <p class="links">Más juegos: <a href="https://jrubioadies.github.io/othello/" target="_blank" rel="noopener">Othello</a> · <a href="https://jrubioadies.github.io/torre-tambaleante/" target="_blank" rel="noopener">Torre Tambaleante</a> · <a href="https://jrubioadies.github.io/sudoku/" target="_blank" rel="noopener">Sudoku</a> · <a href="https://jrubioadies.github.io/solitario/" target="_blank" rel="noopener">Solitario</a> · <a href="https://jrubioadies.github.io/2048/" target="_blank" rel="noopener">2048</a> · <a href="https://jrubioadies.github.io/palabra/" target="_blank" rel="noopener">Palabra del día</a> · <a href="https://jrubioadies.github.io/cuatro-en-raya/" target="_blank" rel="noopener">Cuatro en raya</a> · <a href="https://jrubioadies.github.io/damas/" target="_blank" rel="noopener">Damas</a> · <a href="https://jrubioadies.github.io/parchis/" target="_blank" rel="noopener">Parchís</a> · <a href="https://jrubioadies.github.io/buscaminas/" target="_blank" rel="noopener">Buscaminas</a> · <a href="https://jrubioadies.github.io/descifra-el-codigo/" target="_blank" rel="noopener">Descifra el código</a> · <a href="https://jrubioadies.github.io/nonogramas/" target="_blank" rel="noopener">Nonogramas</a> · <a href="https://jrubioadies.github.io/puzle-15/" target="_blank" rel="noopener">Puzle 15</a> · <a href="https://jrubioadies.github.io/sopa-de-letras/" target="_blank" rel="noopener">Sopa de letras</a> · <a href="https://jrubioadies.github.io/ahorcado/" target="_blank" rel="noopener">El ahorcado</a> · <a href="https://jrubioadies.github.io/serpiente/" target="_blank" rel="noopener">Serpiente</a> · <a href="https://jrubioadies.github.io/rompeladrillos/" target="_blank" rel="noopener">Rompeladrillos</a> · <a href="https://jrubioadies.github.io/memoria-de-colores/" target="_blank" rel="noopener">Memoria de colores</a> · <a href="https://jrubioadies.github.io/parejas/" target="_blank" rel="noopener">Parejas</a><br>
+  Hecho por Javier Rubio · <a href="https://jrubioadies.github.io" target="_blank" rel="noopener">jrubioadies.github.io</a> · <a href="https://github.com/jrubioadies/jrubioadies.github.io/tree/main/hundir-la-flota" target="_blank" rel="noopener">código en GitHub</a></p>
+</div>
+
+<div id="reel" aria-hidden="true">
+  <div class="rv-head"><div class="rv-title">Hundir<em>la flota</em></div>
+    <div class="rv-score">A flote<b id="rvLeft">5</b></div></div>
+  <div class="rv-board" id="rvBoard"></div>
+  <div class="rv-cap" id="rvCap" hidden></div>
+  <div class="rv-mini" id="rvMini"></div>
+  <div class="rv-side">
+    <div><div class="lb">Tu flota</div><div class="rv-pips pips" id="rvPips"></div></div>
+    <div class="rv-acc">Precisión <b id="rvAcc">–</b></div>
+  </div>
+  <div class="rv-win" id="rvWin" hidden><div>¡Victoria!</div></div>
+  <div class="rv-brand"><div><span class="rv-lg">A</span>Adilco Tech Center, SL</div></div>
+  <div class="rv-intro" id="rvIntro">
+    <svg viewBox="0 0 100 100" aria-hidden="true"><circle cx="50" cy="50" r="38" fill="none" stroke="#ff5a36" stroke-width="6"/><circle cx="50" cy="50" r="14" fill="none" stroke="#ff5a36" stroke-width="5"/><path d="M50 2v22M50 76v22M2 50h22M76 50h22" stroke="#fff" stroke-width="6" stroke-linecap="round"/></svg>
+    <div class="big">Hundir<em>la flota</em></div><div class="q">¿Hundes la flota de la CPU?</div></div>
+  <div class="rv-end" id="rvEnd" hidden>
+    <h2>¿Hundes tú<br>la <span>flota</span>?</h2>
+    <div class="play">Juega gratis en el navegador</div>
+    <div class="url">jrubioadies.github.io/hundir-la-flota</div>
+    <div class="co"><span class="rv-lg">A</span><span><b>Adilco Tech Center, SL</b><small>adilcotech.com</small></span></div>
+    <div class="more">Más juegos: Othello · Sudoku · 2048 y más</div>
+  </div>
+</div>
+
+<script>
+(()=>{
+const REEL=new URLSearchParams(location.search).has('reel');
+if(REEL)document.body.classList.add('reel');
+const $=id=>document.getElementById(id);
+const KEY='hundir-flota-v1';
+let clock=0; const now=()=>REEL?clock:performance.now();
+const reduce=!REEL&&matchMedia('(prefers-reduced-motion: reduce)').matches;
+const AIM=reduce?0:170, BOOM=reduce?1:720, SPLASH=reduce?1:650;
+function mulberry32(a){return function(){a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
+const rnd=REEL?mulberry32(20261029):Math.random;
+const hash=n=>{const x=Math.sin(n*127.1+311.7)*43758.5453;return x-Math.floor(x)};
+const N=10, ROWS='ABCDEFGHIJ';
+const FLEET=[['Portaaviones',5],['Acorazado',4],['Crucero',3],['Submarino',3],['Destructor',2]];
+const LEVELS={easy:'Fácil',normal:'Normal',hard:'Difícil'};
+const LVHINT={easy:'Fácil: la CPU dispara al azar.',normal:'Normal: la CPU remata alrededor de cada impacto.',hard:'Difícil: la CPU calcula un mapa de probabilidad.'};
+const cname=i=>ROWS[(i/N)|0]+(i%N+1);
+const pick=a=>a[Math.floor(rnd()*a.length)];
+const lower=n=>n.toLowerCase();
+
+// ---------- lógica ----------
+const cells=sh=>Array.from({length:sh.len},(_,k)=>sh.d?(sh.r+k)*N+sh.c:sh.r*N+sh.c+k);
+const sunk=sh=>sh.hits>=sh.len;
+function inBounds(sh){return sh.r>=0&&sh.c>=0&&(sh.d?sh.r+sh.len<=N&&sh.c<N:sh.c+sh.len<=N&&sh.r<N)}
+function fits(ships,cand,skip){
+  if(!inBounds(cand))return false;
+  const mine=cells(cand);
+  for(let j=0;j<ships.length;j++){if(j===skip||!ships[j].placed)continue;
+    for(const a of cells(ships[j]))for(const b of mine)if(Math.abs(((a/N)|0)-((b/N)|0))<=1&&Math.abs(a%N-b%N)<=1)return false}
+  return true;
+}
+function halo(sh){const s=new Set(cells(sh)),out=[];
+  for(const i of s){const r=(i/N)|0,c=i%N;for(let dr=-1;dr<=1;dr++)for(let dc=-1;dc<=1;dc++){const rr=r+dr,cc=c+dc;
+    if(rr<0||cc<0||rr>=N||cc>=N)continue;const j=rr*N+cc;if(!s.has(j)&&!out.includes(j))out.push(j)}}
+  return out}
+const blankFleet=()=>FLEET.map(([n,len])=>({n,len,r:0,c:0,d:0,placed:false,hits:0}));
+function randomFleet(){
+  for(let tries=0;tries<200;tries++){
+    const ships=blankFleet();let ok=true;
+    for(const sh of ships){let done=false;
+      for(let t=0;t<400&&!done;t++){sh.d=rnd()<.5?0:1;sh.r=Math.floor(rnd()*(N-(sh.d?sh.len-1:0)));sh.c=Math.floor(rnd()*(N-(sh.d?0:sh.len-1)));
+        if(fits(ships,sh,ships.indexOf(sh))){sh.placed=true;done=true}}
+      if(!done){ok=false;break}}
+    if(ok)return ships;
+  }
+  return blankFleet();
+}
+const shipAt=(B,i)=>B.ships.findIndex(sh=>sh.placed&&cells(sh).includes(i));
+const allSunk=B=>B.ships.every(sunk);
+const afloat=B=>B.ships.filter(sh=>!sunk(sh)).length;
+
+// ---------- estado ----------
+let S=null, dirty=true, lockUntil=0, kbd=false, msgT=null;
+let anims=[], queue=[], shotAt={me:{},cpu:{}}, toasts={}, shakes={};
+let drag=null, ghost=null;
+const later=(ms,fn)=>queue.push({t:now()+ms,fn});
+function fresh(level){return {v:1,phase:'place',level,turn:'me',me:{ships:blankFleet(),recv:Array(100).fill(0)},cpu:{ships:[],recv:Array(100).fill(0)},
+  st:{ps:0,ph:0,cs:0,ch:0},winner:null,cur:44,sel:0,last:{me:null,cpu:null}}}
+function load(){try{const s=JSON.parse(localStorage.getItem(KEY));if(s&&s.v===1&&s.me&&s.me.ships&&s.me.ships.length===5&&s.me.recv.length===100&&s.cpu.recv.length===100)return s}catch(e){}return null}
+function save(){if(REEL||!S)return;try{localStorage.setItem(KEY,JSON.stringify(S));localStorage.setItem(KEY+'-lvl',S.level)}catch(e){}}
+function getRec(){try{const r=JSON.parse(localStorage.getItem(KEY+'-rec'));if(r&&r.easy)return r}catch(e){}return {easy:{w:0,l:0},normal:{w:0,l:0},hard:{w:0,l:0},best:0}}
+function setRec(r){try{localStorage.setItem(KEY+'-rec',JSON.stringify(r))}catch(e){}}
+function savedLevel(){try{const l=localStorage.getItem(KEY+'-lvl');if(LEVELS[l])return l}catch(e){}return 'normal'}
+
+// ---------- disparos ----------
+function shoot(bk,i){
+  const B=S[bk];const t=now();const k=shipAt(B,i);
+  B.recv[i]=k>=0?2:1;shotAt[bk][i]=t+AIM;
+  anims.push({b:bk,kind:'aim',i,t0:t,dur:AIM});
+  let res='agua',ship=null;
+  if(k>=0){ship=B.ships[k];ship.hits++;res='tocado';
+    anims.push({b:bk,kind:'boom',i,t0:t+AIM,dur:BOOM});
+    if(sunk(ship)){res='hundido';
+      cells(ship).forEach((c,j)=>{if(c!==i)anims.push({b:bk,kind:'boom',i:c,t0:t+AIM+140+j*85,dur:BOOM,small:1})});
+      halo(ship).forEach(c=>{if(B.recv[c]===0){B.recv[c]=3;shotAt[bk][c]=t+AIM+260+cells(ship).length*85}});
+    }
+    if(!reduce)shakes[bk]={t0:t+AIM,amp:res==='hundido'?1:.5};
+  }else anims.push({b:bk,kind:'splash',i,t0:t+AIM,dur:SPLASH});
+  lastShot=i;toast(bk,res,ship,t+AIM);
+  dirty=true;return {res,ship,i};
+}
+let lastShot=0;
+function toast(bk,res,ship,t0){
+  const el=$(bk==='cpu'?'tE':'tO');
+  const mini=bk==='me'&&S.phase!=='place';
+  el.className='toast'+(res==='hundido'?'':' '+res);
+  {const rows=(res==='hundido'?cells(ship):[lastShot]).map(c=>(c/N)|0),lo=Math.min(...rows),hi=Math.max(...rows);el.style.top=hi<=4?'72%':lo>=5?'30%':(lo+hi)/2<4.5?'86%':'16%'}
+  if(res==='hundido')el.innerHTML=(mini?'¡Hundido!':'¡Tocado y hundido!')+(mini?'':'<small>'+ship.n+' · '+ship.len+' casillas</small>');
+  else el.textContent=res==='agua'?'Agua':'¡Tocado!';
+  toasts[bk]={el,t0,dur:reduce?1200:(res==='hundido'?1500:res==='tocado'?820:700)};
+}
+function playerFire(i){
+  if(!S||S.phase!=='battle'||S.turn!=='me'||(!REEL&&now()<lockUntil)||!$('veil').hidden)return;
+  if(S.cpu.recv[i]!==0){if(S.cpu.recv[i]===3)flash('Esa casilla es agua seguro: toca a un barco hundido.');return}
+  const r=shoot('cpu',i);S.st.ps++;if(r.res!=='agua')S.st.ph++;
+  S.last.me={i,res:r.res,n:r.ship?r.ship.n:null};S.cur=i;
+  if(allSunk(S.cpu))finish('me');
+  else{S.turn='cpu';later(REEL?cpuDelay:820,cpuTurn)}
+  save();ui();
+}
+let cpuDelay=400;
+function cpuTurn(){
+  if(!S||S.phase!=='battle'||S.turn!=='cpu')return;
+  const i=aiPick(S.level);
+  const r=shoot('me',i);S.st.cs++;if(r.res!=='agua')S.st.ch++;
+  S.last.cpu={i,res:r.res,n:r.ship?r.ship.n:null};
+  if(allSunk(S.me))finish('cpu');
+  else{S.turn='me';lockUntil=now()+AIM+120}
+  save();ui();
+}
+function finish(w){
+  S.phase='over';S.winner=w;S.turn='me';
+  const rec=getRec();const acc=S.st.ps?Math.round(100*S.st.ph/S.st.ps):0;let newBest=false;
+  if(w==='me'){rec[S.level].w++;if(acc>rec.best){rec.best=acc;newBest=true}}else rec[S.level].l++;
+  if(!REEL){setRec(rec);later(1300,()=>endVeil(newBest))}
+}
+function endVeil(newBest){
+  const acc=S.st.ps?Math.round(100*S.st.ph/S.st.ps):0;
+  const t=$('veilT');
+  if(S.winner==='me'){t.textContent='¡Victoria!';t.className='win';
+    veil(null,`Has hundido la flota enemiga en ${S.st.ps} disparos, con un ${acc} % de precisión.`+(newBest?' <span class="rec">Nuevo récord de precisión.</span>':''),[['Ver tableros',hideVeil],['Revancha',newGame,1]])}
+  else{t.textContent='Derrota';t.className='';
+    veil(null,`La CPU (${LEVELS[S.level].toLowerCase()}) ha hundido tu flota. Te quedaban ${afloat(S.cpu)} barcos enemigos por hundir. Tu precisión: ${acc} %.`,[['Ver tableros',hideVeil],['Revancha',newGame,1]])}
+}
+
+// ---------- CPU ----------
+function aiPick(level){
+  const B=S.me,R=B.recv;const unknown=[];for(let i=0;i<100;i++)if(R[i]===0)unknown.push(i);
+  if(level==='easy')return pick(unknown);
+  const sunkCells=new Set();B.ships.forEach(sh=>{if(sunk(sh))cells(sh).forEach(c=>sunkCells.add(c))});
+  const open=[];for(let i=0;i<100;i++)if(R[i]===2&&!sunkCells.has(i))open.push(i);
+  const banned=new Set();
+  open.forEach(i=>{const r=(i/N)|0,c=i%N;[[-1,-1],[-1,1],[1,-1],[1,1]].forEach(([a,b])=>{const rr=r+a,cc=c+b;if(rr>=0&&cc>=0&&rr<N&&cc<N)banned.add(rr*N+cc)})});
+  const cand=unknown.filter(i=>!banned.has(i));
+  if(level==='hard'){const p=density(R,sunkCells,open,banned);if(p>=0)return p}
+  if(open.length){
+    const set=new Set(open),cl=[open[0]],seen=new Set([open[0]]);
+    for(let q=0;q<cl.length;q++){const i=cl[q],r=(i/N)|0,c=i%N;
+      [[r-1,c],[r+1,c],[r,c-1],[r,c+1]].forEach(([rr,cc])=>{const j=rr*N+cc;if(rr>=0&&cc>=0&&rr<N&&cc<N&&set.has(j)&&!seen.has(j)){seen.add(j);cl.push(j)}})}
+    let opts=[];
+    if(cl.length>1){const hz=((cl[0]/N)|0)===((cl[1]/N)|0);
+      if(hz){const r=(cl[0]/N)|0,cs=cl.map(i=>i%N);const a=Math.min(...cs),b=Math.max(...cs);if(a>0)opts.push(r*N+a-1);if(b<N-1)opts.push(r*N+b+1)}
+      else{const c=cl[0]%N,rs=cl.map(i=>(i/N)|0);const a=Math.min(...rs),b=Math.max(...rs);if(a>0)opts.push((a-1)*N+c);if(b<N-1)opts.push((b+1)*N+c)}}
+    if(!opts.filter(i=>R[i]===0).length){const i=cl[0],r=(i/N)|0,c=i%N;opts=[];[[r-1,c],[r+1,c],[r,c-1],[r,c+1]].forEach(([rr,cc])=>{if(rr>=0&&cc>=0&&rr<N&&cc<N)opts.push(rr*N+cc)})}
+    opts=opts.filter(i=>R[i]===0);
+    if(opts.length)return pick(opts);
+  }
+  return pick(cand.length?cand:unknown);
+}
+function density(R,sunkCells,open,banned){
+  const P=Array(100).fill(0);
+  S.me.ships.filter(sh=>!sunk(sh)).forEach(sh=>{const L=sh.len;
+    for(let d=0;d<2;d++)for(let r=0;r<N;r++)for(let c=0;c<N;c++){
+      const cand={r,c,d,len:L};if(!inBounds(cand))continue;const cs=cells(cand);let ok=true,k=0;
+      for(const i of cs){if(R[i]===1||R[i]===3||sunkCells.has(i)){ok=false;break}if(R[i]===2)k++}
+      if(!ok||(open.length&&!k))continue;
+      const w=open.length?Math.pow(40,k):1;
+      for(const i of cs)if(R[i]===0&&!banned.has(i))P[i]+=w}});
+  let best=0,arr=[];for(let i=0;i<100;i++){if(P[i]>best+1e-9){best=P[i];arr=[i]}else if(best>0&&Math.abs(P[i]-best)<1e-9)arr.push(i)}
+  return best>0?pick(arr):-1;
+}
+
+// ---------- dibujo ----------
+const cvE=$('cvE'),cvO=$('cvO');
+let C={};
+function readColors(){const cs=getComputedStyle(document.documentElement);
+  ['frame','water','water2','grid','label','ship','ship-edge','deck','sunk','sunk-edge','hit','hit-bg','miss','signal'].forEach(k=>C[k]=cs.getPropertyValue('--'+k).trim())}
+function rr(ctx,x,y,w,h,r){ctx.beginPath();ctx.moveTo(x+r,y);ctx.arcTo(x+w,y,x+w,y+h,r);ctx.arcTo(x+w,y+h,x,y+h,r);ctx.arcTo(x,y+h,x,y,r);ctx.arcTo(x,y,x+w,y,r);ctx.closePath()}
+function hull(ctx,s,sh,fill,edge,alpha,r0,c0,d0){
+  const r=r0==null?sh.r:r0,c=c0==null?sh.c:c0,d=d0==null?sh.d:d0,len=sh.len;
+  const pad=s*.13,L=len*s-2*pad,H=s-2*pad;
+  ctx.save();ctx.globalAlpha=alpha;
+  ctx.translate(s+c*s+(d?s/2:len*s/2),s+r*s+(d?len*s/2:s/2));if(d)ctx.rotate(Math.PI/2);
+  const x0=-L/2,x1=L/2,y0=-H/2,y1=H/2,b=H*.85,q=H*.3;
+  ctx.beginPath();ctx.moveTo(x0+q,y0);ctx.lineTo(x1-b,y0);ctx.quadraticCurveTo(x1-H*.1,y0,x1,0);ctx.quadraticCurveTo(x1-H*.1,y1,x1-b,y1);
+  ctx.lineTo(x0+q,y1);ctx.quadraticCurveTo(x0,y1,x0,y1-q);ctx.lineTo(x0,y0+q);ctx.quadraticCurveTo(x0,y0,x0+q,y0);ctx.closePath();
+  ctx.fillStyle=fill;ctx.fill();if(edge){ctx.lineWidth=Math.max(1,s*.05);ctx.strokeStyle=edge;ctx.stroke()}
+  ctx.fillStyle=edge||C.deck;ctx.globalAlpha=alpha*.55;
+  for(let k=0;k<len-1;k++){const cx=-len*s/2+(k+.5)*s;ctx.beginPath();ctx.arc(cx,0,H*.17,0,7);ctx.fill()}
+  if(len>=3){ctx.globalAlpha=alpha*.35;rr(ctx,-len*s/2+s*.9,-H*.22,s*.8,H*.44,H*.14);ctx.fill()}
+  ctx.restore();
+}
+function xmark(ctx,cx,cy,s,col){const z=s*.2;ctx.save();ctx.strokeStyle=col;ctx.lineWidth=s*.11;ctx.lineCap='round';
+  ctx.beginPath();ctx.moveTo(cx-z,cy-z);ctx.lineTo(cx+z,cy+z);ctx.moveTo(cx+z,cy-z);ctx.lineTo(cx-z,cy+z);ctx.stroke();ctx.restore()}
+function fxBoom(ctx,cx,cy,s,k,seed,small){
+  const e=1-Math.pow(1-k,3),f=1-k;
+  const R=s*(small?.3:.42)+s*(small?.55:.95)*e;
+  const g=ctx.createRadialGradient(cx,cy,0,cx,cy,R);
+  g.addColorStop(0,`rgba(255,252,225,${f})`);g.addColorStop(.35,`rgba(255,200,70,${.95*f})`);g.addColorStop(.7,`rgba(255,92,40,${.7*f})`);g.addColorStop(1,'rgba(255,60,30,0)');
+  ctx.fillStyle=g;ctx.beginPath();ctx.arc(cx,cy,R,0,7);ctx.fill();
+  ctx.strokeStyle=`rgba(255,225,160,${.85*f})`;ctx.lineWidth=s*.08*f+.5;ctx.beginPath();ctx.arc(cx,cy,s*(.3+(small?1:1.5)*e),0,7);ctx.stroke();
+  for(let j=0;j<10;j++){const a=hash(seed*13+j)*6.283,sp=.55+hash(seed*7+j*3)*.9,dd=s*(.2+1.25*sp*e);
+    const x=cx+Math.cos(a)*dd,y=cy+Math.sin(a)*dd+s*.5*k*k,z=s*.1*f+1;
+    ctx.fillStyle=j%3?`rgba(255,${140+j*11},50,${f})`:`rgba(255,255,230,${f})`;ctx.fillRect(x-z/2,y-z/2,z,z)}
+}
+function fxSplash(ctx,cx,cy,s,k,seed){
+  for(let j=0;j<2;j++){const kk=(k-j*.18)/(1-j*.18);if(kk<=0)continue;
+    ctx.strokeStyle=`rgba(230,246,255,${.9*(1-kk)})`;ctx.lineWidth=s*.08*(1-kk)+.5;ctx.beginPath();ctx.arc(cx,cy,s*(.12+.62*(1-Math.pow(1-kk,2))),0,7);ctx.stroke()}
+  for(let j=0;j<7;j++){const a=-Math.PI/2+(hash(seed*5+j)-.5)*2.2,v=.9+hash(seed*3+j*7)*.7;
+    const x=cx+Math.cos(a)*v*k*s*.7,y=cy+(Math.sin(a)*v*k-1.6*k*k*.5)*s*.7+s*1.1*k*k;
+    ctx.fillStyle=`rgba(235,248,255,${1-k})`;ctx.beginPath();ctx.arc(x,y,s*.06*(1-k*.5),0,7);ctx.fill()}
+}
+function fxAim(ctx,cx,cy,s,k){const R=s*(1.15-.65*k);ctx.save();ctx.strokeStyle=C.signal;ctx.globalAlpha=.4+.6*k;ctx.lineWidth=s*.07;
+  ctx.beginPath();ctx.arc(cx,cy,R,0,7);ctx.moveTo(cx-R*1.35,cy);ctx.lineTo(cx-R*.55,cy);ctx.moveTo(cx+R*.55,cy);ctx.lineTo(cx+R*1.35,cy);
+  ctx.moveTo(cx,cy-R*1.35);ctx.lineTo(cx,cy-R*.55);ctx.moveTo(cx,cy+R*.55);ctx.lineTo(cx,cy+R*1.35);ctx.stroke();ctx.restore()}
+
+function draw(bk){
+  const cv=bk==='cpu'?cvE:cvO;const w=cv.clientWidth;if(!w||!S)return;
+  const dpr=REEL?1:Math.min(3,window.devicePixelRatio||1),px=Math.round(w*dpr);
+  if(cv.width!==px||cv.height!==px){cv.width=px;cv.height=px}
+  const ctx=cv.getContext('2d');ctx.setTransform(dpr,0,0,dpr,0,0);ctx.clearRect(0,0,w,w);
+  const s=w/11,t=now(),B=S[bk],R=B.recv,mini=bk==='me'&&S.phase!=='place';
+  ctx.fillStyle=C.frame;rr(ctx,0,0,w,w,s*.4);ctx.fill();
+  // rótulos
+  ctx.fillStyle=C.label;ctx.textAlign='center';ctx.textBaseline='middle';ctx.font=`600 ${s*(mini?.5:.42)}px "Chakra Petch",sans-serif`;
+  const cr=bk==='cpu'&&kbd&&S.phase==='battle'?S.cur:-1;
+  for(let k=0;k<N;k++){
+    ctx.fillStyle=cr>=0&&cr%N===k?C.signal:C.label;ctx.fillText(String(k+1),s*(1.5+k),s*.54);
+    ctx.fillStyle=cr>=0&&((cr/N)|0)===k?C.signal:C.label;ctx.fillText(ROWS[k],s*.52,s*(1.53+k))}
+  // agua
+  ctx.save();rr(ctx,s,s,10*s,10*s,s*.25);ctx.clip();
+  for(let i=0;i<100;i++){const r=(i/N)|0,c=i%N;ctx.fillStyle=(r+c)%2?C.water2:C.water;ctx.fillRect(s+c*s,s+r*s,s+.5,s+.5)}
+  ctx.strokeStyle=C.grid;ctx.lineWidth=1;ctx.beginPath();
+  for(let k=1;k<N;k++){ctx.moveTo(s+k*s,s);ctx.lineTo(s+k*s,11*s);ctx.moveTo(s,s+k*s);ctx.lineTo(11*s,s+k*s)}ctx.stroke();
+  const shown=i=>R[i]&&!(shotAt[bk][i]>t);
+  // impactos en barcos no hundidos (fondo)
+  for(let i=0;i<100;i++)if(R[i]===2&&shown(i)){const k=shipAt(B,i);if(k>=0&&sunk(B.ships[k])&&cells(B.ships[k]).every(shown))continue;const r=(i/N)|0,c=i%N;ctx.fillStyle=C['hit-bg'];ctx.fillRect(s+c*s,s+r*s,s,s)}
+  // barcos
+  B.ships.forEach((sh,k)=>{
+    if(!sh.placed)return;if(drag&&drag.moved&&drag.k===k&&bk==='me')return;
+    if(bk==='me'){const done=sunk(sh)&&cells(sh).every(shown);
+      hull(ctx,s,sh,done?C.sunk:C.ship,done?C['sunk-edge']:C['ship-edge'],1);
+      if(S.phase==='place'&&S.sel===k){ctx.save();ctx.strokeStyle=C.signal;ctx.lineWidth=s*.1;rr(ctx,s+sh.c*s+s*.05,s+sh.r*s+s*.05,(sh.d?1:sh.len)*s-s*.1,(sh.d?sh.len:1)*s-s*.1,s*.3);ctx.stroke();ctx.restore()}}
+    else{const rev=sunk(sh)&&cells(sh).every(shown);
+      if(rev)hull(ctx,s,sh,C.sunk,C['sunk-edge'],1);
+      else if(S.phase==='over'&&S.winner==='cpu')hull(ctx,s,sh,C.ship,C['ship-edge'],.5)}
+  });
+  // marcas
+  for(let i=0;i<100;i++){if(!shown(i))continue;const r=(i/N)|0,c=i%N,cx=s*(1.5+c),cy=s*(1.5+r);
+    if(R[i]===1){ctx.fillStyle=C.miss;ctx.beginPath();ctx.arc(cx,cy,s*.13,0,7);ctx.fill()}
+    else if(R[i]===3){ctx.fillStyle=C.miss;ctx.globalAlpha=.4;ctx.beginPath();ctx.arc(cx,cy,s*.07,0,7);ctx.fill();ctx.globalAlpha=1}
+    else if(R[i]===2)xmark(ctx,cx,cy,s,C.hit)}
+  // fantasma al colocar
+  if(bk==='me'&&ghost){const sh=S.me.ships[ghost.k];hull(ctx,s,sh,ghost.ok?C.signal:C.hit,null,.75,ghost.r,ghost.c,ghost.d)}
+  ctx.restore();
+  // cursor de teclado
+  if(cr>=0){const r=(cr/N)|0,c=cr%N;ctx.strokeStyle=C.signal;ctx.lineWidth=s*.08;rr(ctx,s+c*s+s*.06,s+r*s+s*.06,s*.88,s*.88,s*.18);ctx.stroke()}
+  // efectos
+  for(const a of anims){if(a.b!==bk)continue;const k=(t-a.t0)/a.dur;if(k<0||k>=1)continue;const r=(a.i/N)|0,c=a.i%N,cx=s*(1.5+c),cy=s*(1.5+r);
+    if(a.kind==='aim')fxAim(ctx,cx,cy,s,k);else if(a.kind==='boom')fxBoom(ctx,cx,cy,s,k,a.i+1,a.small);else fxSplash(ctx,cx,cy,s,k,a.i+1)}
+}
+function frame(){
+  if(!S)return;
+  const t=now();
+  queue.sort((a,b)=>a.t-b.t);while(queue.length&&queue[0].t<=t)queue.shift().fn();
+  anims=anims.filter(a=>t<a.t0+a.dur);
+  if(msgT&&t>msgT.until){msgT=null;ui()}
+  let busy=anims.length>0;
+  for(const bk of ['cpu','me']){
+    const ts=toasts[bk];if(ts){const k=(t-ts.t0)/ts.dur;
+      if(k<0)ts.el.style.opacity=0;else if(k>=1){ts.el.style.opacity=0;delete toasts[bk]}
+      else{const sc=k<.12?.55+.6*(k/.12):k<.2?1.15-.15*((k-.12)/.08):1;ts.el.style.opacity=k>.78?(1-k)/.22:1;ts.el.style.transform=`translate(-50%,-50%) scale(${sc})`;busy=true}}
+    const sk=shakes[bk],cv=bk==='cpu'?cvE:cvO;
+    if(sk){const k=(t-sk.t0)/260;if(k>=1){cv.style.transform='';delete shakes[bk]}else if(k>=0){const a=sk.amp*cv.clientWidth*.012*(1-k);cv.style.transform=`translate(${(Math.sin(k*47)*a).toFixed(2)}px,${(Math.cos(k*39)*a*.6).toFixed(2)}px)`;busy=true}else busy=true}
+  }
+  if(dirty||busy||REEL){draw('cpu');draw('me')}
+  dirty=busy;
+}
+
+// ---------- interfaz ----------
+function flash(txt){msgT={txt,until:now()+2600};ui()}
+function shotTxt(l){if(!l)return '—';return cname(l.i)+' · '+(l.res==='agua'?'<b class="w">agua</b>':l.res==='tocado'?'<b class="h">¡tocado!</b>':'<b class="h">¡hundido!</b>')}
+function ui(){
+  if(!S)return;
+  const ph=S.phase,battle=ph!=='place';
+  document.body.classList.toggle('ph-battle',battle);
+  $('placeUI').hidden=battle;$('placePanel').hidden=battle;$('battlePanel').hidden=!battle;$('lvhint').hidden=battle;
+  if(!REEL){
+    if(battle){if(cvO.parentNode.parentNode!==$('miniSlot'))$('miniSlot').appendChild($('wOwn'));$('wEnemy').hidden=false}
+    else{if($('wOwn').parentNode!==$('big'))$('big').insertBefore($('wOwn'),$('veil'));$('wEnemy').hidden=true}
+  }
+  $('lvl').textContent='CPU · '+LEVELS[S.level];
+  document.querySelectorAll('#seg button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.l===S.level));
+  $('lvhint').textContent=LVHINT[S.level];
+  // estado
+  let h='';
+  if(msgT)h=`<span class="t">Aviso</span><span>${msgT.txt}</span>`;
+  else if(ph==='place'){const left=S.me.ships.filter(sh=>!sh.placed);const sel=S.me.ships[S.sel];
+    if(!left.length)h=`<span class="t">Flota lista</span><span>Toca un barco para moverlo o girarlo, o pulsa <b>¡A la batalla!</b></span>`;
+    else if(sel&&!sel.placed)h=`<span class="t">Coloca tu flota · ${5-left.length}/5</span><span>Toca el mar para colocar el <b>${lower(sel.n)}</b> (${sel.len}) o arrástralo. «Girar» lo pone en ${sel.d?'horizontal':'vertical'}.</span>`;
+    else h=`<span class="t">Coloca tu flota · ${5-left.length}/5</span><span>Toca un barco de la lista o pulsa <b>Barajar</b>.</span>`}
+  else{const lg=`<span class="log"><span><i>Tú:</i> ${shotTxt(S.last.me)}</span><span><i>CPU:</i> ${shotTxt(S.last.cpu)}</span></span>`;
+    const tt=ph==='over'?(S.winner==='me'?'¡Victoria! Flota enemiga hundida':'Derrota: han hundido tu flota'):S.turn==='me'?'Tu turno: toca el mar enemigo':'La CPU apunta…';
+    h=`<span class="t">${tt}</span>${lg}`}
+  $('status').innerHTML=h;
+  // dique
+  if(ph==='place'){const dk=$('dock');if(!dk.children.length)S.me.ships.forEach((sh,k)=>{const b=document.createElement('button');b.className='ship';b.dataset.k=k;
+      b.innerHTML=`<span>${sh.n}<small></small></span><span class="segs">${'<i></i>'.repeat(sh.len)}</span>`;dk.appendChild(b)});
+    [...dk.children].forEach((b,k)=>{const sh=S.me.ships[k];b.classList.toggle('placed',sh.placed);b.classList.toggle('sel',S.sel===k);
+      b.querySelector('small').textContent=sh.placed?'En el mar · '+cname(sh.r*N+sh.c):(sh.d?'Vertical':'Horizontal')+' · '+sh.len+' casillas'});
+    $('start').disabled=!S.me.ships.every(sh=>sh.placed);$('rot').disabled=S.sel<0;$('clear').disabled=!S.me.ships.some(sh=>sh.placed)}
+  else{
+    const pipsE=S.cpu.ships.map(sh=>`<span class="pip${sunk(sh)?' sunk':''}" title="${sh.n}">${'<i></i>'.repeat(sh.len)}</span>`).join('');
+    const pipsM=S.me.ships.map(sh=>`<span class="pip${sunk(sh)?' sunk':''}" title="${sh.n}">${Array.from({length:sh.len},(_,j)=>`<i${S.me.recv[cells(sh)[j]]===2?' class="h"':''}></i>`).join('')}</span>`).join('');
+    $('ePips').innerHTML=pipsE;$('mPips').innerHTML=pipsM;
+    $('eLeft').textContent=afloat(S.cpu)+'/5';$('mLeft').textContent=afloat(S.me)+'/5';
+    $('sShots').textContent=S.st.ps;$('sHits').textContent=S.st.ph;$('sAcc').textContent=S.st.ps?Math.round(100*S.st.ph/S.st.ps)+' %':'–';
+    const rec=getRec(),rl=rec[S.level];$('recl').textContent=`${LEVELS[S.level]}: ${rl.w} ${rl.w===1?'victoria':'victorias'} · ${rl.l} ${rl.l===1?'derrota':'derrotas'}`+(rec.best?` · mejor precisión ${rec.best} %`:'');
+    if(REEL){$('rvLeft').textContent=afloat(S.cpu);$('rvPips').innerHTML=pipsM;$('rvAcc').textContent=$('sAcc').textContent}
+  }
+  dirty=true;
+}
+function veil(title,sub,btns){
+  if(title!=null){$('veilT').textContent=title;$('veilT').className=''}
+  $('veilS').innerHTML=sub;const r=$('veilR');r.innerHTML='';
+  btns.forEach(([txt,fn,main])=>{const b=document.createElement('button');b.className='btn'+(main?' main':'');b.textContent=txt;b.onclick=fn;r.appendChild(b)});
+  $('veil').hidden=false;
+}
+function hideVeil(){$('veil').hidden=true}
+
+// ---------- partida ----------
+function newGame(){
+  const lv=S?S.level:savedLevel();
+  queue=[];anims=[];shotAt={me:{},cpu:{}};toasts={};lockUntil=0;
+  ['tE','tO'].forEach(id=>$(id).style.opacity=0);
+  S=fresh(lv);hideVeil();save();ui();
+}
+function startBattle(){
+  if(!S.me.ships.every(sh=>sh.placed))return;
+  S.cpu.ships=randomFleet();S.phase='battle';S.turn='me';S.sel=-1;S.cur=44;
+  S.me.recv=Array(100).fill(0);S.cpu.recv=Array(100).fill(0);S.me.ships.forEach(sh=>sh.hits=0);
+  save();ui();
+  if(!REEL){try{scrollTo({top:0,behavior:reduce?'auto':'smooth'})}catch(e){}setTimeout(()=>{try{cvE.focus({preventScroll:true})}catch(e){}},0)}
+}
+
+// ---------- colocación ----------
+function tryPlace(k,r,c,d){
+  const sh=S.me.ships[k];const cand={...sh,d};
+  if(d){cand.r=Math.max(0,Math.min(r,N-sh.len));cand.c=Math.max(0,Math.min(c,N-1))}
+  else{cand.c=Math.max(0,Math.min(c,N-sh.len));cand.r=Math.max(0,Math.min(r,N-1))}
+  if(!fits(S.me.ships,cand,k))return false;
+  Object.assign(sh,{r:cand.r,c:cand.c,d,placed:true});return true;
+}
+function nextUnplaced(from){for(let j=1;j<=5;j++){const k=(from+j)%5;if(!S.me.ships[k].placed)return k}return -1}
+function rotate(k,pivot){
+  const sh=S.me.ships[k];
+  if(!sh.placed){sh.d=1-sh.d;ui();return}
+  const nd=1-sh.d,old={...sh},p=pivot==null?0:cells(sh).indexOf(pivot);
+  const pr=sh.d?sh.r+p:sh.r,pc=sh.d?sh.c:sh.c+p;
+  const tries=[[sh.r,sh.c]];for(let o=0;o<sh.len;o++)tries.push(nd?[pr-o,pc]:[pr,pc-o]);
+  for(const [r,c] of tries){sh.placed=false;if(tryPlace(k,r,c,nd)){save();ui();return}Object.assign(sh,old)}
+  Object.assign(sh,old);flash('No se puede girar ahí: chocaría con otro barco o se saldría del mar.');
+}
+function cellAt(cv,x,y,loose){const b=cv.getBoundingClientRect(),s=b.width/11;let c=Math.floor((x-b.left)/s)-1,r=Math.floor((y-b.top)/s)-1;
+  if(loose){if(x<b.left||x>b.right||y<b.top||y>b.bottom)return null;c=Math.max(0,Math.min(9,c));r=Math.max(0,Math.min(9,r))}
+  return r>=0&&c>=0&&r<N&&c<N?{r,c,i:r*N+c}:null}
+function updGhost(e){
+  const sh=S.me.ships[drag.k],cl=cellAt(cvO,e.clientX,e.clientY,true);
+  if(!cl){ghost=null;dirty=true;return}
+  let r=sh.d?cl.r-drag.grab:cl.r,c=sh.d?cl.c:cl.c-drag.grab;
+  if(sh.d)r=Math.max(0,Math.min(r,N-sh.len));else c=Math.max(0,Math.min(c,N-sh.len));
+  ghost={k:drag.k,r,c,d:sh.d,ok:fits(S.me.ships,{...sh,r,c},drag.k)};dirty=true;
+}
+cvO.addEventListener('pointerdown',e=>{
+  if(!S||S.phase!=='place')return;e.preventDefault();kbd=false;
+  const cl=cellAt(cvO,e.clientX,e.clientY);if(!cl)return;
+  const k=shipAt(S.me,cl.i);
+  if(k>=0){drag={k,grab:cells(S.me.ships[k]).indexOf(cl.i),x:e.clientX,y:e.clientY,moved:false,src:'board',cell:cl.i};try{cvO.setPointerCapture(e.pointerId)}catch(_){}}
+  else if(S.sel>=0){const k2=S.sel,was=S.me.ships[k2].placed,old={...S.me.ships[k2]};S.me.ships[k2].placed=false;
+    if(tryPlace(k2,cl.r,cl.c,S.me.ships[k2].d)){if(!was){const n=nextUnplaced(k2);S.sel=n>=0?n:k2}save();ui()}
+    else{Object.assign(S.me.ships[k2],old);flash('Ahí no cabe: los barcos no pueden tocarse ni salirse del mar.')}}
+  else flash('Primero elige un barco de la lista.');
+});
+$('dock').addEventListener('pointerdown',e=>{
+  const b=e.target.closest('.ship');if(!b||!S||S.phase!=='place')return;
+  const k=+b.dataset.k;const sh=S.me.ships[k];
+  drag={k,grab:Math.floor(sh.len/2),x:e.clientX,y:e.clientY,moved:false,src:'dock',wasSel:S.sel===k};
+  try{b.setPointerCapture(e.pointerId)}catch(_){}
+});
+document.addEventListener('pointermove',e=>{
+  if(!drag)return;
+  if(!drag.moved&&Math.hypot(e.clientX-drag.x,e.clientY-drag.y)>8){drag.moved=true;S.sel=drag.k;ui()}
+  if(drag.moved)updGhost(e);
+});
+document.addEventListener('pointerup',e=>{
+  if(!drag)return;const d=drag;drag=null;
+  if(d.moved){
+    if(ghost&&ghost.ok){const sh=S.me.ships[d.k],was=sh.placed;Object.assign(sh,{r:ghost.r,c:ghost.c,placed:true});
+      if(!was){const n=nextUnplaced(d.k);S.sel=n>=0?n:d.k}else S.sel=d.k}
+    else if(ghost)flash('Ahí no cabe: los barcos no pueden tocarse ni salirse del mar.');
+    ghost=null;save();ui();return}
+  if(d.src==='board'){if(S.sel===d.k)rotate(d.k,d.cell);else{S.sel=d.k;ui()}}
+  else{if(d.wasSel)rotate(d.k);else{S.sel=d.k;ui()}}
+  save();
+});
+document.addEventListener('pointercancel',()=>{drag=null;ghost=null;dirty=true});
+$('rot').onclick=()=>{if(S.sel>=0)rotate(S.sel)};
+$('shuffle').onclick=()=>{S.me.ships=randomFleet();S.sel=-1;save();ui()};
+$('clear').onclick=()=>{S.me.ships=blankFleet();S.sel=0;save();ui()};
+$('start').onclick=startBattle;
+$('seg').addEventListener('click',e=>{const b=e.target.closest('button');if(!b||S.phase!=='place')return;S.level=b.dataset.l;save();ui()});
+
+// ---------- batalla ----------
+cvE.addEventListener('click',e=>{if(!S||S.phase!=='battle')return;kbd=false;const cl=cellAt(cvE,e.clientX,e.clientY);if(cl)playerFire(cl.i)});
+$('new').onclick=()=>{
+  if(S.phase==='battle'&&S.st.ps>0&&$('veil').hidden){$('veilT').className='';veil('¿Retirada?','Perderás la batalla en curso.',[['Seguir luchando',hideVeil],['Sí, nueva',newGame,1]])}
+  else newGame()};
+document.addEventListener('keydown',e=>{
+  if(!S||REEL||!$('veil').hidden||e.target.closest('a'))return;
+  const mv={ArrowUp:[-1,0],ArrowDown:[1,0],ArrowLeft:[0,-1],ArrowRight:[0,1]}[e.key];
+  if(S.phase==='battle'){
+    if(mv){e.preventDefault();kbd=true;const r=Math.max(0,Math.min(9,((S.cur/N)|0)+mv[0])),c=Math.max(0,Math.min(9,S.cur%N+mv[1]));S.cur=r*N+c;dirty=true}
+    else if((e.key==='Enter'||e.key===' ')&&(e.target===cvE||e.target===document.body)){e.preventDefault();kbd=true;playerFire(S.cur)}
+  }else if(S.phase==='place'&&S.sel>=0){
+    const sh=S.me.ships[S.sel];
+    if(e.key==='r'||e.key==='R'){e.preventDefault();rotate(S.sel)}
+    else if(mv&&sh.placed){e.preventDefault();const old={...sh};sh.placed=false;if(!tryPlace(S.sel,sh.r+mv[0],sh.c+mv[1],sh.d)||(sh.r===old.r&&sh.c===old.c&&false))Object.assign(sh,old);save();ui()}
+  }
+});
+matchMedia('(prefers-color-scheme: dark)').addEventListener('change',()=>{readColors();dirty=true});
+new MutationObserver(()=>{readColors();dirty=true}).observe(document.documentElement,{attributes:true,attributeFilter:['data-theme']});
+if(window.ResizeObserver){const ro=new ResizeObserver(()=>{dirty=true});ro.observe(cvE);ro.observe(cvO)}
+addEventListener('resize',()=>{dirty=true});
+
+// ---------- modo reel: batalla guionizada ----------
+function setupReel(){
+  readColors();
+  S=fresh('normal');
+  const fleet=spec=>FLEET.map(([n,len],k)=>({n,len,r:spec[k][0],c:spec[k][1],d:spec[k][2],placed:true,hits:0}));
+  S.me.ships=fleet([[7,5,0],[1,1,1],[0,4,0],[3,7,1],[9,0,0]]);
+  S.cpu.ships=fleet([[1,2,0],[3,8,1],[8,1,0],[4,4,1],[9,6,0]]);
+  S.phase='battle';S.sel=-1;
+  $('rvBoard').appendChild($('wEnemy'));$('rvMini').appendChild($('wOwn'));$('wEnemy').hidden=false;
+  ui();
+  const cap=(txt,cls)=>{const c=$('rvCap');c.hidden=!txt;if(txt){c.textContent=txt;c.className='rv-cap'+(cls?' '+cls:'')}};
+  const ev=[];const at=(t,fn)=>ev.push({t,fn});
+  const slow=[[5,2],[1,4],[1,5],[1,6],[1,7],[1,3],[1,2]];
+  const fast=[[5,8],[4,8],[3,8],[2,8],[6,8],[5,4],[4,4],[6,4],[8,0],[8,1],[8,2],[8,3],[9,5],[9,6],[9,7]];
+  at(2450,()=>cap('Toca una casilla: ¡fuego!'));
+  let t=2700;
+  slow.forEach(([r,c])=>{at(t,()=>{cpuDelay=460;playerFire(r*N+c)});t+=950});
+  at(3150,()=>cap('Agua… prueba otra'));
+  at(3900,()=>cap('¡Tocado! Sigue la línea','hit'));
+  at(6720,()=>cap('Agua: ahora al otro lado'));
+  at(8600,()=>cap('¡Portaaviones hundido!','hit'));
+  t=9300;
+  at(9250,()=>cap('La CPU también dispara'));
+  fast.forEach(([r,c])=>{at(t,()=>{cpuDelay=200;playerFire(r*N+c)});t+=400});
+  at(11500,()=>cap('⏩ ¡A toda máquina!','sig'));
+  const tWin=t-400+AIM+620;
+  at(tWin,()=>{cap('Flota enemiga hundida','hit');$('rvWin').hidden=false;delete toasts.cpu;$('tE').style.opacity=0});
+  at(16300,()=>{$('rvEnd').hidden=false;$('rvWin').hidden=true;cap('')});
+  window.__reelDuration=19500;
+  window.__step=()=>{
+    clock+=1000/30;
+    ev.sort((a,b)=>a.t-b.t);
+    while(ev.length&&ev[0].t<=clock)ev.shift().fn();
+    frame();
+    const w=$('rvWin');if(!w.hidden){const k=Math.min(1,(clock-tWin)/320);w.style.opacity=k;w.firstChild.style.transform=`scale(${.6+.4*k}) rotate(${-4*k}deg)`}
+    const intro=$('rvIntro');intro.style.opacity=clock<2000?1:Math.max(0,1-(clock-2000)/400);intro.hidden=clock>2400;
+    return clock;
+  };
+  window.__state=()=>S;
+  window.__ready=true;
+}
+
+// ---------- arranque ----------
+readColors();
+if(REEL){setupReel();return}
+(function loop(){frame();requestAnimationFrame(loop)})();
+const saved=load();
+if(saved){S=saved;if(S.sel==null)S.sel=-1;ui();
+  if(S.phase==='battle'&&S.turn==='cpu')later(700,cpuTurn);
+  if(S.phase==='over')endVeil(false)}
+else newGame();
+window.__state=()=>S;
+})();
+</script>
+</body>
+</html>

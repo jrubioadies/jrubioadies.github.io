@@ -55,7 +55,7 @@ footer a{color:var(--ink);font-weight:700}
   <header>
     <span class="eyebrow">Adilco Tech Center · juegos para el móvil</span>
     <h1>Juegos <span>de bolsillo</span></h1>
-    <p class="lead">17 clásicos para jugar en el navegador del móvil, gratis y sin instalar nada. Cada uno guarda tu partida y tu récord.</p>
+    <p class="lead">Veinte clásicos para jugar en el navegador del móvil, gratis y sin instalar nada. Cada uno guarda tu partida y tu récord.</p>
   </header>
 
   <main class="grid" id="grid"></main>
@@ -77,6 +77,8 @@ const GAMES=[
   ['palabra','Palabra del día','Adivina la palabra de 5 letras en 6 intentos. Con modo Finanzas.'],
   ['cuatro-en-raya','Cuatro en raya','Junta cuatro antes que la CPU, con tres niveles, o reta a un amigo.'],
   ['damas','Damas','Damas españolas con dama voladora, contra la CPU o a dos.'],
+  ['hundir-la-flota','Hundir la flota','Coloca tu flota y húndele los barcos a la CPU.'],
+  ['parchis','Parchís','El parchís de toda la vida, contra la CPU o en familia.'],
   ['buscaminas','Buscaminas','Despeja el campo sin pisar ninguna mina.'],
   ['descifra-el-codigo','Descifra el código','Adivina la combinación secreta de colores en 10 intentos.'],
   ['nonogramas','Nonogramas','Pinta las casillas con las pistas y descubre el dibujo oculto.'],
@@ -85,6 +87,7 @@ const GAMES=[
   ['ahorcado','El ahorcado','Adivina la palabra letra a letra antes de que se complete el dibujo.'],
   ['serpiente','Serpiente','Come, crece y no te muerdas la cola.'],
   ['rompeladrillos','Rompeladrillos','Rompe todos los ladrillos con la bola, nivel a nivel.'],
+  ['memoria-de-colores','Memoria de colores','Repite la secuencia de colores, cada vez más larga.'],
   ['parejas','Parejas','Levanta las cartas y encuentra todas las parejas.'],
 ];
 document.getElementById('grid').innerHTML=GAMES.map(([f,n,d])=>`

@@ -1,0 +1,499 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#1F6F5B">
+<meta property="og:title" content="Memoria de colores">
+<meta property="og:description" content="Repite la secuencia de colores, cada vez más larga.">
+<meta property="og:image" content="https://jrubioadies.github.io/memoria-de-colores/portada.jpg">
+<title>Memoria de colores</title>
+<meta name="description" content="Memoria de colores para el móvil: mira cómo se iluminan los botones y repite la secuencia, que crece cada ronda. Tres modos y récord. Por Adilco Tech Center, SL.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Unbounded:wght@600;700;800&family=Lexend:wght@400;500;600;700&display=swap">
+<style>
+/* Una consola de juguete: carcasa grafito, cuatro teclas de luz y un disco central con la ronda */
+:root{
+  --bg:#e4e7ee; --card:#f5f6f9; --ink:#1a1d2b; --muted:#5a6072; --line:#cfd4df;
+  --console:#232637; --console-hi:#2e3248; --hub:#f5f6f9; --hub-ink:#1a1d2b; --hub-track:#dde1ea;
+  --red:#e5484d; --yellow:#ffbe2e; --green:#2fa36b; --blue:#3e63dd;
+  --dim:42%; --amber:#f0a31a; --danger:#e5484d;
+  --brand:#1F6F5B; --brand-ink:#ffffff;
+  --display:"Unbounded","Arial Black",system-ui,sans-serif;
+  --body:"Lexend",system-ui,-apple-system,"Segoe UI",sans-serif;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#11131b; --card:#1b1e2a; --ink:#e8eaf2; --muted:#959bb0; --line:#2a2e3e;
+  --console:#1f2232; --console-hi:#2a2e43; --hub:#2a2e42; --hub-ink:#eef0f7; --hub-track:#3a3f57;
+  --dim:34%; --brand:#2f8f76; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#11131b; --card:#1b1e2a; --ink:#e8eaf2; --muted:#959bb0; --line:#2a2e3e;
+  --console:#1f2232; --console-hi:#2a2e43; --hub:#2a2e42; --hub-ink:#eef0f7; --hub-track:#3a3f57;
+  --dim:34%; --brand:#2f8f76; color-scheme:dark}
+[hidden]{display:none!important}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);margin:0;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));
+  -webkit-tap-highlight-color:transparent}
+.app{max-width:500px;margin:0 auto;display:flex;flex-direction:column;gap:14px;padding-block:14px 24px}
+header{display:flex;align-items:center;justify-content:space-between;gap:10px}
+h1{font:800 30px/.95 var(--display);margin:0;letter-spacing:-.5px}
+h1 em{display:block;font-style:normal;font-size:17px;letter-spacing:.01em;margin-top:6px}
+h1 em i{font-style:normal}
+i.c0,i.c1,i.c2,i.c3{font-style:normal}
+.c0{color:var(--red)} .c1{color:var(--yellow)} .c2{color:var(--green)} .c3{color:var(--blue)}
+.scores{display:flex;gap:8px}
+.sc{background:var(--card);border-radius:14px;padding:7px 12px;min-width:70px;text-align:center;box-shadow:0 1px 0 var(--line)}
+.sc small{display:block;font-size:10.5px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.1em}
+.sc b{display:block;font:700 20px/1.2 var(--display);font-variant-numeric:tabular-nums}
+.seg{display:flex;background:var(--card);border-radius:14px;padding:4px;gap:4px;box-shadow:0 1px 0 var(--line)}
+.seg button{flex:1;border:0;background:transparent;color:var(--muted);font:600 14px var(--body);padding:9px 6px;border-radius:10px;cursor:pointer}
+.seg button[aria-pressed="true"]{background:var(--ink);color:var(--bg)}
+.bar{display:flex;gap:8px;align-items:center}
+.bar p{margin:0;flex:1;font-size:14px;color:var(--muted);line-height:1.3;min-width:0}
+.bar p b{color:var(--ink)}
+.btn{border:0;border-radius:12px;padding:10px 14px;font:600 14px var(--body);cursor:pointer;background:var(--card);color:var(--ink);box-shadow:0 1px 0 var(--line);display:inline-flex;gap:6px;align-items:center;white-space:nowrap}
+.btn.main{background:var(--ink);color:var(--bg)}
+.btn.icon{padding:9px 10px}
+.btn svg{width:20px;height:20px;display:block}
+button:focus-visible{outline:3px solid var(--blue);outline-offset:2px}
+
+.wrap{position:relative}
+.board{container-type:inline-size;position:relative;isolation:isolate;aspect-ratio:1;width:100%;background:var(--console);
+  border-radius:12%;padding:4%;display:grid;grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr;gap:3.2%;
+  box-shadow:inset 0 2px 0 var(--console-hi),0 14px 30px rgba(20,24,40,.22);user-select:none;-webkit-user-select:none}
+.pad{--c:var(--red);position:relative;border:0;padding:0;margin:0;cursor:pointer;touch-action:manipulation;border-radius:5cqw;
+  background:color-mix(in srgb,var(--c) var(--dim),var(--console));color:var(--sym,#fff);z-index:1}
+.pad.p0{--c:var(--red);border-top-left-radius:34cqw}
+.pad.p1{--c:var(--yellow);--sym:#3a2600;border-top-right-radius:34cqw}
+.pad.p2{--c:var(--green);border-bottom-left-radius:34cqw}
+.pad.p3{--c:var(--blue);border-bottom-right-radius:34cqw}
+.pad svg{position:absolute;width:30%;height:30%;opacity:.55;pointer-events:none}
+.p0 svg{left:24%;top:24%} .p1 svg{right:24%;top:24%} .p2 svg{left:24%;bottom:24%} .p3 svg{right:24%;bottom:24%}
+.pad.on{background:var(--c);box-shadow:0 0 0 .6cqw rgba(255,255,255,.55) inset,0 0 7cqw 1cqw color-mix(in srgb,var(--c) 75%,transparent);z-index:2}
+.pad.on svg{opacity:1}
+.pad.wrong{background:color-mix(in srgb,var(--c) 22%,var(--console))}
+.pad .x{position:absolute;inset:0;display:none;place-items:center;font:800 26cqw/1 var(--display);color:#fff;pointer-events:none}
+.pad.wrong .x{display:grid}
+.pad.wrong svg{opacity:.2}
+.hub{position:absolute;left:50%;top:50%;width:35%;aspect-ratio:1;transform:translate(-50%,-50%);border-radius:50%;z-index:3;
+  background:var(--hub);color:var(--hub-ink);border:2.6cqw solid var(--console);display:grid;place-items:center;text-align:center;cursor:pointer;padding:0;font:inherit}
+.hub svg{position:absolute;inset:4%;width:92%;height:92%;transform:rotate(-90deg)}
+.hub circle{fill:none;stroke-width:5}
+.hub .trk{stroke:var(--hub-track)} .hub .ring{stroke:var(--amber);stroke-linecap:round}
+.hub .ring.low{stroke:var(--danger)}
+.hub span{position:relative;display:block}
+.hub small{display:block;font:600 2.6cqw var(--body);letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+.hub b{display:block;font:800 11cqw/1 var(--display);font-variant-numeric:tabular-nums;margin-top:.6cqw}
+.hub.idle b{font-size:4.4cqw;letter-spacing:.02em;margin-top:1cqw}
+.hub.bad{background:var(--danger);color:#fff} .hub.bad small{color:rgba(255,255,255,.85)}
+
+.veil{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:12px;text-align:center;z-index:5;
+  background:color-mix(in srgb,var(--bg) 80%,transparent);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);border-radius:12%;padding:24px}
+.veil h2{font:800 34px/1.05 var(--display);margin:0}
+.veil p{margin:0;color:var(--muted);line-height:1.4}
+.veil .row{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
+.veil .best{color:var(--amber);font-weight:700}
+
+.rules{font-size:13px;color:var(--muted);line-height:1.55;margin:0}
+.rules b{color:var(--ink)}
+.promo{display:flex;align-items:center;gap:12px;background:var(--brand);color:var(--brand-ink);border-radius:14px;padding:12px 14px;text-decoration:none}
+.promo .logo{flex:none;width:40px;height:40px;border-radius:10px;background:rgba(255,255,255,.16);display:grid;place-items:center;font:800 20px var(--display)}
+.promo span{min-width:0}
+.promo b{display:block;font-size:15px}
+.promo small{display:block;font-size:12.5px;opacity:.85;margin-top:1px}
+.promo .arrow{margin-left:auto;font-weight:700;font-size:13px;white-space:nowrap}
+.links{font-size:12.5px;color:var(--muted);margin:0;text-align:center;line-height:1.7}
+.links a{color:var(--ink);font-weight:700}
+@media (max-width:460px){.promo .arrow{display:none}}
+@media (max-width:370px){h1{font-size:25px}.sc{min-width:58px;padding:6px 8px}.seg button{font-size:13px}}
+
+/* ---------- Modo reel (1080×1920, solo para grabar el vídeo) ---------- */
+#reel{display:none}
+body.reel{padding:0;overflow:hidden}
+body.reel .app{display:none}
+body.reel #reel{display:block;position:fixed;left:0;top:0;width:1080px;height:1920px;overflow:hidden;
+  background:radial-gradient(75% 45% at 50% 52%,#f4f6fa 0%,var(--bg) 78%)}
+.rv-head{position:absolute;left:80px;right:80px;top:120px}
+.rv-title{font:800 112px/.9 var(--display);letter-spacing:-3px;color:var(--ink)}
+.rv-title em{display:block;font-style:normal;font-size:70px;letter-spacing:-1px;margin-top:14px}
+.rv-stats{position:absolute;left:80px;right:80px;top:400px;display:flex;gap:18px}
+.rv-stats div{background:#fff;border-radius:999px;padding:14px 30px;font:500 32px var(--body);color:var(--muted);box-shadow:0 4px 14px rgba(20,24,40,.08);white-space:nowrap}
+.rv-stats b{color:var(--ink);font:700 34px var(--display);font-variant-numeric:tabular-nums;margin-left:8px}
+.rv-stats .gold{background:var(--amber)} .rv-stats .gold,.rv-stats .gold b{color:#2b1a00}
+.rv-board{position:absolute;left:90px;top:520px;width:900px}
+body.reel .board{box-shadow:inset 0 4px 0 var(--console-hi),0 40px 80px rgba(20,24,40,.28)}
+.rv-cap{position:absolute;left:50%;top:1500px;transform:translateX(-50%);white-space:nowrap;background:var(--ink);color:#fff;
+  font:600 50px var(--body);padding:22px 44px;border-radius:999px;box-shadow:0 12px 30px rgba(20,24,40,.3)}
+.rv-cap.blue{background:var(--blue)} .rv-cap.red{background:var(--danger)} .rv-cap.gold{background:var(--amber);color:#2b1a00}
+.rv-brand{position:absolute;left:0;right:0;bottom:100px;display:flex;justify-content:center}
+.rv-brand div{display:flex;align-items:center;gap:20px;font:600 38px var(--body);color:var(--ink)}
+.rv-lg{width:68px;height:68px;border-radius:16px;background:var(--brand);color:#fff;display:grid;place-items:center;font:800 38px var(--display)}
+.rv-stamp{position:absolute;left:0;right:0;top:1010px;display:flex;flex-direction:column;align-items:center;gap:10px;z-index:10}
+.rv-stamp div{background:var(--amber);color:#2b1a00;border-radius:40px;padding:40px 70px 46px;text-align:center;box-shadow:0 30px 80px rgba(240,163,26,.55),0 0 0 12px #fff}
+.rv-stamp small{display:block;font:700 46px var(--body);letter-spacing:.12em;text-transform:uppercase}
+.rv-stamp b{display:block;font:800 210px/1 var(--display);letter-spacing:-6px}
+.rv-stamp i{display:block;font:600 44px var(--body);font-style:normal}
+.rv-intro{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:26px;text-align:center;z-index:20;
+  background:color-mix(in srgb,var(--bg) 90%,transparent);backdrop-filter:blur(10px)}
+.rv-intro .dots{display:grid;grid-template-columns:130px 130px;gap:16px;margin-bottom:30px}
+.rv-intro .dots i{width:130px;height:130px;border-radius:26px;display:block}
+.rv-intro .dots i:nth-child(1){background:var(--red);border-top-left-radius:80px}
+.rv-intro .dots i:nth-child(2){background:var(--yellow);border-top-right-radius:80px}
+.rv-intro .dots i:nth-child(3){background:var(--green);border-bottom-left-radius:80px}
+.rv-intro .dots i:nth-child(4){background:var(--blue);border-bottom-right-radius:80px}
+.rv-intro .big{font:800 140px/.9 var(--display);letter-spacing:-4px;color:var(--ink)}
+.rv-intro .big em{display:block;font-style:normal;font-size:96px;margin-top:10px}
+.rv-intro .q{font:600 58px var(--body);color:#fff;background:var(--ink);padding:18px 40px;border-radius:20px;margin-top:40px}
+.rv-end{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:40px;text-align:center;z-index:30;
+  background:radial-gradient(circle at 50% 35%,#2e3350,#12141f 72%);color:#fff}
+.rv-end h2{font:800 104px/1.02 var(--display);margin:0;letter-spacing:-3px}
+.rv-end h2 span{color:var(--yellow)}
+.rv-end .play{font:600 50px var(--body);opacity:.9}
+.rv-end .url{font:700 40px var(--body);background:#fff;color:#1a1d2b;padding:24px 34px;border-radius:22px}
+.rv-end .co{display:flex;align-items:center;gap:26px;margin-top:70px}
+.rv-end .co .rv-lg{width:110px;height:110px;border-radius:24px;font-size:60px}
+.rv-end .co b{display:block;font:700 52px var(--body);text-align:left}
+.rv-end .co small{display:block;font:500 38px var(--body);opacity:.8;text-align:left}
+.rv-end .more{font:600 32px var(--body);opacity:.7;margin-top:10px}
+</style>
+<style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}</style>
+</head>
+<body>
+<div class="app">
+  <header>
+    <h1>Memoria<em><i class="c0">de</i> <i class="c1">co</i><i class="c2">lo</i><i class="c3">res</i></em></h1>
+    <div class="scores">
+      <div class="sc"><small>Ronda</small><b id="round">–</b></div>
+      <div class="sc"><small>Récord</small><b id="best">0</b></div>
+    </div>
+  </header>
+  <div class="seg" role="group" aria-label="Modo de juego">
+    <button data-mode="clasico" aria-pressed="true">Clásico</button>
+    <button data-mode="rapido" aria-pressed="false">Rápido</button>
+    <button data-mode="reves" aria-pressed="false">Al revés</button>
+  </div>
+  <div class="bar">
+    <p id="status" aria-live="polite">Elige modo y pulsa <b>Empezar</b>.</p>
+    <button class="btn icon" id="mute" aria-label="Silenciar" title="Sonido"></button>
+    <button class="btn main" id="start">Empezar</button>
+  </div>
+
+  <div class="wrap">
+    <div class="board" id="board">
+      <button class="pad p0" data-p="0" aria-label="Rojo, círculo"><svg viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="20" r="16" fill="currentColor"/></svg><span class="x">×</span></button>
+      <button class="pad p1" data-p="1" aria-label="Amarillo, triángulo"><svg viewBox="0 0 40 40" aria-hidden="true"><path d="M20 3 L38 35 H2 Z" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg><span class="x">×</span></button>
+      <button class="pad p2" data-p="2" aria-label="Verde, cuadrado"><svg viewBox="0 0 40 40" aria-hidden="true"><rect x="5" y="5" width="30" height="30" rx="3" fill="currentColor"/></svg><span class="x">×</span></button>
+      <button class="pad p3" data-p="3" aria-label="Azul, cruz"><svg viewBox="0 0 40 40" aria-hidden="true"><path d="M14 3h12v11h11v12H26v11H14V26H3V14h11z" fill="currentColor"/></svg><span class="x">×</span></button>
+      <button class="hub idle" id="hub" aria-label="Empezar">
+        <svg viewBox="0 0 100 100" aria-hidden="true"><circle class="trk" cx="50" cy="50" r="46"/><circle class="ring" id="ring" cx="50" cy="50" r="46" stroke-dasharray="289.03" stroke-dashoffset="289.03"/></svg>
+        <span><small id="hubL">Toca para</small><b id="hubN">Empezar</b></span>
+      </button>
+    </div>
+    <div class="veil" id="veil" hidden>
+      <h2 id="veilT"></h2>
+      <p id="veilS"></p>
+      <div class="row" id="veilR"></div>
+    </div>
+  </div>
+
+  <p class="rules">Los botones se iluminan en una secuencia; repítela tocándolos en el mismo orden. Cada ronda la secuencia crece un paso. Tienes un tiempo límite para cada toque (el anillo del centro). En <b>Rápido</b> la secuencia se acelera ronda a ronda y en <b>Al revés</b> hay que repetirla del último al primero. Cada botón tiene su sonido y su símbolo (círculo, triángulo, cuadrado y cruz), así que también se juega sin distinguir colores. En ordenador usa las teclas 1 2 3 4 o Q W A S. Hay récord por modo y la partida se guarda sola.</p>
+
+  <a class="promo" href="https://adilcotech.com" target="_blank" rel="noopener">
+    <span class="logo" aria-hidden="true">A</span>
+    <span><b>Adilco Tech Center, SL</b><small>Consultoría ERP y soluciones tecnológicas a medida</small></span>
+    <span class="arrow">adilcotech.com →</span>
+  </a>
+  <p class="links">Más juegos: <a href="https://jrubioadies.github.io/othello/" target="_blank" rel="noopener">Othello</a> · <a href="https://jrubioadies.github.io/torre-tambaleante/" target="_blank" rel="noopener">Torre Tambaleante</a> · <a href="https://jrubioadies.github.io/sudoku/" target="_blank" rel="noopener">Sudoku</a> · <a href="https://jrubioadies.github.io/solitario/" target="_blank" rel="noopener">Solitario</a> · <a href="https://jrubioadies.github.io/2048/" target="_blank" rel="noopener">2048</a> · <a href="https://jrubioadies.github.io/palabra/" target="_blank" rel="noopener">Palabra del día</a> · <a href="https://jrubioadies.github.io/cuatro-en-raya/" target="_blank" rel="noopener">Cuatro en raya</a> · <a href="https://jrubioadies.github.io/damas/" target="_blank" rel="noopener">Damas</a> · <a href="https://jrubioadies.github.io/hundir-la-flota/" target="_blank" rel="noopener">Hundir la flota</a> · <a href="https://jrubioadies.github.io/parchis/" target="_blank" rel="noopener">Parchís</a> · <a href="https://jrubioadies.github.io/buscaminas/" target="_blank" rel="noopener">Buscaminas</a> · <a href="https://jrubioadies.github.io/descifra-el-codigo/" target="_blank" rel="noopener">Descifra el código</a> · <a href="https://jrubioadies.github.io/nonogramas/" target="_blank" rel="noopener">Nonogramas</a> · <a href="https://jrubioadies.github.io/puzle-15/" target="_blank" rel="noopener">Puzle 15</a> · <a href="https://jrubioadies.github.io/sopa-de-letras/" target="_blank" rel="noopener">Sopa de letras</a> · <a href="https://jrubioadies.github.io/ahorcado/" target="_blank" rel="noopener">El ahorcado</a> · <a href="https://jrubioadies.github.io/serpiente/" target="_blank" rel="noopener">Serpiente</a> · <a href="https://jrubioadies.github.io/rompeladrillos/" target="_blank" rel="noopener">Rompeladrillos</a> · <a href="https://jrubioadies.github.io/parejas/" target="_blank" rel="noopener">Parejas</a><br>
+  Hecho por Javier Rubio · <a href="https://jrubioadies.github.io" target="_blank" rel="noopener">jrubioadies.github.io</a> · <a href="https://github.com/jrubioadies/jrubioadies.github.io/tree/main/memoria-de-colores" target="_blank" rel="noopener">código en GitHub</a></p>
+</div>
+
+<div id="reel" aria-hidden="true">
+  <div class="rv-head"><div class="rv-title">Memoria<em><i class="c0">de</i> <i class="c1">co</i><i class="c2">lo</i><i class="c3">res</i></em></div></div>
+  <div class="rv-stats"><div>Modo <b>Rápido</b></div><div>Ronda <b id="rvRound">1</b></div><div id="rvBestBox">Récord <b id="rvBest">8</b></div></div>
+  <div class="rv-board" id="rvBoard"></div>
+  <div class="rv-cap" id="rvCap" hidden></div>
+  <div class="rv-stamp" id="rvStamp" hidden><div><small>Nuevo récord</small><b id="rvStampN">10</b><i>rondas</i></div></div>
+  <div class="rv-brand"><div><span class="rv-lg">A</span>Adilco Tech Center, SL</div></div>
+  <div class="rv-intro" id="rvIntro"><div class="dots"><i></i><i></i><i></i><i></i></div>
+    <div class="big">Memoria<em><i class="c0">de</i> <i class="c1">co</i><i class="c2">lo</i><i class="c3">res</i></em></div>
+    <div class="q">¿Hasta qué ronda llegas?</div></div>
+  <div class="rv-end" id="rvEnd" hidden>
+    <h2>¿Pasas tú de<br>la <span>ronda 10</span>?</h2>
+    <div class="play">Juega gratis en el navegador</div>
+    <div class="url">jrubioadies.github.io/memoria-de-colores</div>
+    <div class="co"><span class="rv-lg">A</span><span><b>Adilco Tech Center, SL</b><small>adilcotech.com</small></span></div>
+    <div class="more">Más juegos: 2048 · Sudoku · Othello y más</div>
+  </div>
+</div>
+
+<script>
+(()=>{
+const REEL=new URLSearchParams(location.search).has('reel');
+if(REEL)document.body.classList.add('reel');
+const $=id=>document.getElementById(id);
+const KEY='memoria-colores-v1';
+let clock=0; const now=()=>REEL?clock:performance.now();
+const reduce=!REEL&&matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+function mulberry32(a){return function(){a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
+const rand=REEL?mulberry32(20261029):Math.random;
+
+const PADS=[
+  {name:'el círculo rojo',f:261.63},{name:'el triángulo amarillo',f:329.63},
+  {name:'el cuadrado verde',f:392.00},{name:'la cruz azul',f:523.25}];
+const MODES={clasico:'Clásico',rapido:'Rápido',reves:'Al revés'};
+const LIMIT={clasico:3000,rapido:2000,reves:4000};
+
+// tiempos por ronda: paso (ms entre encendidos), encendido y pausa antes de mostrar
+function timing(r){
+  if(REEL){
+    const steps=[0,520,430,170,150,130,115,100,100,100,100,100,100];
+    const step=steps[Math.min(r,12)];
+    return {step,on:r<=2?step*.7:55,pause:r<=2?320:100};
+  }
+  if(S.mode==='rapido'){const step=Math.max(230,600*Math.pow(.9,r-1));return {step,on:step*.66,pause:550}}
+  return {step:640,on:440,pause:750};
+}
+
+// ---------- guardado ----------
+let store={mode:'clasico',best:{clasico:0,rapido:0,reves:0},muted:false,seq:null,smode:null};
+function load(){try{const s=JSON.parse(localStorage.getItem(KEY));if(s&&s.best){store=Object.assign(store,s);store.best=Object.assign({clasico:0,rapido:0,reves:0},s.best)}}catch(e){}}
+function save(){if(REEL)return;try{localStorage.setItem(KEY,JSON.stringify(store))}catch(e){}}
+
+// ---------- audio (sólo tras el primer toque) ----------
+let AC=null, master=null;
+function initAudio(){
+  if(REEL)return;
+  try{
+    if(!AC){const C=window.AudioContext||window.webkitAudioContext;if(!C)return;AC=new C();master=AC.createGain();master.gain.value=store.muted?0:.5;master.connect(AC.destination)}
+    if(AC.state==='suspended')AC.resume();
+  }catch(e){AC=null}
+}
+function tone(f,dur,type='triangle',vol=.6){
+  if(!AC||store.muted)return;
+  try{
+    const t=AC.currentTime,o=AC.createOscillator(),g=AC.createGain();
+    o.type=type;o.frequency.value=f;
+    g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(vol,t+.015);
+    g.gain.setValueAtTime(vol,t+Math.max(.03,dur/1000-.06));g.gain.linearRampToValueAtTime(0,t+dur/1000);
+    o.connect(g);g.connect(master);o.start(t);o.stop(t+dur/1000+.02);
+  }catch(e){}
+}
+const ICON_ON='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9v6h4l5 4V5L8 9z" fill="currentColor"/><path d="M16.5 8.5a5 5 0 0 1 0 7M19 6a8.5 8.5 0 0 1 0 12"/></svg>';
+const ICON_OFF='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9v6h4l5 4V5L8 9z" fill="currentColor"/><path d="M17 9l5 6M22 9l-5 6"/></svg>';
+function muteUI(){const b=$('mute');b.innerHTML=store.muted?ICON_OFF:ICON_ON;b.setAttribute('aria-label',store.muted?'Activar sonido':'Silenciar');b.setAttribute('aria-pressed',store.muted)}
+
+// ---------- estado ----------
+// phase: idle | show | input | fail | paused
+let S=null;
+const pads=[...document.querySelectorAll('.pad')];
+function newState(mode){return {mode,seq:[],phase:'idle',t0:0,idx:0,deadline:0,limit:LIMIT[mode],lastTone:-1,press:null,fail:null,veiled:false,done:0}}
+function rnd(){return Math.floor(rand()*4)}
+function expected(){const n=S.seq.length;return S.mode==='reves'?S.seq[n-1-S.idx]:S.seq[S.idx]}
+function beginShow(at){S.phase='show';S.t0=at;S.lastTone=-1;S.idx=0;
+  if(!REEL){store.seq=S.seq.slice();store.smode=S.mode;save()}}
+function startGame(){
+  initAudio();$('veil').hidden=true;
+  S=newState(S.mode);S.seq=[rnd()];beginShow(now()+500);ui();
+}
+function tap(p){
+  if(!S||S.phase!=='input')return;
+  const t=now();S.press={p,t};
+  if(p===expected()){
+    tone(PADS[p].f,240);
+    S.idx++;S.deadline=t+S.limit;
+    if(S.idx===S.seq.length){
+      S.done=S.seq.length;
+      if(S.done>store.best[S.mode]){store.best[S.mode]=S.done;S.newBest=true}
+      S.seq.push(rnd());beginShow(t+timing(S.seq.length).pause);
+    }
+  }else fail(p);
+  ui();
+}
+function fail(got){
+  const t=now();
+  S.phase='fail';S.fail={want:expected(),got,t};S.veiled=false;
+  tone(98,520,'sawtooth',.35);
+  store.seq=null;store.smode=null;save();ui();
+}
+function tick(){
+  if(!S)return;
+  const t=now();
+  if(S.phase==='show'){
+    const n=S.seq.length,{step,on}=timing(n),el=t-S.t0;
+    if(el>=0){const i=Math.floor(el/step);
+      if(i>=n){S.phase='input';S.idx=0;S.deadline=t+S.limit;ui()}
+      else if(i!==S.lastTone&&el-i*step<on){S.lastTone=i;tone(PADS[S.seq[i]].f,on)}}
+  }else if(S.phase==='input'){
+    if(t>S.deadline)fail(-1);
+  }else if(S.phase==='fail'&&!REEL&&!S.veiled&&t>S.fail.t+1800){
+    S.veiled=true;
+    const rec=S.newBest&&S.done>0;
+    veil(S.fail.got<0?'¡Tiempo!':'¡Fallo!',
+      `Superaste <b>${S.done}</b> ${S.done===1?'ronda':'rondas'} en modo ${MODES[S.mode]}${rec?' · <span class="best">nuevo récord</span>':''}.<br>Tocaba ${PADS[S.fail.want].name}.`,
+      [['Cambiar modo',()=>{$('veil').hidden=true;S=newState(S.mode);ui()}],['Otra vez',startGame,1]]);
+  }
+  draw(t);
+}
+function litPad(t){
+  if(S.phase==='show'){const n=S.seq.length,{step,on}=timing(n),el=t-S.t0;if(el<0)return -1;const i=Math.floor(el/step);if(i<n&&el-i*step<on)return S.seq[i];return -1}
+  return -1;
+}
+let lastStatus='';
+function draw(t){
+  const lit=litPad(t);
+  const pr=lit<0&&S.press&&t-S.press.t<200&&S.phase!=='fail'?S.press.p:-1;
+  let want=-1,wrong=-1,blink=false,fe=0;
+  if(S.phase==='fail'){fe=t-S.fail.t;want=S.fail.want;wrong=S.fail.got;blink=fe<1600?(fe%400)<230:true}
+  pads.forEach((el,p)=>{
+    const on=p===lit||p===pr||(p===want&&blink);
+    el.classList.toggle('on',on);el.classList.toggle('wrong',p===wrong);
+    let tr='';
+    if(p===pr&&!reduce)tr='scale(.97)';
+    if(p===wrong&&fe<450&&!reduce)tr=`translateX(${Math.sin(fe/22)*(1-fe/450)*2.2}cqw)`;
+    el.style.transform=tr;
+  });
+  // anillo de tiempo
+  const ring=$('ring');let frac=0;
+  if(S.phase==='input')frac=Math.max(0,(S.deadline-t)/S.limit);
+  ring.style.strokeDashoffset=(289.03*(1-frac)).toFixed(1);
+  ring.classList.toggle('low',frac>0&&frac<.3);
+  ring.style.opacity=frac>0?1:0;
+  $('hub').classList.toggle('bad',S.phase==='fail');
+  // estado
+  let st='';const n=S.seq.length;
+  if(S.phase==='idle')st='Elige modo y pulsa <b>Empezar</b>.';
+  else if(S.phase==='paused')st='Partida en pausa.';
+  else if(S.phase==='show')st=t<S.t0?(n>1?'<b>¡Bien!</b> Ronda '+n+'.':'Atento…'):'Mira la secuencia…';
+  else if(S.phase==='input')st=(S.mode==='reves'?'Al revés: <b>':'Tu turno: <b>')+(S.idx+1)+'</b> de '+n+'.';
+  else if(S.phase==='fail')st=(S.fail.got<0?'Se acabó el tiempo. ':'¡Fallo! ')+'Tocaba <b>'+PADS[S.fail.want].name+'</b>.';
+  if(st!==lastStatus){$('status').innerHTML=st;lastStatus=st}
+}
+function veil(t,s,btns){
+  $('veilT').textContent=t;$('veilS').innerHTML=s;const r=$('veilR');r.innerHTML='';
+  btns.forEach(([txt,fn,main])=>{const b=document.createElement('button');b.className='btn'+(main?' main':'');b.textContent=txt;b.onclick=fn;r.appendChild(b)});
+  $('veil').hidden=false;
+  const m=r.querySelector('.main');if(m&&!REEL)m.focus({preventScroll:true});
+}
+function ui(){
+  const playing=S.phase==='show'||S.phase==='input';
+  const n=S.seq.length;
+  $('round').textContent=n&&S.phase!=='idle'?n:'–';
+  $('best').textContent=store.best[S.mode];
+  $('start').textContent=playing?'Reiniciar':'Empezar';
+  document.querySelectorAll('.seg button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.mode===S.mode));
+  const hub=$('hub');const idle=S.phase==='idle'||S.phase==='paused';
+  hub.classList.toggle('idle',idle);
+  $('hubL').textContent=idle?'Toca para':S.phase==='fail'?'Fallo en':'Ronda';
+  $('hubN').textContent=idle?(S.phase==='paused'?'Seguir':'Empezar'):n;
+  hub.setAttribute('aria-label',idle?'Empezar':'Ronda '+n);
+  if(REEL){$('rvRound').textContent=n||1;$('rvBest').textContent=Math.max(8,store.best.rapido)}
+}
+
+// ---------- controles ----------
+pads.forEach(el=>{
+  el.addEventListener('pointerdown',e=>{e.preventDefault();initAudio();tap(+el.dataset.p)});
+  el.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();initAudio();tap(+el.dataset.p)}});
+});
+const KEYS={'1':0,'2':1,'3':2,'4':3,q:0,w:1,a:2,s:3,Q:0,W:1,A:2,S:3};
+document.addEventListener('keydown',e=>{
+  if(e.ctrlKey||e.metaKey||e.altKey)return;
+  if(e.key in KEYS&&$('veil').hidden){e.preventDefault();initAudio();tap(KEYS[e.key]);return}
+  if((e.key===' '||e.key==='Enter')&&(e.target===document.body)&&$('veil').hidden&&S&&(S.phase==='idle'||S.phase==='fail'||S.phase==='paused')){e.preventDefault();hubAction()}
+});
+function hubAction(){
+  if(!S)return;
+  if(S.phase==='idle'||S.phase==='fail')startGame();
+  else if(S.phase==='paused')resume();
+}
+$('hub').addEventListener('click',()=>{initAudio();hubAction()});
+$('start').onclick=()=>{
+  initAudio();
+  if(S.phase==='show'||S.phase==='input'){
+    const keep=S.phase;S.phase='paused';ui();
+    veil('¿Empezar de nuevo?','Perderás la partida en curso (ronda '+S.seq.length+').',[['Seguir',()=>{$('veil').hidden=true;resume()}],['Sí, nueva',startGame,1]]);
+  }else if(S.phase==='paused')resume();
+  else startGame();
+};
+document.querySelectorAll('.seg button').forEach(b=>b.onclick=()=>{
+  const m=b.dataset.mode;if(m===S.mode&&S.phase==='idle')return;
+  const apply=()=>{$('veil').hidden=true;store.mode=m;store.seq=null;store.smode=null;save();S=newState(m);ui()};
+  if(S.phase==='show'||S.phase==='input'){
+    S.phase='paused';ui();
+    veil('¿Cambiar a '+MODES[m]+'?','Perderás la partida en curso.',[['Seguir jugando',()=>{$('veil').hidden=true;resume()}],['Cambiar',apply,1]]);
+  }else apply();
+});
+$('mute').onclick=()=>{store.muted=!store.muted;save();muteUI();initAudio();if(master)master.gain.value=store.muted?0:.5};
+function resume(){initAudio();$('veil').hidden=true;S.press=null;beginShow(now()+700);ui()}
+
+// ---------- modo reel: partida guionizada y determinista ----------
+function setupReel(){
+  $('rvBoard').appendChild(document.querySelector('.wrap'));
+  store.best.rapido=8;
+  S=newState('rapido');S.limit=2000;
+  const cap=(txt,cls)=>{const c=$('rvCap');c.hidden=!txt;if(txt){c.textContent=txt;c.className='rv-cap'+(cls?' '+cls:'')}};
+  const FAIL_ROUND=11, FAIL_AT=5;
+  const gaps={1:330,2:270,10:66,11:99};
+  let botNext=0,lastRound=0,lastPhase='',failT=-1,endShown=false;
+  const ev=[];const at=(t,fn)=>ev.push({t,fn});
+  at(2350,()=>{S.seq=[rnd()];beginShow(2350);ui()});
+  at(2500,()=>cap('Mira qué botón se ilumina…'));
+  at(16300,()=>{$('rvEnd').hidden=false;$('rvStamp').hidden=true;cap('')});
+  const onRound=r=>{
+    if(r===2)cap('…y repite la secuencia','blue');
+    if(r===3)cap('Cada ronda, un paso más');
+    if(r===5)cap('⏩ Y cada vez más rápido…');
+    if(r===10)cap('¡Ronda 10! Nuevo récord','gold');
+    if(r===11)cap('Ronda 11, a toda velocidad…');
+  };
+  window.__reelDuration=19500;
+  window.__step=()=>{
+    clock+=1000/30;
+    ev.sort((a,b)=>a.t-b.t);
+    while(ev.length&&ev[0].t<=clock){ev.shift().fn()}
+    tick();
+    if(S.phase==='show'&&S.seq.length!==lastRound){lastRound=S.seq.length;onRound(lastRound);ui()}
+    if(S.phase==='input'){
+      const r=S.seq.length;
+      if(lastPhase!=='input'){botNext=clock+(r<=2?260:r>=10?90:0);if(r===1)cap('Ahora tú: repítelo','blue')}
+      if(gaps[r]===undefined){while(S.phase==='input'&&S.seq.length===r)tap(expected())}
+      else if(clock>=botNext){
+        const want=expected();
+        if(r===FAIL_ROUND&&S.idx===FAIL_AT){tap((want+1)%4);failT=clock}
+        else tap(want);
+        botNext=clock+gaps[r];
+      }
+      tick();
+    }
+    if(S.phase==='fail'&&failT>0){
+      const fe=clock-failT;
+      if(fe<40)cap('¡Fallo! Tocaba '+PADS[S.fail.want].name,'red');
+      if(fe>=700&&!endShown){endShown=true;$('rvStampN').textContent=store.best.rapido;$('rvStamp').hidden=false}
+      const st=$('rvStamp');if(!st.hidden){const k=Math.min(1,(fe-700)/260);st.style.opacity=k;st.style.transform=`scale(${1.35-.35*k}) rotate(${-4*k}deg)`}
+    }
+    lastPhase=S.phase;
+    $('rvBestBox').className=store.best.rapido>8?'gold':'';
+    ui();
+    const intro=$('rvIntro');intro.style.opacity=clock<2000?1:Math.max(0,1-(clock-2000)/400);intro.hidden=clock>2400;
+    return clock;
+  };
+  ui();draw(0);
+  window.__ready=true;
+}
+
+// ---------- arranque ----------
+load();
+muteUI();
+if(REEL){setupReel();return}
+S=newState(store.mode in MODES?store.mode:'clasico');
+if(store.seq&&store.seq.length&&store.smode in MODES){
+  S=newState(store.smode);S.seq=store.seq.slice();S.phase='paused';
+  veil('Partida guardada','Modo '+MODES[S.mode]+' · ronda '+S.seq.length+'. Se repetirá la secuencia de esta ronda.',[['Nueva',()=>{$('veil').hidden=true;startGame()}],['Continuar',resume,1]]);
+}
+ui();
+(function loop(){tick();requestAnimationFrame(loop)})();
+})();
+</script>
+</body>
+</html>
