@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Juegos de Bolsillo</title>
-<meta name="description" content="Siete juegos para el móvil, gratis en el navegador: Othello, Torre Tambaleante, Sudoku, Solitario, 2048, Palabra del día y Cuatro en raya. Por Adilco Tech Center, SL.">
+<meta name="description" content="9 juegos para el móvil, gratis en el navegador: Othello, Torre Tambaleante, Sudoku, Solitario, 2048, Palabra del día y Cuatro en raya. Por Adilco Tech Center, SL.">
 <meta name="theme-color" content="#1F6F5B">
 <meta property="og:title" content="Juegos de Bolsillo">
 <meta property="og:description" content="Siete juegos clásicos para el móvil, gratis y sin instalar nada.">
@@ -55,7 +55,7 @@ footer a{color:var(--ink);font-weight:700}
   <header>
     <span class="eyebrow">Adilco Tech Center · juegos para el móvil</span>
     <h1>Juegos <span>de bolsillo</span></h1>
-    <p class="lead">Siete clásicos para jugar en el navegador del móvil, gratis y sin instalar nada. Cada uno guarda tu partida y tu récord.</p>
+    <p class="lead">9 clásicos para jugar en el navegador del móvil, gratis y sin instalar nada. Cada uno guarda tu partida y tu récord.</p>
   </header>
 
   <main class="grid" id="grid"></main>
@@ -72,10 +72,12 @@ const GAMES=[
   ['othello','Othello','El clásico de fichas blancas y negras. Contra la CPU o a dos, en 14 idiomas.'],
   ['torre-tambaleante','Torre Tambaleante','Saca bloques de una torre en 3D y colócalos arriba sin que se caiga.'],
   ['sudoku','Sudoku','Sudokus nuevos en cada partida, con notas, pistas y cuatro niveles.'],
-  ['solitario','Solitario de canicas','Salta canicas hasta dejar una sola. Tablero clásico y triangular, con pista.'],
+  ['solitario','Solitario','Salta canicas hasta dejar una sola. Tablero clásico y triangular, con pista.'],
   ['2048','2048','Desliza, junta números iguales y llega al 2048.'],
   ['palabra','Palabra del día','Adivina la palabra de 5 letras en 6 intentos. Con modo Finanzas.'],
   ['cuatro-en-raya','Cuatro en raya','Junta cuatro antes que la CPU, con tres niveles, o reta a un amigo.'],
+  ['descifra-el-codigo','Descifra el código','Adivina la combinación secreta de colores en 10 intentos.'],
+  ['puzle-15','Puzle 15','Ordena las fichas deslizantes en el menor número de movimientos.'],
 ];
 document.getElementById('grid').innerHTML=GAMES.map(([f,n,d])=>`
   <article class="game">
