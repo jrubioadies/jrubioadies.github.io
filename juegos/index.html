@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Juegos de Bolsillo</title>
+<meta name="description" content="Siete juegos para el móvil, gratis en el navegador: Othello, Torre Tambaleante, Sudoku, Solitario, 2048, Palabra del día y Cuatro en raya. Por Adilco Tech Center, SL.">
+<meta name="theme-color" content="#1F6F5B">
+<meta property="og:title" content="Juegos de Bolsillo">
+<meta property="og:description" content="Siete juegos clásicos para el móvil, gratis y sin instalar nada.">
+<meta property="og:image" content="https://jrubioadies.github.io/juegos/img/2048.jpg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@600;700&family=DM+Sans:wght@400;500;700&display=swap">
+<style>
+/* Estantería de juegos: tarjetas con la captura real de cada uno, sobre un fondo neutro con el verde de Adilco */
+:root{
+  --bg:#eef1ef; --card:#ffffff; --ink:#18241f; --muted:#5d6a64; --line:#d5ddd9; --brand:#1F6F5B; --accent:#e2a72e;
+  --display:"Fredoka","Arial Rounded MT Bold",system-ui,sans-serif;
+  --body:"DM Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  color-scheme:light;
+}
+@media (prefers-color-scheme: dark){:root{--bg:#121816;--card:#1b2420;--ink:#e8efec;--muted:#9aa9a2;--line:#2a3631;--brand:#2f8f76;color-scheme:dark}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--body);
+  padding:max(20px,env(safe-area-inset-top,0px)) max(16px,env(safe-area-inset-right,0px)) max(28px,env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px))}
+.wrap{max-width:1040px;margin:0 auto;display:flex;flex-direction:column;gap:22px}
+header{display:flex;flex-direction:column;gap:8px}
+.eyebrow{font:700 12px var(--body);letter-spacing:.14em;text-transform:uppercase;color:var(--brand)}
+h1{font:700 clamp(38px,8vw,64px)/.95 var(--display);margin:0;text-wrap:balance}
+h1 span{color:var(--accent)}
+.lead{margin:0;color:var(--muted);font-size:17px;line-height:1.5;max-width:60ch}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:16px}
+.game{background:var(--card);border-radius:18px;overflow:hidden;display:flex;flex-direction:column;box-shadow:0 1px 0 var(--line),0 10px 24px rgba(20,40,30,.06)}
+.game a.shot{display:block;aspect-ratio:1;background:var(--line)}
+.game img{display:block;width:100%;height:100%;object-fit:cover}
+.game .body{padding:14px 16px 16px;display:flex;flex-direction:column;gap:6px;flex:1}
+.game h2{margin:0;font:700 22px/1.1 var(--display)}
+.game p{margin:0;color:var(--muted);font-size:14px;line-height:1.45;flex:1}
+.game .row{display:flex;gap:8px;margin-top:8px}
+.btn{flex:1;text-align:center;text-decoration:none;font:700 14px var(--body);padding:10px 12px;border-radius:12px;background:var(--brand);color:#fff}
+.btn.ghost{flex:0 0 auto;background:transparent;color:var(--ink);box-shadow:inset 0 0 0 1.5px var(--line)}
+.btn:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.promo{display:flex;align-items:center;gap:14px;background:var(--brand);color:#fff;border-radius:18px;padding:16px 18px;text-decoration:none}
+.promo .logo{flex:none;width:46px;height:46px;border-radius:12px;background:rgba(255,255,255,.16);display:grid;place-items:center;font:700 26px var(--display)}
+.promo b{display:block;font-size:17px}
+.promo small{display:block;opacity:.85;font-size:14px}
+.promo .arrow{margin-left:auto;font-weight:700;white-space:nowrap}
+footer{color:var(--muted);font-size:13px;text-align:center;line-height:1.7}
+footer a{color:var(--ink);font-weight:700}
+@media (max-width:520px){.promo .arrow{display:none}.grid{grid-template-columns:1fr 1fr;gap:10px}.game h2{font-size:18px}.game p{display:none}.game .row{flex-direction:column}.btn.ghost{display:none}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <span class="eyebrow">Adilco Tech Center · juegos para el móvil</span>
+    <h1>Juegos <span>de bolsillo</span></h1>
+    <p class="lead">Siete clásicos para jugar en el navegador del móvil, gratis y sin instalar nada. Cada uno guarda tu partida y tu récord.</p>
+  </header>
+
+  <main class="grid" id="grid"></main>
+
+  <a class="promo" href="https://adilcotech.com" target="_blank" rel="noopener">
+    <span class="logo" aria-hidden="true">A</span>
+    <span><b>Adilco Tech Center, SL</b><small>Consultoría ERP y soluciones tecnológicas a medida</small></span>
+    <span class="arrow">adilcotech.com →</span>
+  </a>
+  <footer>Hecho por Javier Rubio · <a href="https://jrubioadies.github.io">jrubioadies.github.io</a> · <a href="https://github.com/jrubioadies/jrubioadies.github.io">código en GitHub</a></footer>
+</div>
+<script>
+const GAMES=[
+  ['othello','Othello','El clásico de fichas blancas y negras. Contra la CPU o a dos, en 14 idiomas.'],
+  ['torre-tambaleante','Torre Tambaleante','Saca bloques de una torre en 3D y colócalos arriba sin que se caiga.'],
+  ['sudoku','Sudoku','Sudokus nuevos en cada partida, con notas, pistas y cuatro niveles.'],
+  ['solitario','Solitario de canicas','Salta canicas hasta dejar una sola. Tablero clásico y triangular, con pista.'],
+  ['2048','2048','Desliza, junta números iguales y llega al 2048.'],
+  ['palabra','Palabra del día','Adivina la palabra de 5 letras en 6 intentos. Con modo Finanzas.'],
+  ['cuatro-en-raya','Cuatro en raya','Junta cuatro antes que la CPU, con tres niveles, o reta a un amigo.'],
+];
+document.getElementById('grid').innerHTML=GAMES.map(([f,n,d])=>`
+  <article class="game">
+    <a class="shot" href="../${f}/" aria-label="Jugar a ${n}"><img src="img/${f}.jpg" alt="Captura de ${n}" loading="lazy" width="480" height="480"></a>
+    <div class="body"><h2>${n}</h2><p>${d}</p>
+      <div class="row"><a class="btn" href="../${f}/">Jugar</a><a class="btn ghost" href="https://github.com/jrubioadies/jrubioadies.github.io/tree/main/${f}" target="_blank" rel="noopener">Código</a></div></div>
+  </article>`).join('');
+</script>
+</body>
+</html>
