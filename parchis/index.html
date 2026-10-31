@@ -8,7 +8,7 @@
 <meta property="og:description" content="El parchís de toda la vida, contra la CPU o en familia.">
 <meta property="og:image" content="https://jrubioadies.github.io/parchis/portada.jpg">
 <title>Parchís de Bolsillo</title>
-<meta name="description" content="El parchís de siempre en el móvil: juega contra 3 CPU o con amigos en el mismo teléfono. Sal con un 5, cómete fichas y cuenta 20. Por Adilco Tech Center, SL.">
+<meta name="description" content="El parchís de siempre en el móvil: juega contra 3 CPU, con amigos en el mismo teléfono u online, cada uno desde su móvil. Sal con un 5, cómete fichas y cuenta 20. Por Adilco Tech Center, SL.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bungee&family=Sora:wght@400;600;700;800&display=swap">
 <style>
@@ -21,7 +21,7 @@
   --c2:#e03a3a; --c2d:#951c1c; --c2t:#f8cdcd;
   --c3:#1e9a57; --c3d:#0d5f33; --c3t:#c4ead4;
   --accent:#18213a; --gold:#f5b301;
-  --brand:#1F6F5B; --brand-ink:#ffffff;
+  --brand:#1F6F5B; --brand-ink:#ffffff; --ok:#0f7a42; --bad:#c62828;
   --display:"Bungee","Arial Black",system-ui,sans-serif;
   --body:"Sora",system-ui,-apple-system,"Segoe UI",sans-serif;
 }
@@ -29,12 +29,12 @@
   --bg:#0d111b; --card:#171d2b; --ink:#e8ecf5; --muted:#98a1b8; --line:#263049;
   --board:#060a14; --sq:#232b3f; --grid:#060a14; --safe:#30394f; --mark:#7d88a3; --hole:#1a2132; --slot:#2a3348;
   --c0t:#5c4706; --c1t:#1d3463; --c2t:#5a1d22; --c3t:#124129;
-  --accent:#e8ecf5; --brand:#2f8f76; color-scheme:dark}}
+  --accent:#e8ecf5; --brand:#2f8f76; --ok:#5fd394; --bad:#ff7b7b; color-scheme:dark}}
 :root[data-theme="dark"]{
   --bg:#0d111b; --card:#171d2b; --ink:#e8ecf5; --muted:#98a1b8; --line:#263049;
   --board:#060a14; --sq:#232b3f; --grid:#060a14; --safe:#30394f; --mark:#7d88a3; --hole:#1a2132; --slot:#2a3348;
   --c0t:#5c4706; --c1t:#1d3463; --c2t:#5a1d22; --c3t:#124129;
-  --accent:#e8ecf5; --brand:#2f8f76; color-scheme:dark}
+  --accent:#e8ecf5; --brand:#2f8f76; --ok:#5fd394; --bad:#ff7b7b; color-scheme:dark}
 [hidden]{display:none!important}
 *{box-sizing:border-box}
 body{background:var(--bg);color:var(--ink);font-family:var(--body);margin:0;
@@ -114,6 +114,73 @@ button:focus-visible{outline:3px solid var(--c1);outline-offset:2px}
 @media (max-width:460px){.promo .arrow{display:none}}
 @media (max-width:370px){h1{font-size:30px}.chip small{font-size:10px}}
 
+/* ---------- partida online ---------- */
+.seg.tabs{background:var(--card);box-shadow:0 1px 0 var(--line);padding:3px;border-radius:11px}
+.seg.tabs button{padding:6px 14px;font-size:12.5px}
+.sbox{display:flex;flex-direction:column;align-items:center;gap:8px;width:100%}
+.sbox .lead{max-width:320px;color:var(--ink);font-size:13.5px;line-height:1.45}
+.chip.lost small{color:var(--bad);font-weight:700}
+.net{display:flex;align-items:center;gap:10px;background:var(--card);border-radius:14px;padding:5px 5px 5px 12px;box-shadow:0 1px 0 var(--line);font-size:12.5px;min-width:0}
+.nd{width:9px;height:9px;border-radius:50%;background:var(--ok);flex:none;box-shadow:0 0 0 3px color-mix(in srgb,var(--ok) 22%,transparent)}
+.nd.wait{background:var(--c0);box-shadow:0 0 0 3px color-mix(in srgb,var(--c0) 25%,transparent)}
+.nd.bad{background:var(--bad);box-shadow:0 0 0 3px color-mix(in srgb,var(--bad) 22%,transparent)}
+.net span{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.net .btn{padding:7px 13px;font-size:12.5px;background:var(--bg);box-shadow:none}
+.nwarn{background:color-mix(in srgb,var(--bad) 10%,var(--card));border:2px solid var(--bad);border-radius:14px;padding:10px 12px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;font-size:13px}
+.nwarn span{flex:1 1 170px;min-width:0;line-height:1.35}
+.nwarn .row{display:flex;gap:6px}
+.nwarn .btn{padding:8px 11px;font-size:12.5px}
+#nveil{z-index:2}
+body.noscroll{overflow:hidden}
+.room{position:fixed;inset:0;z-index:40;background:var(--bg);overflow-y:auto;overscroll-behavior:contain;
+  padding:14px max(16px,env(safe-area-inset-right,0px)) 28px max(16px,env(safe-area-inset-left,0px))}
+.room-in{max-width:500px;margin:0 auto;display:flex;flex-direction:column;gap:12px}
+.rtop{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.rtitle{font:400 30px/.9 var(--display);margin:0;letter-spacing:-.5px}
+.rtitle i{font-style:normal;color:var(--c2)}
+.rtitle em{display:block;font:700 13px var(--body);font-style:normal;color:var(--muted);letter-spacing:.04em;margin-top:5px}
+.pill{font:700 11px var(--body);text-transform:uppercase;letter-spacing:.12em;padding:6px 10px 6px 9px;border-radius:999px;background:var(--ink);color:var(--bg);display:inline-flex;align-items:center;gap:7px;white-space:nowrap}
+.pill i{width:8px;height:8px;border-radius:50%;background:var(--c3)}
+.card{background:var(--card);border-radius:16px;padding:14px;box-shadow:0 1px 0 var(--line);display:flex;flex-direction:column;gap:10px;min-width:0}
+.lab{font-size:10.5px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;margin:0}
+.room h2{font:400 22px/1.05 var(--display);margin:0}
+.room p{margin:0}
+.lead{font-size:14px;line-height:1.45}
+.code{display:flex;gap:7px}
+.code b{flex:1;max-width:58px;height:62px;display:grid;place-items:center;font:400 32px var(--display);background:var(--bg);border-radius:12px;box-shadow:inset 0 -5px 0 var(--k)}
+.link{font-size:12.5px;color:var(--muted);background:var(--bg);border-radius:10px;padding:9px 11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;-webkit-user-select:all;user-select:all}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.two.one{grid-template-columns:1fr}
+.acts{display:grid;grid-template-columns:1fr 1.6fr;gap:8px}
+.btn.big{padding:13px 14px;font-size:15px;border-radius:14px}
+.room .btn{white-space:normal;text-align:center}
+.seats{display:flex;flex-direction:column;gap:6px}
+.st{display:flex;align-items:center;gap:10px;background:var(--card);border-radius:13px;padding:8px 8px 8px 10px;box-shadow:0 1px 0 var(--line);min-height:50px}
+.st.dim{opacity:.5}
+.st .dot{width:20px;height:20px;border-radius:50%;border:2px solid rgba(0,0,0,.25);flex:none}
+.st .nm{flex:1;min-width:0}
+.st .nm b{display:block;font-size:14px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.st .nm small{display:block;font-size:11.5px;color:var(--muted);margin-top:1px}
+.st .btn{padding:7px 10px;font-size:12px;background:var(--bg);box-shadow:none}
+.st .seg{flex:none}
+.st .seg button{padding:6px 7px;font-size:11.5px}
+.tag{font:700 11px var(--body);padding:5px 9px;border-radius:999px;background:var(--bg);color:var(--muted);white-space:nowrap;display:inline-flex;align-items:center;gap:6px;flex:none}
+.tag.ok,.tag.bad{background:color-mix(in srgb,currentColor 12%,transparent)}
+.tag.ok{color:var(--ok)} .tag.bad{color:var(--bad)}
+.tag.ok::before,.tag.bad::before{content:"";width:7px;height:7px;border-radius:50%;background:currentColor}
+.tag.me{background:var(--ink);color:var(--bg)}
+.hint{font-size:12.5px;color:var(--muted);line-height:1.45;border-left:3px solid var(--c0);padding:2px 0 2px 10px}
+.field{display:flex;flex-direction:column;gap:6px}
+.inp{font:600 16px var(--body);padding:12px 13px;border-radius:12px;border:2px solid var(--line);background:var(--card);color:var(--ink);width:100%;min-width:0}
+.inp:focus{outline:none;border-color:var(--c1)}
+.status{font-size:13.5px;font-weight:700;display:flex;align-items:center;gap:9px;line-height:1.35}
+.status .nd{margin-left:2px}
+.status.bad{color:var(--bad)}
+.room .chk{max-width:none}
+.cdot{display:inline-block;width:11px;height:11px;border-radius:50%;vertical-align:0;border:2px solid rgba(0,0,0,.25)}
+.toast{position:fixed;left:50%;bottom:28px;transform:translateX(-50%);background:var(--ink);color:var(--bg);font:700 13.5px var(--body);padding:10px 16px;border-radius:999px;z-index:50;box-shadow:0 8px 24px rgba(0,0,0,.25);white-space:nowrap}
+@media (max-width:370px){.st .seg button{padding:6px 5px;font-size:11px}.code b{font-size:27px;height:54px}}
+
 /* ---------- Modo reel (1080×1920, solo para grabar el vídeo) ---------- */
 #reel{display:none}
 body.reel{padding:0;overflow:hidden}
@@ -183,27 +250,42 @@ body.reel .msg b{font-size:36px} body.reel .msg span{font-size:30px}
     <svg id="svg" viewBox="0 0 1000 1000" role="img" aria-label="Tablero de parchís. Toca una ficha resaltada para moverla."></svg>
     <div class="veil" id="setup" hidden>
       <h2>Nueva partida</h2>
+      <div class="seg tabs" id="stabs" role="tablist"><button class="on" data-tab="local" role="tab">En este móvil</button><button data-tab="online" role="tab">Online</button></div>
+      <div class="sbox" id="slocal">
       <div class="pl" id="plist"></div>
       <label class="chk"><input type="checkbox" id="opt7"> <span>Variante: si no te quedan fichas en casa, el 6 cuenta 7</span></label>
       <p class="err" id="serr"></p>
       <div class="row"><button class="btn" id="scancel">Cancelar</button><button class="btn" id="solo">Tú contra 3 CPU</button><button class="btn main" id="sgo">Empezar</button></div>
+      </div>
+      <div class="sbox" id="sonline" hidden>
+      <p class="lead">Cada jugador usa su propio móvil y ve la partida en directo. Creas una sala, pasas el enlace y los demás entran con un toque.</p>
+      <p>La conexión es directa entre móviles, sin registros.</p>
+      <div class="row"><button class="btn" id="scancel2">Cancelar</button><button class="btn main" id="screate">Crear sala</button></div>
+      </div>
     </div>
     <div class="veil" id="veil" hidden>
       <h2 id="veilT"></h2>
       <p id="veilS"></p>
       <div class="row" id="veilR"></div>
     </div>
+    <div class="veil" id="nveil" hidden>
+      <h2 id="nveilT"></h2>
+      <p id="nveilS"></p>
+      <div class="row" id="nveilR"></div>
+    </div>
   </div>
 
   <div class="dock">
+    <div class="nwarn" id="nwarn" hidden><span id="nwarnT"></span><div class="row"><button class="btn" id="nwait">Esperar</button><button class="btn main" id="ncpu">Pasar a CPU</button></div></div>
     <div class="chips" id="chips"></div>
     <div class="turn">
       <button class="die" id="die" aria-label="Tirar el dado"><svg viewBox="0 0 100 100" id="dieSvg"></svg></button>
       <div class="msg" aria-live="polite"><b id="who"></b><span id="msg"></span></div>
     </div>
+    <div class="net" id="net" hidden><i class="nd" id="netDot"></i><span id="netTxt"></span><button class="btn" id="netBtn">Sala</button></div>
   </div>
 
-  <p class="rules">Cada jugador tira el dado en su turno y las fichas avanzan en sentido contrario a las agujas del reloj. Se sale de casa con un 5 (es obligatorio si puedes). Con un 6 repites; si sacas tres seises seguidos, tu última ficha movida vuelve a casa. Si caes en una casilla con una ficha rival, te la comes, vuelve a su casa y cuentas 20 con la ficha que quieras; al llegar a la meta (con la cuenta exacta) cuentas 10. En los seguros (casillas con círculo) no se come, y dos fichas del mismo color forman una barrera que nadie puede cruzar. Gana quien mete antes sus cuatro fichas. Si solo hay un movimiento posible se hace solo; si hay varios, toca la ficha resaltada (o usa las flechas y Enter; Espacio para tirar). La partida se guarda sola.</p>
+  <p class="rules">Cada jugador tira el dado en su turno y las fichas avanzan en sentido contrario a las agujas del reloj. Se sale de casa con un 5 (es obligatorio si puedes). Con un 6 repites; si sacas tres seises seguidos, tu última ficha movida vuelve a casa. Si caes en una casilla con una ficha rival, te la comes, vuelve a su casa y cuentas 20 con la ficha que quieras; al llegar a la meta (con la cuenta exacta) cuentas 10. En los seguros (casillas con círculo) no se come, y dos fichas del mismo color forman una barrera que nadie puede cruzar. Gana quien mete antes sus cuatro fichas. Si solo hay un movimiento posible se hace solo; si hay varios, toca la ficha resaltada (o usa las flechas y Enter; Espacio para tirar). Para jugar online, cada uno desde su móvil, elige «Online» en «Nueva», crea una sala y pasa el enlace: quien lo abre pone su nombre y entra con un color libre. La partida se guarda sola.</p>
 
   <a class="promo" href="https://adilcotech.com" target="_blank" rel="noopener">
     <span class="logo" aria-hidden="true">A</span>
@@ -213,6 +295,8 @@ body.reel .msg b{font-size:36px} body.reel .msg span{font-size:30px}
   <p class="links">Más juegos: <a href="https://jrubioadies.github.io/othello/" target="_blank" rel="noopener">Othello</a> · <a href="https://jrubioadies.github.io/torre-tambaleante/" target="_blank" rel="noopener">Torre Tambaleante</a> · <a href="https://jrubioadies.github.io/sudoku/" target="_blank" rel="noopener">Sudoku</a> · <a href="https://jrubioadies.github.io/solitario/" target="_blank" rel="noopener">Solitario</a> · <a href="https://jrubioadies.github.io/2048/" target="_blank" rel="noopener">2048</a> · <a href="https://jrubioadies.github.io/palabra/" target="_blank" rel="noopener">Palabra del día</a> · <a href="https://jrubioadies.github.io/cuatro-en-raya/" target="_blank" rel="noopener">Cuatro en raya</a> · <a href="https://jrubioadies.github.io/damas/" target="_blank" rel="noopener">Damas</a> · <a href="https://jrubioadies.github.io/hundir-la-flota/" target="_blank" rel="noopener">Hundir la flota</a> · <a href="https://jrubioadies.github.io/buscaminas/" target="_blank" rel="noopener">Buscaminas</a> · <a href="https://jrubioadies.github.io/descifra-el-codigo/" target="_blank" rel="noopener">Descifra el código</a> · <a href="https://jrubioadies.github.io/nonogramas/" target="_blank" rel="noopener">Nonogramas</a> · <a href="https://jrubioadies.github.io/puzle-15/" target="_blank" rel="noopener">Puzle 15</a> · <a href="https://jrubioadies.github.io/sopa-de-letras/" target="_blank" rel="noopener">Sopa de letras</a> · <a href="https://jrubioadies.github.io/ahorcado/" target="_blank" rel="noopener">El ahorcado</a> · <a href="https://jrubioadies.github.io/serpiente/" target="_blank" rel="noopener">Serpiente</a> · <a href="https://jrubioadies.github.io/rompeladrillos/" target="_blank" rel="noopener">Rompeladrillos</a> · <a href="https://jrubioadies.github.io/memoria-de-colores/" target="_blank" rel="noopener">Memoria de colores</a> · <a href="https://jrubioadies.github.io/parejas/" target="_blank" rel="noopener">Parejas</a><br>
   Hecho por Javier Rubio · <a href="https://jrubioadies.github.io" target="_blank" rel="noopener">jrubioadies.github.io</a> · <a href="https://github.com/jrubioadies/jrubioadies.github.io/tree/main/parchis" target="_blank" rel="noopener">código en GitHub</a></p>
 </div>
+
+<div class="room" id="room" hidden role="dialog" aria-modal="true" aria-label="Partida online"><div class="room-in" id="roomIn"></div></div>
 
 <div id="reel" aria-hidden="true">
   <div class="rv-head"><div class="rv-title">Parch<i>í</i>s<em>de bolsillo</em></div>
@@ -265,16 +349,18 @@ function metaSlot(c,j){const [x,y]=rot(-57+38*j,82,c);return {x:500+x,y:500+y}}
 
 // ---------- estado ----------
 let S=null, CUR=[], sel=0, FORCE=[], FPICK=[], hook=()=>{};
+let ON=null; // partida online: null sin conexión; si no, {role:'host'|'guest', …}
 function fresh(cfg,opt7){
   const act=[0,1,2,3].filter(c=>cfg[c]!=='x');
   return {cfg:cfg.slice(),act,opt7:!!opt7,p:[0,1,2,3].map(()=>[-1,-1,-1,-1]),turn:act[0],phase:'roll',die:5,sixes:0,last:null,again:false,bonus:[],pend:null,resume:null,winner:null,msg:'',moves:0};
 }
 const humans=()=>S.act.filter(c=>S.cfg[c]==='h').length;
-const isHuman=c=>!REEL&&S.cfg[c]==='h';
+const isHuman=c=>!REEL&&(S.cfg[c]==='h'||S.cfg[c]==='g'); // 'g': invitado online (lo maneja otro móvil)
+const local=c=>ON?c===ON.me:isHuman(c); // ¿se juega desde este móvil?
 const homeN=c=>S.p[c].filter(p=>p<0).length;
 const metaN=c=>S.p[c].filter(p=>p>=META).length;
 function load(){try{const s=JSON.parse(localStorage.getItem(KEY));if(s&&s.p&&s.p.length===4&&s.act&&s.act.length)return s}catch(e){}return null}
-function save(){if(REEL)return;try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
+function save(){if(REEL)return;if(ON){if(ON.role==='host')hostSync();return}try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
 function stats(){try{return JSON.parse(localStorage.getItem(SKEY))||{g:0,w:0}}catch(e){return {g:0,w:0}}}
 function setStats(s){try{localStorage.setItem(SKEY,JSON.stringify(s))}catch(e){}}
 let lastCfg=null;try{lastCfg=JSON.parse(localStorage.getItem(KEY+'-cfg'))}catch(e){}
@@ -343,13 +429,13 @@ function startTurn(){S.sixes=0;S.last=null;S.again=false;hook('turn',S.turn);toR
 function toRoll(){
   S.phase='roll';S.pend=null;S.resume=null;
   if(!S.msg||!S.keep)setMsg(isHuman(S.turn)?'Toca el dado para tirar':'Tirando el dado…');S.keep=false;
-  save();ui();if(!isHuman(S.turn))later(D.cpuRoll,doRoll);
+  save();ui();if(!isHuman(S.turn))later(D.cpuRoll,()=>{if(!isHuman(S.turn))doRoll()});
 }
 let dieT0=-1e9;
 function doRoll(){
   if(!S||S.phase!=='roll')return;
   const v=FORCE.length?FORCE.shift():1+Math.floor(rnd()*6);
-  S.die=v;dieT0=now();setMsg('Rodando el dado…');goBusy({k:'roll',v},D.roll);
+  S.die=v;dieT0=now();net('roll',{v});setMsg('Rodando el dado…');goBusy({k:'roll',v},D.roll);
 }
 function afterRoll(v){
   S.again=v===6;hook('rolled',v);
@@ -365,13 +451,13 @@ function offer(n,bonus){
   if(ms.length===1){setMsg(base+(ms[0].exit?' · ¡sale de casa!':''));exec(ms[0],D.auto);return}
   S.phase='choose';sel=0;
   setMsg(base+(isHuman(S.turn)?' · elige ficha':''));save();ui();
-  if(!isHuman(S.turn))later(D.cpuThink,()=>{if(S.phase==='choose')exec(cpuPick(ms),0)});
+  if(!isHuman(S.turn))later(D.cpuThink,()=>{if(S.phase==='choose'&&!isHuman(S.turn))exec(cpuPick(ms),0)});
 }
 function exec(m,delay){
   if(!S||S.phase==='over')return;
   const dur=animMove(m,delay);
   S.p[m.c][m.i]=m.to;if(m.cap)S.p[m.cap.c][m.cap.i]=-1;
-  S.last=m.i;S.moves++;CUR=[];hook('move',m);
+  S.last=m.i;S.moves++;CUR=[];net('move',{m,delay});hook('move',m);
   goBusy({k:'move',m},dur);
 }
 function won(c){return S.p[c].every(p=>p>=META)}
@@ -391,19 +477,22 @@ function cont(){
 function nextTurn(){const a=S.act;S.turn=a[(a.indexOf(S.turn)+1)%a.length];S.bonus=[];S.msg='';startTurn()}
 function penalty(){
   const c=S.turn,i=S.last;S.again=false;S.bonus=[];
-  if(i!=null&&S.p[c][i]>=0&&S.p[c][i]<=LAST){animHome(c,i,0);S.p[c][i]=-1;setMsg('¡Tres seises! La última ficha movida vuelve a casa')}
+  if(i!=null&&S.p[c][i]>=0&&S.p[c][i]<=LAST){animHome(c,i,0);net('home',{c,i});S.p[c][i]=-1;setMsg('¡Tres seises! La última ficha movida vuelve a casa')}
   else setMsg('¡Tres seises! Pierdes el turno');
   hook('penalty',c);goBusy({k:'next'},D.pass+D.home);
 }
 function finish(c){
   S.phase='over';S.winner=c;S.resume=null;CUR=[];
   setMsg('Cuatro fichas en la meta');
-  if(!REEL&&!S.counted){S.counted=true;const st=stats();st.g++;if(humans()===1&&isHuman(c))st.w++;setStats(st)}
+  if(!REEL&&!S.counted){S.counted=true;const st=stats();st.g++;if(ON?c===ON.me:humans()===1&&isHuman(c))st.w++;setStats(st)}
   hook('win',c);save();ui();
   if(!REEL)later(700,showWin);
 }
 function showWin(){
   if(!S||S.phase!=='over')return;const c=S.winner;
+  if(ON){const me=c===ON.me,host=ON.role==='host';
+    veil(me?'¡Has ganado!':'¡Gana '+nm(c)+'!',(me?'':nm(c)+(nm(c)!==NAMES[c]?' ('+NAMES[c].toLowerCase()+')':'')+' mete sus cuatro fichas. ')+S.moves+' movimientos.'+(host?'':' El anfitrión puede empezar la revancha.'),
+      host?[['Volver a la sala',hostLobby],['Revancha',hostRematch,1]]:[['Ver el tablero',()=>{$('veil').hidden=true},1]]);return}
   const solo=humans()===1;
   veil(solo?(isHuman(c)?'¡Has ganado!':'Gana '+NAMES[c]):'¡Gana '+NAMES[c]+'!',
     (solo&&!isHuman(c)?'La CPU '+NAMES[c].toLowerCase()+' mete sus cuatro fichas. ':'Cuatro fichas en la meta. ')+S.moves+' movimientos.',
@@ -411,8 +500,10 @@ function showWin(){
 }
 function newGame(cfg,opt7){
   Q=[];for(const k in A)delete A[k];FL.length=0;
-  S=fresh(cfg,opt7);try{localStorage.setItem(KEY+'-cfg',JSON.stringify({cfg,opt7:!!opt7}))}catch(e){}
-  lastCfg={cfg,opt7:!!opt7};
+  S=fresh(cfg,opt7);
+  if(ON){S.gid=rid(6);net('new',{})}
+  else{try{localStorage.setItem(KEY+'-cfg',JSON.stringify({cfg,opt7:!!opt7}))}catch(e){}
+  lastCfg={cfg,opt7:!!opt7}}
   $('veil').hidden=true;$('setup').hidden=true;buildChips();startTurn();
 }
 
@@ -483,7 +574,7 @@ function animHome(c,i,delay){const k=c*4+i;A[k]={pts:[curPos(c,i),null],t0:now()
 const FL=[];
 function float(txt,at,c,delay=0){
   const e=mk('text',{x:at.x,y:at.y,class:'fl',style:`fill:var(--c${c});stroke:var(--board)`,opacity:0},floatL);e.textContent=txt;
-  FL.push({e,x:at.x,y:at.y,t0:now()+delay});
+  FL.push({e,x:at.x,y:at.y,t0:now()+delay});net('float',{txt,at:{x:at.x,y:at.y},c,delay});
 }
 // dado
 const PIPS={1:[[50,50]],2:[[28,28],[72,72]],3:[[28,28],[50,50],[72,72]],4:[[28,28],[72,28],[28,72],[72,72]],5:[[28,28],[72,28],[50,50],[28,72],[72,72]],6:[[28,26],[72,26],[28,50],[72,50],[28,74],[72,74]]};
@@ -492,7 +583,7 @@ function drawDie(f){if(f===shownFace)return;shownFace=f;dieSvg.innerHTML='';for(
 
 function frame(){
   if(!S)return;
-  if($('setup').hidden||REEL)pump();if(!S)return;
+  if(($('setup').hidden&&$('room').hidden)||REEL||ON)pump();if(!S)return;
   const t=now(),L=layout();
   for(let c=0;c<4;c++)for(let i=0;i<4;i++){
     const k=c*4+i,pe=PE[k];
@@ -533,16 +624,33 @@ function role(c){if(S.cfg[c]==='x')return 'No juega';if(S.cfg[c]==='c')return 'C
 function ui(){
   if(!S)return;
   const st=stats();$('wins').textContent=st.w;
-  for(let c=0;c<4;c++){const d=$('chip'+c);if(!d)continue;d.className='chip'+(S.turn===c&&S.phase!=='over'?' on':'')+(S.cfg[c]==='x'?' off':'');
-    d.querySelector('small').textContent=S.cfg[c]==='x'?'—':role(c)+' · '+metaN(c)+'/4';
-    if(S.turn===c)d.style.borderColor=`var(--c${c})`;else d.style.borderColor=''}
-  const c=S.turn,hum=isHuman(c);
-  $('who').textContent=S.phase==='over'?'¡Gana '+NAMES[S.winner]+'!':(hum&&humans()===1?'Tu turno':'Turno de '+NAMES[c]+(S.cfg[c]==='c'?' (CPU)':''));
-  $('msg').textContent=S.msg||'';
+  const play=S.phase!=='wait';
+  for(let c=0;c<4;c++){const d=$('chip'+c);if(!d)continue;d.className='chip'+(S.turn===c&&S.phase!=='over'&&play?' on':'')+(S.cfg[c]==='x'?' off':'');
+    let sm;
+    if(S.cfg[c]==='x')sm='—';
+    else if(!ON)sm=role(c)+' · '+metaN(c)+'/4';
+    else if(!play)sm=c===ON.me?'Tú':S.cfg[c]==='c'?'CPU':'Online';
+    else if(S.cfg[c]!=='c'&&c!==ON.me&&!seatOn(c)){sm='Sin conexión';d.classList.add('lost')}
+    else sm=(c===ON.me?'Tú · ':S.cfg[c]==='c'?'CPU · ':'')+metaN(c)+'/4'+(c===ON.me||S.cfg[c]==='c'?'':' en meta');
+    if(ON)d.querySelector('b').textContent=nm(c);
+    d.querySelector('small').textContent=sm;
+    if(S.turn===c&&play)d.style.borderColor=`var(--c${c})`;else d.style.borderColor=''}
+  const c=S.turn,hum=isHuman(c),mine=local(c),wait=!!(ON&&ON.role==='guest'&&(ON.sent||!ON.connected));
+  let who,msg=S.msg||'';
+  if(!play){who='Sala '+ON.code;msg='Esperando a que empiece la partida'}
+  else if(S.phase==='over')who=ON?(S.winner===ON.me?'¡Has ganado!':'¡Gana '+nm(S.winner)+'!'):'¡Gana '+NAMES[S.winner]+'!';
+  else if(ON)who=mine?'Tu turno':'Turno de '+nm(c)+(S.cfg[c]==='c'?' (CPU)':'');
+  else who=hum&&humans()===1?'Tu turno':'Turno de '+NAMES[c]+(S.cfg[c]==='c'?' (CPU)':'');
+  if(ON&&play&&!mine&&hum&&S.phase!=='over'){
+    if(!seatOn(c))msg='Sin conexión · esperando a que vuelva';
+    else msg=msg.replace('Toca el dado para tirar','Esperando a que tire').replace(' · elige ficha',' · está eligiendo');
+  }
+  $('who').textContent=who;$('msg').textContent=msg;
   const die=$('die');die.style.setProperty('--dc',`var(--c${S.phase==='over'?S.winner:c})`);
-  const canRoll=S.phase==='roll'&&hum;die.disabled=!canRoll;die.classList.toggle('go',canRoll);
-  CUR=S.phase==='choose'&&hum&&S.pend?movesFor(c,S.pend.n,S.pend.bonus):[];
+  const canRoll=S.phase==='roll'&&mine&&!wait;die.disabled=!canRoll;die.classList.toggle('go',canRoll);
+  CUR=S.phase==='choose'&&mine&&!wait&&S.pend?movesFor(c,S.pend.n,S.pend.bonus):[];
   if(sel>=CUR.length)sel=0;
+  if(ON)renderNet();
 }
 function veil(t,s,btns){
   $('veilT').textContent=t;$('veilS').textContent=s;const r=$('veilR');r.innerHTML='';
@@ -553,7 +661,7 @@ function veil(t,s,btns){
 let draft=null;
 function openSetup(){
   const base=lastCfg||{cfg:['h','c','c','c'],opt7:false};
-  draft={cfg:base.cfg.slice(),opt7:base.opt7};renderSetup();$('veil').hidden=true;$('setup').hidden=false;$('scancel').hidden=!S||S.phase==='over';
+  draft={cfg:base.cfg.slice(),opt7:base.opt7};renderSetup();setTab(stab);$('veil').hidden=true;$('setup').hidden=false;$('scancel').hidden=$('scancel2').hidden=!S||S.phase==='over';
 }
 function renderSetup(){
   const pl=$('plist');pl.innerHTML='';
@@ -572,11 +680,20 @@ $('opt7').onchange=e=>{draft.opt7=e.target.checked};
 $('sgo').onclick=()=>{if(!$('sgo').disabled)newGame(draft.cfg,draft.opt7)};
 $('solo').onclick=()=>newGame(['h','c','c','c'],draft.opt7);
 $('scancel').onclick=()=>{$('setup').hidden=true;if(S&&S.phase==='over')showWin()};
-$('new').onclick=openSetup;
+$('new').onclick=()=>{if(ON)openRoom();else openSetup()};
+let stab='local';
+function setTab(t){stab=t;$('stabs').querySelectorAll('button').forEach(b=>b.classList.toggle('on',b.dataset.tab===t));$('slocal').hidden=t!=='local';$('sonline').hidden=t!=='online'}
+$('stabs').onclick=e=>{const b=e.target.closest('button');if(b)setTab(b.dataset.tab)};
+$('scancel2').onclick=()=>$('scancel').onclick();
+$('screate').onclick=()=>{$('setup').hidden=true;openCreate()};
 
 // ---------- controles ----------
-function humanRoll(){if(S&&S.phase==='roll'&&isHuman(S.turn)&&$('setup').hidden)doRoll()}
-function humanPick(m){if(S&&S.phase==='choose'&&isHuman(S.turn)&&m)exec(m,0)}
+function humanRoll(){
+  if(ON&&ON.role==='guest'){if(S&&S.phase==='roll'&&S.turn===ON.me&&!ON.sent&&ON.connected){ON.sent=true;send(ON.conn,{t:'roll'});ui()}return}
+  if(S&&S.phase==='roll'&&local(S.turn)&&($('setup').hidden||ON))doRoll()}
+function humanPick(m){
+  if(ON&&ON.role==='guest'){if(S&&S.phase==='choose'&&S.turn===ON.me&&m&&!ON.sent&&ON.connected){ON.sent=true;send(ON.conn,{t:'move',i:m.i});CUR=[];ui()}return}
+  if(S&&S.phase==='choose'&&local(S.turn)&&m)exec(m,0)}
 $('die').onclick=humanRoll;
 function svgPt(e){const p=svg.createSVGPoint();p.x=e.clientX;p.y=e.clientY;return p.matrixTransform(svg.getScreenCTM().inverse())}
 let downAt=null;
@@ -591,13 +708,443 @@ svg.addEventListener('pointerup',e=>{
   humanPick(best);
 });
 document.addEventListener('keydown',e=>{
-  if(!S||!$('setup').hidden||!$('veil').hidden)return;
+  if(!S||!$('setup').hidden||!$('veil').hidden||!$('nveil').hidden||!$('room').hidden)return;
   if(e.target.closest&&e.target.closest('a,input,button:not(#die)'))return;
   if(e.key===' '||e.key==='Enter'){e.preventDefault();if(S.phase==='roll')humanRoll();else if(CUR.length)humanPick(CUR[sel])}
   else if((e.key==='ArrowRight'||e.key==='ArrowDown')&&CUR.length){e.preventDefault();sel=(sel+1)%CUR.length}
   else if((e.key==='ArrowLeft'||e.key==='ArrowUp')&&CUR.length){e.preventDefault();sel=(sel+CUR.length-1)%CUR.length}
   else if(/^[1-4]$/.test(e.key)&&CUR[+e.key-1]){humanPick(CUR[+e.key-1])}
 });
+
+// ---------- partida online: WebRTC entre móviles con PeerJS; el anfitrión ejecuta el motor ----------
+const PJS='https://cdnjs.cloudflare.com/ajax/libs/peerjs/1.5.4/peerjs.min.js';
+const PFX='parchis-bolsillo-', HKEY=KEY+'-host', GKEY=KEY+'-guest', NKEY=KEY+'-name';
+const ABC='ABCDEFGHJKMNPQRSTUVWXYZ'; // sin I, L ni O para que no se confundan
+const ROOM=(Q_.get('sala')||'').toUpperCase().replace(/[^A-Z]/g,'').slice(0,8);
+const NOCONN='No se ha podido conectar. Probad todos con wifi o con otra red.';
+const lsGet=k=>{try{return JSON.parse(localStorage.getItem(k))}catch(e){return null}};
+const lsSet=(k,v)=>{try{if(v==null)localStorage.removeItem(k);else localStorage.setItem(k,JSON.stringify(v))}catch(e){}};
+const rid=n=>{let r='';for(let i=0;i<n;i++)r+=ABC[Math.floor(Math.random()*ABC.length)];return r};
+const esc=t=>String(t).replace(/[&<>"']/g,ch=>'&#'+ch.charCodeAt(0)+';');
+const cleanName=t=>String(t||'').replace(/[\u0000-\u001f<>]/g,'').replace(/\s+/g,' ').trim().slice(0,12);
+const nm=c=>ON&&ON.view&&ON.view[c]&&ON.view[c].name?ON.view[c].name:NAMES[c];
+const seatOn=c=>!ON||!ON.view||!ON.view[c]||ON.view[c].on!==false;
+const tnow=()=>performance.now();
+function send(conn,m){try{if(conn&&conn.open)conn.send(m)}catch(e){}}
+function bcast(m){if(ON&&ON.seats)for(const s of ON.seats)if(s.conn&&s.on)send(s.conn,m)}
+function net(e,data){if(ON&&ON.role==='host')bcast(Object.assign({t:'ev',e},data))}
+function loadPeerLib(){
+  if(window.Peer)return Promise.resolve();
+  return new Promise((ok,ko)=>{const sc=document.createElement('script');sc.src=PJS;sc.async=true;sc.crossOrigin='anonymous';
+    sc.onload=()=>window.Peer?ok():ko();sc.onerror=()=>{sc.remove();ko()};document.head.appendChild(sc)});
+}
+function peerOpts(){ // ?peerhost=localhost&peerport=9000 para probar con un servidor PeerJS propio
+  const h=Q_.get('peerhost');if(!h)return {debug:0};
+  return {debug:0,host:h,port:+(Q_.get('peerport')||9000),path:Q_.get('peerpath')||'/',secure:Q_.has('peersecure'),config:{iceServers:[]}};
+}
+function keepQ(){const k=new URLSearchParams();for(const n of ['peerhost','peerport','peerpath','peersecure','test'])if(Q_.has(n))k.set(n,Q_.get(n));const t=k.toString().replace(/=(&|$)/g,'$1');return t?'&'+t:''}
+const baseURL=()=>location.href.split(/[?#]/)[0];
+// En la tienda (versión de pago o demo) el enlace lleva a la versión pública, para que los invitados entren gratis
+const shareBase=()=>/adilcotech\.com$/.test(location.hostname)?'https://jrubioadies.github'+'.io/parchis/':baseURL();
+const roomURL=code=>shareBase()+'?sala='+code+keepQ();
+function toast(t){let e=$('toast');if(!e){e=document.createElement('div');e.id='toast';e.className='toast';e.setAttribute('role','status');document.body.appendChild(e)}
+  e.textContent=t;e.hidden=false;clearTimeout(toast.t);toast.t=setTimeout(()=>{e.hidden=true},1800)}
+function placeholder(cfg){S=fresh(cfg.map(k=>k==='x'?'x':k==='c'?'c':'g'),ON.opt7);S.phase='wait';if(ON.role==='host'&&ON.me>=0)S.cfg[ON.me]='h'}
+function enterOnline(){
+  Q=[];CUR=[];for(const k in A)delete A[k];FL.length=0;
+  $('setup').hidden=true;$('veil').hidden=true;$('nveil').hidden=true;
+  placeholder(ON.seats?ON.seats.map(s=>s.kind):['g','g','g','g']);buildChips();
+  $('net').hidden=false;clearInterval(enterOnline.iv);enterOnline.iv=setInterval(netTick,1000);ui();
+}
+function netTick(){
+  if(!ON)return;const t=tnow();ON.hb=(ON.hb||0)+1;
+  if(ON.role==='host'){
+    if(ON.hb%2===0)bcast({t:'hb'});
+    for(const s of ON.seats)if(s.kind!=='h'&&s.on&&s.conn&&t-s.last>10000){const cn=s.conn;try{cn.close()}catch(e){}hostDrop(cn)}
+  }else if(ON.connected&&ON.conn){
+    if(ON.hb%2===0)send(ON.conn,{t:'hb'});
+    if(t-ON.lastHost>10000)guestLost();
+  }
+  ui();
+}
+function leaveOnline(){
+  if(ON){if(ON.role==='host'){bcast({t:'bye'});lsSet(HKEY,null)}else{send(ON.conn,{t:'bye'});lsSet(GKEY,null)}}
+  const p=ON&&ON.peer;ON=null;
+  setTimeout(()=>{try{p&&p.destroy()}catch(e){}location.replace(baseURL()+(TEST?'?test':''))},250);
+}
+
+// ----- anfitrión -----
+let cdraft=null;
+function openCreate(){
+  const me=lastCfg?Math.max(0,lastCfg.cfg.indexOf('h')):0;
+  cdraft={cfg:[0,1,2,3].map(c=>c===me?'me':'g'),opt7:!!(lastCfg&&lastCfg.opt7),name:lsGet(NKEY)||'',err:''};
+  showRoom('create');
+}
+function hostCreate(){
+  const name=cleanName(cdraft.name);
+  if(!name){cdraft.err='Escribe tu nombre: es el que verán los demás.';renderRoom();return}
+  lsSet(NKEY,name);
+  const me=cdraft.cfg.indexOf('me');
+  ON={role:'host',code:rid(5),me,phase:'lobby',fill:'c',opt7:cdraft.opt7,status:'opening',
+    seats:cdraft.cfg.map((k,c)=>c===me?{kind:'h',plan:'h',name,on:true}:{kind:k,plan:k,name:null,on:false})};
+  ON.view=seatView();
+  history.replaceState(null,'','?sala='+ON.code+keepQ());
+  enterOnline();hostSaveStore();showRoom();hostOpen();
+}
+function hostRestore(hs){
+  ON={role:'host',code:hs.code,me:hs.me,phase:hs.S?hs.phase:'lobby',fill:hs.fill||'c',opt7:!!hs.opt7,status:'opening',restored:true,
+    seats:hs.seats.map(s=>Object.assign({},s,{on:s.kind==='h',conn:null,offAt:tnow()}))};
+  ON.view=seatView();enterOnline();
+  if(ON.phase==='game'){
+    S=hs.S;buildChips();
+    if(S.phase==='over'){ui();showWin()}
+    else if(S.resume){ui();resume()}
+    else if(S.phase==='choose'&&S.pend){offer(S.pend.n,S.pend.bonus)}
+    else{S.keep=true;toRoll()}
+  }else showRoom();
+  hostOpen();
+}
+function hostSaveStore(){
+  lsSet(HKEY,{code:ON.code,me:ON.me,phase:ON.phase,fill:ON.fill,opt7:ON.opt7,S:ON.phase==='game'?S:null,
+    seats:ON.seats.map(s=>({kind:s.kind,plan:s.plan,name:s.name||null,token:s.token||null,cpu:!!s.cpu}))});
+}
+function hostOpen(){
+  const mine=ON;
+  if(ON.peer){try{ON.peer.destroy()}catch(e){}ON.peer=null}
+  ON.status='opening';renderNet();renderRoom();
+  loadPeerLib().then(()=>{
+    if(ON!==mine)return;
+    let p;try{p=new Peer(PFX+ON.code,peerOpts())}catch(e){return hostFail('fatal')}
+    ON.peer=p;
+    p.on('open',()=>{if(ON!==mine)return;ON.status='open';ON.fails=0;ON.everOpen=true;renderNet();renderRoom()});
+    p.on('connection',cn=>{if(ON===mine)hostConn(cn)});
+    p.on('disconnected',()=>{if(ON!==mine||ON.peer!==p||p.destroyed)return;ON.status='opening';renderNet();setTimeout(()=>{if(ON===mine&&ON.peer===p&&!p.destroyed&&p.disconnected){try{p.reconnect()}catch(e){}}},1500)});
+    p.on('error',e=>{
+      if(ON!==mine||ON.peer!==p)return;const ty=e&&e.type;
+      if(ty==='peer-unavailable')return;
+      if(ty==='browser-incompatible')return hostFail('fatal');
+      if(ty==='unavailable-id'&&!ON.everOpen&&!ON.restored&&ON.phase==='lobby'&&!ON.seats.some(s=>s.token)){ // código ya usado por otra sala
+        ON.code=rid(5);history.replaceState(null,'','?sala='+ON.code+keepQ());hostSaveStore();ON.view=seatView();}
+      hostFail(ty==='unavailable-id'?'busy':'net');
+    });
+  },()=>{if(ON===mine)hostFail('lib')});
+}
+function hostFail(kind){
+  ON.fails=(ON.fails||0)+1;ON.status=kind==='fatal'?'fatal':kind==='busy'&&ON.fails<6?'busy':'fail';
+  renderNet();renderRoom();
+  if(kind==='fatal')return;
+  const mine=ON;clearTimeout(ON.retryT);ON.retryT=setTimeout(()=>{if(ON===mine)hostOpen()},Math.min(10000,1500+1500*ON.fails));
+}
+function seatView(){return ON.seats.map(s=>({kind:s.kind,name:s.kind==='c'&&!s.cpu?null:s.name||null,on:s.kind!=='g'||!!s.on,cpu:!!s.cpu}))}
+function seatOf(cn){return ON.seats.findIndex(s=>s.conn===cn)}
+function hostConn(cn){
+  cn.on('data',d=>hostMsg(cn,d));
+  cn.on('close',()=>hostDrop(cn));
+  cn.on('error',()=>hostDrop(cn));
+}
+function hostMsg(cn,d){
+  if(!ON||ON.role!=='host'||!d||typeof d!=='object')return;
+  const c=seatOf(cn);if(c>=0)ON.seats[c].last=tnow();
+  if(d.t==='hello')return hostHello(cn,d);
+  if(c<0)return;
+  const st=ON.seats[c];
+  if(d.t==='roll'){if(ON.phase==='game'&&S.turn===c&&S.cfg[c]==='g'&&S.phase==='roll')doRoll();else send(cn,{t:'st',S,seats:ON.view});return}
+  if(d.t==='move'){
+    if(ON.phase==='game'&&S.turn===c&&S.cfg[c]==='g'&&S.phase==='choose'&&S.pend){const m=movesFor(c,S.pend.n,S.pend.bonus).find(x=>x.i===d.i);if(m){exec(m,0);return}}
+    send(cn,{t:'st',S,seats:ON.view});return}
+  if(d.t==='pick'&&ON.phase==='lobby'){const k=d.c,to=ON.seats[k];
+    if(to&&to.kind==='g'&&!to.name){Object.assign(to,{name:st.name,token:st.token,conn:cn,on:true,last:tnow()});Object.assign(st,{name:null,token:null,conn:null,on:false});
+      send(cn,{t:'welcome',c:k,token:to.token,code:ON.code});hostSync()}return}
+  if(d.t==='bye')hostDrop(cn);
+}
+function hostHello(cn,d){
+  const name=cleanName(d.name)||'Invitado';
+  let c=d.token?ON.seats.findIndex(s=>s.token&&s.token===d.token&&s.kind!=='h'):-1;
+  if(c<0){
+    if(ON.phase!=='lobby'){send(cn,{t:'deny',why:'La partida ya ha empezado y no quedan colores libres. Pide al anfitrión que vuelva a la sala.'});setTimeout(()=>{try{cn.close()}catch(e){}},400);return}
+    const free=[0,1,2,3].filter(k=>ON.seats[k].kind==='g'&&!ON.seats[k].name);
+    if(!free.length){send(cn,{t:'deny',why:'La sala está completa: no quedan colores libres.'});setTimeout(()=>{try{cn.close()}catch(e){}},400);return}
+    c=free.includes(d.want)?d.want:free[0];
+    ON.seats[c].token=rid(8)+Date.now().toString(36);
+  }
+  const s=ON.seats[c];
+  if(s.conn&&s.conn!==cn){const old=s.conn;s.conn=null;try{old.close()}catch(e){}}
+  Object.assign(s,{conn:cn,on:true,name,last:tnow(),wait:false});
+  if(s.cpu){s.kind='g';s.cpu=false;
+    if(ON.phase==='game'){S.cfg[c]='g';if(S.turn===c&&S.phase==='roll'){S.msg='';S.keep=false;toRoll()}}}
+  send(cn,{t:'welcome',c,token:s.token,code:ON.code});
+  hostSync();
+}
+function hostDrop(cn){
+  if(!ON||ON.role!=='host')return;const c=seatOf(cn);if(c<0)return;
+  const s=ON.seats[c];s.conn=null;s.on=false;s.offAt=tnow();s.wait=false;
+  if(ON.phase==='lobby'){s.name=null;s.token=null}
+  hostSync();
+}
+function hostSync(){
+  if(!ON||ON.role!=='host')return;
+  ON.view=seatView();hostSaveStore();
+  bcast(ON.phase==='lobby'?{t:'lobby',seats:ON.view,opt7:ON.opt7}:{t:'st',S,seats:ON.view});
+  renderRoom();ui();
+}
+function hostStart(){
+  const cfg=ON.seats.map(s=>s.kind==='g'&&!s.name?ON.fill:s.kind);
+  if(cfg.filter(k=>k!=='x').length<2){ON.err='Tienen que jugar al menos dos colores: espera a alguien o pon los huecos en CPU.';renderRoom();return}
+  ON.seats.forEach((s,c)=>{s.kind=cfg[c]});ON.err='';
+  ON.phase='game';ON.view=seatView();hideRoom();newGame(cfg,ON.opt7);
+}
+function hostRematch(){ON.phase='game';newGame(ON.seats.map(s=>s.kind),ON.opt7)}
+function hostLobby(){
+  Q=[];ON.phase='lobby';
+  ON.seats.forEach(s=>{if(s.plan!=='h'){if(s.plan==='g'||s.cpu){s.kind='g';s.cpu=false;if(!s.on){s.name=null;s.token=null}}else s.kind=s.plan}});
+  $('veil').hidden=true;placeholder(ON.seats.map(s=>s.kind));buildChips();showRoom();hostSync();
+}
+function toCPU(c){
+  const s=ON.seats[c];if(!s||s.kind!=='g'||ON.phase!=='game')return;
+  s.kind='c';s.cpu=true;S.cfg[c]='c';
+  if(S.turn===c){if(S.phase==='roll'){S.msg='';S.keep=false;toRoll()}else if(S.phase==='choose'&&S.pend)offer(S.pend.n,S.pend.bonus)}
+  hostSync();
+}
+function offSeat(){
+  if(!ON||ON.role!=='host'||ON.phase!=='game')return -1;const t=tnow();
+  return ON.seats.findIndex(s=>s.kind==='g'&&s.name&&!s.on&&!s.wait&&t-(s.offAt||0)>3000);
+}
+
+// ----- invitado -----
+function guestStart(){
+  const g=lsGet(GKEY);
+  ON={role:'guest',code:ROOM,me:-1,phase:'join',tries:0,connected:false,name:(g&&g.code===ROOM&&g.name)||lsGet(NKEY)||''};
+  enterOnline();
+  if(g&&g.code===ROOM&&g.token&&ON.name){guestJoin(ON.name)}else showRoom();
+}
+function guestJoin(name){
+  name=cleanName(name);if(!name){ON.err='Escribe tu nombre para que los demás sepan quién eres.';renderRoom();return}
+  ON.err='';ON.name=name;lsSet(NKEY,name);ON.phase='connecting';ON.status='Conectando con la sala…';showRoom();
+  const mine=ON;
+  loadPeerLib().then(()=>{if(ON===mine)guestPeer()},()=>{if(ON!==mine)return;ON.status='No se ha podido cargar la conexión online. Comprueba que tienes internet.';ON.bad=true;renderRoom();guestRetry('lib')});
+}
+function guestPeer(){
+  const mine=ON;if(ON.peer){try{ON.peer.destroy()}catch(e){}}
+  let p;try{p=new Peer(peerOpts())}catch(e){ON.status='Este navegador no permite jugar online.';ON.bad=true;ON.fatal=true;renderRoom();return}
+  ON.peer=p;
+  p.on('open',()=>{if(ON===mine&&ON.peer===p)guestConnect()});
+  p.on('disconnected',()=>{if(ON!==mine||ON.peer!==p||p.destroyed)return;setTimeout(()=>{if(ON===mine&&ON.peer===p&&!p.destroyed&&p.disconnected){try{p.reconnect()}catch(e){}}},1500)});
+  p.on('error',e=>{
+    if(ON!==mine||ON.peer!==p)return;const ty=e&&e.type;
+    if(ty==='browser-incompatible'){ON.status='Este navegador no permite jugar online.';ON.bad=true;ON.fatal=true;renderRoom();return}
+    const cn=ON.conn;if(cn&&!cn.open){ON.conn=null;try{cn.close()}catch(_){}}
+    if(ty!=='peer-unavailable'&&!ON.connected)ON.conn=null;
+    if(!ON.connected)guestRetry(ty==='peer-unavailable'?'nohost':'net');
+  });
+}
+function guestConnect(){
+  if(!ON||ON.role!=='guest'||ON.denied||ON.closed||ON.fatal)return;
+  const p=ON.peer,mine=ON;
+  if(!p||p.destroyed)return guestPeer();
+  if(p.disconnected||!p.open){try{if(p.disconnected)p.reconnect()}catch(e){}return guestRetry('net')}
+  let cn;try{cn=p.connect(PFX+ON.code,{reliable:true,serialization:'json'})}catch(e){return guestRetry('net')}
+  ON.conn=cn;
+  const to=setTimeout(()=>{if(ON===mine&&ON.conn===cn&&!ON.connected){ON.conn=null;try{cn.close()}catch(e){}guestRetry('net')}},9000);
+  cn.on('open',()=>{if(ON!==mine||ON.conn!==cn)return;clearTimeout(to);ON.lastHost=tnow();
+    const g=lsGet(GKEY);send(cn,{t:'hello',name:ON.name,token:g&&g.code===ON.code?g.token:null})});
+  cn.on('data',d=>guestMsg(cn,d));
+  cn.on('close',()=>{clearTimeout(to);if(ON===mine&&ON.conn===cn)guestLost()});
+  cn.on('error',()=>{clearTimeout(to);if(ON===mine&&ON.conn===cn)guestLost()});
+}
+function guestRetry(kind){
+  if(!ON||ON.role!=='guest'||ON.retryT||ON.denied||ON.closed||ON.fatal)return;
+  ON.tries++;ON.why=kind;const mine=ON;
+  ON.retryT=setTimeout(()=>{if(ON!==mine)return;ON.retryT=0;guestConnect()},Math.min(10000,1000+1500*(ON.tries-1)));
+  renderNet();renderRoom();
+}
+function guestLost(){
+  if(!ON||ON.role!=='guest')return;
+  const cn=ON.conn;ON.conn=null;ON.connected=false;ON.sent=false;try{cn&&cn.close()}catch(e){}
+  if(ON.denied||ON.closed)return;
+  guestRetry('lost');ui();
+}
+function guestMsg(cn,d){
+  if(!ON||ON.role!=='guest'||ON.conn!==cn||!d||typeof d!=='object')return;
+  ON.lastHost=tnow();
+  switch(d.t){
+    case 'hb':send(cn,{t:'hb'});break;
+    case 'welcome':{const g=lsGet(GKEY);ON.me=d.c;ON.connected=true;ON.tries=0;ON.why='';ON.bad=false;clearTimeout(ON.retryT);ON.retryT=0;
+      lsSet(GKEY,{code:ON.code,token:d.token,name:ON.name,counted:g&&g.code===ON.code?g.counted:null});
+      if(ON.phase==='connecting'||ON.phase==='join')ON.phase='lobby';ui();renderRoom();break}
+    case 'deny':ON.denied=d.why||'No puedes entrar en esta sala.';ON.connected=false;clearTimeout(ON.retryT);showRoom();break;
+    case 'bye':ON.closed=true;ON.connected=false;lsSet(GKEY,null);$('veil').hidden=true;
+      nveil('Sala cerrada','El anfitrión ha cerrado la sala.',[['Jugar sin conexión',leaveOnline,1]]);hideRoom();break;
+    case 'lobby':ON.view=d.seats;ON.opt7=d.opt7;if(ON.phase==='game'){Q=[];$('veil').hidden=true;placeholder(d.seats.map(s=>s.kind));buildChips()}
+      ON.phase='lobby';if(ON.me>=0)showRoom();ui();break;
+    case 'st':guestState(d);break;
+    case 'ev':guestEv(d);break;
+  }
+}
+function guestState(d){
+  if(ON.me<0)return;
+  const prev=S,was=ON.phase;ON.view=d.seats;ON.phase='game';S=d.S;ON.sent=false;
+  if(was!=='game'||!prev||prev.gid!==S.gid){CUR=[];buildChips();hideRoom();if(S.phase!=='over')$('veil').hidden=true}
+  if(S.phase==='over'&&(!prev||prev.phase!=='over'||prev.gid!==S.gid)){
+    const g=lsGet(GKEY)||{};if(g.counted!==S.gid){g.counted=S.gid;lsSet(GKEY,Object.assign({code:ON.code},g));const st=stats();st.g++;if(S.winner===ON.me)st.w++;setStats(st)}
+    later(700,showWin);
+  }
+  if(S.phase!=='over'&&prev&&prev.phase==='over')$('veil').hidden=true;
+  ui();
+}
+function guestEv(d){
+  if(!S||ON.phase!=='game'&&d.e!=='new')return;
+  if(d.e==='roll'){S.die=d.v;dieT0=now()}
+  else if(d.e==='move'){const m=d.m;animMove(m,d.delay||0);S.p[m.c][m.i]=m.to;if(m.cap)S.p[m.cap.c][m.cap.i]=-1;CUR=[]}
+  else if(d.e==='home'){animHome(d.c,d.i,0);S.p[d.c][d.i]=-1}
+  else if(d.e==='float'){float(d.txt,d.at,d.c,d.delay||0)}
+  else if(d.e==='new'){Q=[];for(const k in A)delete A[k];FL.length=0;$('veil').hidden=true}
+}
+
+// ----- interfaz online -----
+function nveil(t,s,btns){
+  if(!$('nveil').hidden&&$('nveilT').textContent===t&&$('nveilS').textContent===s)return;
+  $('nveilT').textContent=t;$('nveilS').textContent=s;const r=$('nveilR');r.innerHTML='';
+  btns.forEach(([txt,fn,main])=>{const b=document.createElement('button');b.className='btn'+(main?' main':'');b.textContent=txt;b.onclick=fn;r.appendChild(b)});
+  $('nveil').hidden=false;
+}
+function renderNet(){
+  if(!ON)return;
+  let dot='',txt='Sala '+ON.code;
+  if(ON.role==='host'){
+    const n=ON.seats.filter(s=>s.kind==='g'&&s.on).length;
+    if(ON.status==='open')txt+=' · '+(n?n+(n>1?' conectados':' conectado'):'nadie conectado aún');
+    else if(ON.status==='opening'||ON.status==='busy'){dot='wait';txt+=' · abriendo…'}
+    else{dot='bad';txt+=' · sin conexión'}
+    const k=offSeat(),w=$('nwarn');
+    if(k>=0){w.hidden=false;$('nwarnT').textContent=ON.seats[k].name+' ('+NAMES[k]+') se ha desconectado. ¿Esperáis a que vuelva o sigue la CPU con su color?';w.dataset.c=k}else w.hidden=true;
+  }else{
+    if(ON.connected)txt+=' · '+(ON.me>=0?NAMES[ON.me]+' (tú)':'conectado');
+    else{dot=ON.tries>2?'bad':'wait';txt+=' · reconectando…'}
+    const lost=ON.phase==='game'&&!ON.connected&&!ON.closed&&!ON.denied;
+    if(lost){nveil(ON.tries>2?'Sin conexión':'Reconectando…',ON.tries>2?NOCONN+' Seguimos intentándolo.':'Se ha perdido la conexión con el anfitrión. La partida sigue en cuanto vuelva.',
+      [['Salir',leaveOnline],['Reintentar ya',()=>{clearTimeout(ON.retryT);ON.retryT=0;guestConnect()},1]])}
+    else if(!ON.closed&&!$('nveil').hidden)$('nveil').hidden=true;
+  }
+  $('netDot').className='nd'+(dot?' '+dot:'');$('netTxt').textContent=txt;
+}
+function showRoom(){$('room').hidden=false;document.body.classList.add('noscroll');renderRoom();$('room').scrollTop=0}
+function hideRoom(){$('room').hidden=true;document.body.classList.remove('noscroll')}
+function openRoom(){if(ON)showRoom()}
+const TITLE='<div class="rtop"><div class="rtitle">Parch<i>í</i>s<em>de bolsillo</em></div><span class="pill"><i></i>Online</span></div>';
+const HINT='<p class="hint">La conexión va directa de móvil a móvil. Si alguien no consigue entrar, probad todos con wifi o con otra red: algunas redes móviles la bloquean.</p>';
+function codeHTML(code){return '<div class="code" aria-label="Código '+code.split('').join(' ')+'">'+code.split('').map((ch,j)=>`<b style="--k:var(--c${j%4})">${ch}</b>`).join('')+'</div>'}
+function shareHTML(){
+  const u=roomURL(ON.code);
+  return `<div class="card"><p class="lab">Código de sala</p>${codeHTML(ON.code)}<p class="link" id="rlink">${esc(u.replace(/^https?:\/\//,''))}</p>
+    <div class="two${navigator.share?'':' one'}">${navigator.share?'<button class="btn main" data-a="share">Compartir</button>':''}<button class="btn${navigator.share?'':' main'}" data-a="copy">Copiar enlace</button></div></div>`;
+}
+function seatRow(c,v,extra){
+  const k=v.kind,me=c===ON.me,off=k==='g'&&v.name&&!v.on;
+  let name,sub,tag;
+  if(k==='x'){name='No juega';sub=NAMES[c];tag=''}
+  else if(k==='c'&&!v.cpu){name='CPU';sub=NAMES[c]+' · juega la máquina';tag='<span class="tag">CPU</span>'}
+  else if(!v.name){name='Esperando a alguien…';sub=NAMES[c]+' · libre';tag='<span class="tag">Libre</span>'}
+  else{name=v.name;sub=NAMES[c]+(k==='h'?' · anfitrión':v.cpu?' · ahora juega la CPU':'');
+    tag=me?'<span class="tag me">Tú</span>':v.cpu?'<span class="tag">CPU</span>':off?'<span class="tag bad">Sin conexión</span>':k==='h'?'<span class="tag ok">Anfitrión</span>':'<span class="tag ok">Conectado</span>'}
+  return `<div class="st${k==='x'?' dim':''}"><i class="dot" style="background:var(--c${c})"></i><span class="nm"><b>${esc(name)}</b><small>${esc(sub)}</small></span>${extra||tag}</div>`;
+}
+function statusHTML(){
+  if(ON.role==='host'){
+    const m={opening:['wait',ON.restored&&!ON.everOpen?'Recuperando la sala…':'Abriendo la sala…'],busy:['wait','Recuperando la sala… (el código aún está ocupado)'],
+      open:['','Sala abierta. Pasa el enlace a quien vaya a jugar.'],fail:['bad',NOCONN+' Reintentando…'],fatal:['bad','Este navegador no permite jugar online.']}[ON.status]||['wait','…'];
+    return `<p class="status${m[0]==='bad'?' bad':''}"><i class="nd${m[0]?' '+m[0]:''}"></i>${esc(m[1])}</p>`;
+  }
+  if(ON.connected)return `<p class="status"><i class="nd"></i>Conectado a la sala</p>`;
+  const txt=ON.fatal||ON.why==='lib'&&ON.tries<2?ON.status:ON.tries>2?NOCONN+' Seguimos intentándolo.':ON.why==='nohost'?'No encontramos la sala. Puede que el anfitrión aún no la haya abierto: reintentando…':ON.status||'Conectando con la sala…';
+  const bad=ON.fatal||ON.tries>2;
+  return `<p class="status${bad?' bad':''}"><i class="nd${bad?' bad':' wait'}"></i>${esc(txt)}</p>`;
+}
+function renderRoom(){
+  const el=$('roomIn');if($('room').hidden)return;
+  let h=TITLE;
+  if(!ON){ // crear sala
+    const d=cdraft;
+    h+=`<div class="card"><h2>Crear sala</h2><p class="lead">Cada jugador usa su móvil. Tú creas la sala y los demás entran con el enlace.</p>
+      <label class="field"><span class="lab">Tu nombre</span><input class="inp" id="rname" maxlength="12" autocomplete="nickname" placeholder="Por ejemplo, Javi" value="${esc(d.name)}"></label></div>
+      <p class="lab">Colores</p><div class="seats">`;
+    for(let c=0;c<4;c++)h+=`<div class="st"><i class="dot" style="background:var(--c${c})"></i><span class="nm"><b>${NAMES[c]}</b></span><div class="seg">`+
+      [['me','Tú'],['g','Invitado'],['c','CPU'],['x','No juega']].map(([v,l])=>`<button data-a="cs" data-c="${c}" data-v="${v}" class="${d.cfg[c]===v?'on':''}">${l}</button>`).join('')+'</div></div>';
+    h+=`</div><label class="chk"><input type="checkbox" id="ropt7"${d.opt7?' checked':''}> <span>Variante: si no te quedan fichas en casa, el 6 cuenta 7</span></label>
+      <p class="hint">Los colores de «Invitado» que nadie ocupe juegan con la CPU (o no juegan, si lo prefieres en la sala).</p>
+      <p class="err" id="rerr">${esc(d.err||'')}</p>
+      <div class="acts"><button class="btn big" data-a="cancel">Cancelar</button><button class="btn main big" data-a="create">Crear sala</button></div>`;
+  }else if(ON.role==='host'){
+    const lobby=ON.phase==='lobby';
+    h+=shareHTML()+statusHTML();
+    h+=`<p class="lab">${lobby?'Jugadores':'En la partida'}</p><div class="seats">`;
+    ON.view.forEach((v,c)=>{const off=!lobby&&v.kind==='g'&&v.name&&!v.on;h+=seatRow(c,v,off?`<button class="btn" data-a="cpu" data-c="${c}">Pasar a CPU</button>`:'')});
+    h+='</div>';
+    if(lobby){
+      h+=`<div class="st"><span class="nm"><b>Colores libres al empezar</b></span><div class="seg">`+[['c','CPU'],['x','No juega']].map(([v,l])=>`<button data-a="fill" data-v="${v}" class="${ON.fill===v?'on':''}">${l}</button>`).join('')+'</div></div>';
+      h+=HINT+`<p class="err">${esc(ON.err||'')}</p><div class="acts"><button class="btn big" data-a="leave">Salir</button><button class="btn main big" data-a="start" id="rstart">Empezar</button></div>`;
+    }else h+=HINT+`<div class="acts"><button class="btn big" data-a="leave">Cerrar la sala</button><button class="btn main big" data-a="back">Volver a la partida</button></div>
+      <button class="btn big" data-a="lobby">Nueva partida en esta sala</button>`;
+  }else{
+    if(ON.denied){h+=`<div class="card"><h2>No puedes entrar</h2><p class="lead">${esc(ON.denied)}</p></div><div class="acts"><button class="btn big" data-a="leave">Jugar sin conexión</button><button class="btn main big" data-a="retry">Reintentar</button></div>`}
+    else if(ON.phase==='join'){
+      h+=`<div class="card"><p class="lab">Te han invitado a la sala</p>${codeHTML(ON.code)}
+        <label class="field"><span class="lab">Tu nombre</span><input class="inp" id="rname" maxlength="12" autocomplete="nickname" placeholder="Por ejemplo, Ana" value="${esc(ON.name)}"></label>
+        <p class="err" id="rerr">${esc(ON.err||'')}</p><button class="btn main big" data-a="join" id="rjoin">Unirme a la partida</button></div>${HINT}
+        <button class="btn big" data-a="leave">Jugar sin conexión</button>`;
+    }else if(ON.phase==='connecting'||ON.me<0){
+      h+=`<div class="card"><p class="lab">Sala</p>${codeHTML(ON.code)}${statusHTML()}</div>${HINT}<button class="btn big" data-a="leave">Jugar sin conexión</button>`;
+    }else{
+      const lobby=ON.phase==='lobby',hn=ON.view?(ON.view.find(v=>v.kind==='h')||{}).name:'';
+      h+=`<div class="card"><h2>${lobby?'¡Estás dentro!':'Sala '+ON.code}</h2><p class="lead">${lobby?`Juegas con el <i class="cdot" style="background:var(--c${ON.me})"></i> <b>${NAMES[ON.me].toLowerCase()}</b>. Esperando a que ${esc(hn||'el anfitrión')} empiece la partida.`:'Estás jugando con el '+NAMES[ON.me].toLowerCase()+'.'}</p>${statusHTML()}</div>`;
+      h+=`<p class="lab">Jugadores</p><div class="seats">`;
+      (ON.view||[]).forEach((v,c)=>{h+=seatRow(c,v,lobby&&v.kind==='g'&&!v.name&&ON.connected?`<button class="btn" data-a="pick" data-c="${c}">Elegir</button>`:'')});
+      h+='</div>'+(lobby?`<p class="hint">Puedes cambiarte a un color libre. Pasa el enlace a más gente si queda sitio:</p>`:'')+shareHTML();
+      h+=lobby?`<button class="btn big" data-a="leave">Salir de la sala</button>`:`<div class="acts"><button class="btn big" data-a="leave">Salir de la sala</button><button class="btn main big" data-a="back">Volver a la partida</button></div>`;
+    }
+  }
+  el.innerHTML=h;
+  const inp=$('rname');if(inp){inp.oninput=()=>{if(ON)ON.name=inp.value;else cdraft.name=inp.value};
+    inp.onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();(ON?()=>guestJoin(inp.value):hostCreate)()}}}
+  const o7=$('ropt7');if(o7)o7.onchange=()=>{cdraft.opt7=o7.checked};
+}
+async function doShare(){
+  const url=roomURL(ON.code);
+  try{await navigator.share({title:'Parchís de bolsillo',text:'¿Te echas un parchís? Entra en mi sala '+ON.code+':',url})}catch(e){}
+}
+function doCopy(){
+  const url=roomURL(ON.code);
+  const fb=()=>{try{const ta=document.createElement('textarea');ta.value=url;ta.style.cssText='position:fixed;opacity:0;left:0;top:0';document.body.appendChild(ta);ta.select();document.execCommand('copy');ta.remove();toast('Enlace copiado')}catch(e){toast('Mantén pulsado el enlace para copiarlo')}};
+  if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(url).then(()=>toast('Enlace copiado'),fb);else fb();
+}
+let leaveArm=0;
+$('room').addEventListener('click',e=>{
+  const b=e.target.closest('[data-a]');if(!b)return;const a=b.dataset.a,c=+b.dataset.c;
+  if(a==='cs'){const v=b.dataset.v;if(v==='me'){const old=cdraft.cfg.indexOf('me');if(old>=0)cdraft.cfg[old]='g'}else if(cdraft.cfg[c]==='me')return;cdraft.cfg[c]=v;cdraft.err='';renderRoom()}
+  else if(a==='cancel'){hideRoom();cdraft=null;if(S&&S.phase==='over')showWin()}
+  else if(a==='create')hostCreate();
+  else if(a==='share')doShare();
+  else if(a==='copy')doCopy();
+  else if(a==='fill'){ON.fill=b.dataset.v;ON.err='';hostSaveStore();renderRoom()}
+  else if(a==='start')hostStart();
+  else if(a==='cpu')toCPU(c);
+  else if(a==='back')hideRoom();
+  else if(a==='lobby')hostLobby();
+  else if(a==='join')guestJoin(ON.name);
+  else if(a==='pick')send(ON.conn,{t:'pick',c});
+  else if(a==='retry'){ON.denied=null;ON.tries=0;guestJoin(ON.name)}
+  else if(a==='leave'){
+    const risky=ON&&(ON.role==='host'?ON.seats.some(s=>s.kind==='g'&&s.on)||ON.phase==='game':ON.phase==='game'&&!ON.closed);
+    if(risky&&tnow()-leaveArm>3500){leaveArm=tnow();b.textContent='¿Seguro? Toca otra vez';return}
+    leaveOnline();
+  }
+});
+$('netBtn').onclick=openRoom;
+$('nwait').onclick=()=>{const k=+$('nwarn').dataset.c;if(ON&&ON.seats[k]){ON.seats[k].wait=true;renderNet()}};
+$('ncpu').onclick=()=>{toCPU(+$('nwarn').dataset.c)};
+function offerResume(hs){
+  nveil('Sala online abierta','Tienes la sala '+hs.code+' a medias. Puedes volver a ella o seguir jugando sin conexión.',
+    [['Cerrar la sala',()=>{lsSet(HKEY,null);$('nveil').hidden=true}],['Volver a la sala',()=>location.replace(baseURL()+'?sala='+hs.code+keepQ()),1]]);
+}
 
 // ---------- modo reel: partida guionizada con el propio motor ----------
 function setupReel(){
@@ -643,7 +1190,12 @@ buildChips();
 if(REEL){setupReel();return}
 (function loop(){frame();requestAnimationFrame(loop)})();
 if(TEST)window.__t={get S(){return S},set S(v){S=v},D,movesFor,newGame,exec,doRoll,cpuPick,CUR:()=>CUR,force:a=>{FORCE=a.slice()},
-  flush(max=20000){let n=0;while(Q.length&&n++<max){Q.forEach(e=>e.t=0);pump()}ui();return n},ui,resume,stats,Q:()=>Q};
+  flush(max=20000){let n=0;while(Q.length&&n++<max){Q.forEach(e=>e.t=0);pump()}ui();return n},ui,resume,stats,Q:()=>Q,
+  get ON(){return ON},gsend:m=>send(ON&&ON.conn,m),local:c=>local(c)};
+const HS=ROOM?lsGet(HKEY):null;
+if(ROOM&&HS&&HS.code===ROOM&&HS.seats)hostRestore(HS); // el anfitrión vuelve a su sala
+else if(ROOM)guestStart();                             // enlace de invitación
+else{
 const saved=load();
 if(saved){S=saved;buildChips();
   if(S.phase==='over'){ui();showWin()}
@@ -651,6 +1203,8 @@ if(saved){S=saved;buildChips();
   else if(S.phase==='choose'&&S.pend){offer(S.pend.n,S.pend.bonus)}
   else{S.keep=true;toRoll()}
 }else newGame(['h','c','c','c'],false);
+const hs=lsGet(HKEY);if(hs&&hs.code&&!(hs.S&&hs.S.phase==='over'))offerResume(hs);
+}
 })();
 </script>
 </body>
