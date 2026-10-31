@@ -428,6 +428,8 @@ if(S){build();render();if(S.done){S.done=false;finish()}}else newGame('ingles');
 <div id="jb-fin" hidden><div><h2>Se acabó la prueba de hoy</h2><p>Mañana tienes otros 10 minutos gratis. O desbloquea el juego completo para siempre, sin límites.</p><a href="https://games.adilcotech.com/?juego=solitario&amp;comprar=1">Desbloquear por 1 €</a><small>Tarjeta, Apple Pay, Google Pay o WeChat Pay</small></div></div>
 <script>
 (()=>{
+  if(/[?&]sala=/.test(location.search)){document.getElementById('jb-t').parentNode.textContent='Partida online · gratis';return;}   // las partidas online no gastan la prueba
+  const K='jb-demo-solitario', LIM=600;
   const K='jb-demo-solitario', LIM=600;
   const hoy=new Date().toDateString();
   let s; try{s=JSON.parse(localStorage.getItem(K))}catch(e){}
