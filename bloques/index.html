@@ -140,7 +140,7 @@ body.reel #cv{border-radius:30px;box-shadow:0 0 0 2px var(--line),0 30px 70px rg
   </div>
 
   <div class="stage" id="stage">
-    <canvas id="cv" aria-label="Pozo de juego. Desliza para mover la pieza, toca para girarla, desliza rápido hacia abajo para soltarla y hacia arriba para guardarla. Con teclado: flechas, Z y X para girar, espacio para soltar y C para guardar."></canvas>
+    <canvas id="cv" aria-label="Pozo de juego. Desliza para mover la pieza, toca para girarla, desliza rápido hacia abajo para soltarla y hacia arriba para guardarla. Con teclado: flechas, Z y X para girar, espacio para soltar y C para guardar. También se juega con mando."></canvas>
     <div class="veil" id="veil" hidden>
       <h2 id="veilT"></h2>
       <p id="veilS"></p>
@@ -497,6 +497,24 @@ document.addEventListener('keydown',e=>{
   const k=KM[e.key];if(!k)return;e.preventDefault();
   if(S.state!=='play'||e.repeat)return;press(k)});
 document.addEventListener('keyup',e=>{const k=KM[e.key];if(k)release(k)});
+// mando (PlayStation, Xbox, MFi…): cruceta o stick para mover, ✕ gira, ○ gira al revés, ↑/□ suelta, L1/R1/△ guarda, Options pausa
+const GPM={14:'l',15:'r',13:'d',0:'cw',1:'ccw',12:'drop',2:'drop',3:'hold',4:'hold',5:'hold'};
+let gpPrev={};
+function pollPad(){
+  if(!S||REEL||!navigator.getGamepads)return;let pads;try{pads=navigator.getGamepads()}catch(e){return}
+  let gp=null;for(const p of pads)if(p&&p.connected){gp=p;break}
+  if(!gp){if(Object.keys(gpPrev).length){['l','r','d'].forEach(release);gpPrev={}}return}
+  const b=i=>!!(gp.buttons[i]&&gp.buttons[i].pressed),ax=gp.axes||[],now={};
+  for(const i in GPM)if(b(+i))now[GPM[i]]=1;
+  if(ax[0]<-.5)now.l=1;if(ax[0]>.5)now.r=1;if(ax[1]>.6)now.d=1;
+  if(b(9)||b(8))now.pause=1;
+  const nw=k=>now[k]&&!gpPrev[k];
+  if(nw("pause")){if(S.state==='paused')resume();else if(S.state==='play'||S.state==='clear')pause()}
+  else if(!$('veil').hidden){if(nw("cw")||nw("drop")){const m=document.querySelector('#veil .main')||document.querySelector('#veil button');if(m)m.click()}}
+  else if(S.state==='play')for(const k in now)if(k!=="pause"&&nw(k))press(k);
+  for(const k of ['l','r','d'])if(gpPrev[k]&&!now[k])release(k);
+  gpPrev=now;
+}
 document.addEventListener('visibilitychange',()=>{if(document.hidden){releaseAll();pause()}});
 addEventListener('blur',()=>{releaseAll();pause()});
 addEventListener('pagehide',save);
@@ -575,6 +593,7 @@ if(saved&&!saved.over&&saved.cur){
 (function loop(ts){
   requestAnimationFrame(loop);
   if(!S)return;
+  pollPad();
   ts=ts||performance.now();let d=ts-last;last=ts;if(d>250)d=250;if(d<0)d=0;
   if(S.state==='play'||S.state==='clear'){acc+=d;let n=0;while(acc>=DT&&n<40){update();acc-=DT;n++}}else acc=0;
   if(S.dirty){S.dirty=false;ui()}
