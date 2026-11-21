@@ -1,0 +1,469 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Dado Atrevido 10</title>
+<meta name="robots" content="noindex">
+<meta name="theme-color" content="#1c0910">
+<meta name="description" content="Juego para adultos (+18), por parejas o de 2 a 6 jugadores: un dado de diez caras con verdad, reto, prenda, duelo, comodín, brindis y más.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Outfit:wght@400;600;700;800&display=swap">
+<style>
+/* Una sola atmósfera, a propósito: luz de vela sobre terciopelo granate. Decaedro de lacre con ocho palos de color */
+:root{
+  --bg:#1c0910; --bg2:#2e0f1b; --card:#2a111b; --card2:#3a1726; --ink:#fbeef0; --muted:#d3a9b3; --line:#4a2232;
+  --verdad:#f2c26b; --reto:#ff5d73; --prenda:#c58bff; --duelo:#ff8a4c; --mandas:#ffd166; --comodin:#7fe0a8; --brindis:#5fd3c9; --todos:#7cb7ff;
+  --display:"DM Serif Display",Georgia,"Times New Roman",serif;
+  --body:"Outfit",system-ui,-apple-system,"Segoe UI",sans-serif;
+  color-scheme:dark;
+}
+[hidden]{display:none!important}
+*{box-sizing:border-box}
+html{background:var(--bg)}
+body{margin:0;min-height:100vh;color:var(--ink);font-family:var(--body);
+  background:radial-gradient(120% 70% at 50% 0%,var(--bg2) 0%,var(--bg) 62%) fixed,var(--bg);
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));
+  -webkit-tap-highlight-color:transparent}
+.app{max-width:480px;margin:0 auto;display:flex;flex-direction:column;gap:14px;padding-block:16px 28px}
+header{display:flex;align-items:flex-end;justify-content:space-between;gap:12px}
+h1{font:400 40px/.95 var(--display);margin:0;letter-spacing:-.3px}
+h1 i{color:var(--reto)}
+h1 sup{font:800 15px var(--body);color:var(--verdad);vertical-align:top;margin-left:4px}
+h1 small{display:block;font:700 12px var(--body);letter-spacing:.2em;text-transform:uppercase;color:var(--muted);margin-top:6px}
+.btn{border:0;border-radius:14px;padding:12px 16px;font:700 15px var(--body);cursor:pointer;background:var(--card2);color:var(--ink);display:inline-flex;align-items:center;justify-content:center;gap:8px;text-align:center}
+.btn.main{background:var(--ink);color:var(--bg)}
+.btn.ghost{background:transparent;box-shadow:inset 0 0 0 2px var(--line)}
+.btn.sm{padding:9px 12px;font-size:13px;border-radius:11px}
+.btn:disabled{opacity:.4;cursor:default}
+button:focus-visible,input:focus-visible{outline:3px solid var(--verdad);outline-offset:2px}
+
+/* marcador: una ficha por jugador */
+.board{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:8px}
+.pl{background:var(--card);border-radius:16px;padding:10px 12px;display:flex;flex-direction:column;gap:5px;border:2px solid transparent;transition:border-color .25s,transform .25s;min-width:0;position:relative}
+.pl.on{border-color:var(--verdad);transform:translateY(-2px)}
+.pl b{font:400 20px/1.05 var(--display);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding-right:16px}
+.pl .tm{position:absolute;right:9px;top:10px;width:10px;height:10px;border-radius:50%}
+.pl .row{display:flex;gap:10px;font-size:12px;color:var(--muted);flex-wrap:wrap}
+.pl .row span{display:flex;align-items:center;gap:4px;white-space:nowrap}
+.pl .row em{font-style:normal;font-weight:800;color:var(--ink);font-variant-numeric:tabular-nums}
+.clothes{display:flex;gap:3px}
+.clothes i{width:12px;height:5px;border-radius:3px;background:var(--prenda)}
+.clothes i.off{background:var(--line)}
+
+/* mesa y dado */
+.stage{position:relative;background:radial-gradient(70% 60% at 50% 48%,#4a1426 0%,#22090f 100%);border-radius:26px;padding:18px 16px 16px;display:flex;flex-direction:column;align-items:center;gap:6px;
+  box-shadow:inset 0 0 0 1px var(--line),0 18px 40px rgba(0,0,0,.45);overflow:hidden}
+.stage::before{content:"";position:absolute;inset:-40% -20% auto;height:80%;background:radial-gradient(closest-side,rgba(242,194,107,.16),transparent);pointer-events:none;animation:glow 4s ease-in-out infinite}
+@keyframes glow{50%{opacity:.55;transform:translateY(6px)}}
+.whose{font:400 25px/1.1 var(--display);text-align:center;z-index:1}
+.whose em{font-style:italic;color:var(--verdad)}
+.whose small{display:block;font:600 13px var(--body);color:var(--muted);margin-top:3px}
+#die{width:240px;height:240px;max-width:100%;cursor:pointer;z-index:1;touch-action:manipulation;display:block}
+.flat{width:170px;height:170px;margin:30px auto;border-radius:30px;display:grid;place-items:center;background:radial-gradient(85% 85% at 30% 25%,#a3213f,#7d1530 55%,#4c0a1b);font:800 20px var(--body);letter-spacing:.12em;text-transform:uppercase;cursor:pointer;z-index:1}
+.legend{display:flex;flex-wrap:wrap;justify-content:center;gap:5px 10px;z-index:1;font-size:11.5px;color:var(--muted)}
+.legend span{display:flex;align-items:center;gap:5px;white-space:nowrap}
+.legend i{width:8px;height:8px;border-radius:50%}
+.hint{font-size:13px;color:var(--muted);z-index:1;text-align:center}
+
+/* carta */
+.card{background:var(--card);border-radius:22px;padding:18px;display:flex;flex-direction:column;gap:12px;box-shadow:0 1px 0 var(--line);position:relative;overflow:hidden;min-height:120px}
+.card::before{content:"";position:absolute;left:0;top:0;bottom:0;width:6px;background:var(--k,var(--line))}
+.card .tag{font:800 12px var(--body);letter-spacing:.18em;text-transform:uppercase;color:var(--k)}
+.card p{margin:0;font:400 24px/1.25 var(--display);text-wrap:balance}
+.card p.empty{color:var(--muted);font-size:20px}
+.card .sub{font:400 13.5px/1.45 var(--body);color:var(--muted)}
+.card.in{animation:deal .45s cubic-bezier(.2,.9,.3,1.15)}
+@keyframes deal{from{opacity:0;transform:translateY(18px) rotate(-1.5deg)}}
+.acts{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:10px}
+.acts .btn{padding:15px 10px;font-size:15.5px}
+.acts .btn.drink{background:transparent;box-shadow:inset 0 0 0 2px var(--reto)}
+.acts .btn.wild{background:transparent;box-shadow:inset 0 0 0 2px var(--comodin)}
+.acts:empty{display:none}
+.foot{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+.foot p{margin:0;font-size:12.5px;color:var(--muted);line-height:1.45;flex:1 1 220px}
+.rules{font-size:13px;color:var(--muted);line-height:1.55;margin:0}
+.rules b{font-weight:700}
+
+/* capas */
+.veil{position:fixed;inset:0;z-index:20;background:rgba(18,5,10,.95);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);overflow-y:auto;
+  padding:max(20px,env(safe-area-inset-top,0px)) max(16px,env(safe-area-inset-right,0px)) max(24px,env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px))}
+.vin{max-width:440px;margin:0 auto;min-height:100%;display:flex;flex-direction:column;justify-content:center;gap:14px}
+.veil h2{font:400 38px/1 var(--display);margin:0}
+.veil h2 i{color:var(--reto)}
+.veil p{margin:0;font-size:15px;line-height:1.5;color:var(--muted)}
+.box{background:var(--card);border-radius:20px;padding:16px;display:flex;flex-direction:column;gap:12px}
+.lab{font:800 11.5px var(--body);letter-spacing:.16em;text-transform:uppercase;color:var(--muted);margin:0}
+.names{display:flex;flex-direction:column;gap:10px}
+.pair{display:grid;grid-template-columns:auto 1fr 1fr;gap:8px;align-items:center}
+.pair .dot{width:12px;height:12px;border-radius:50%}
+.names.solo .pair{grid-template-columns:1fr 1fr}
+.inp{width:100%;min-width:0;font:600 16px var(--body);color:var(--ink);background:var(--bg);border:2px solid var(--line);border-radius:13px;padding:11px}
+.inp:focus{border-color:var(--verdad);outline:none}
+.seg{display:grid;grid-auto-flow:column;grid-auto-columns:1fr;background:var(--bg);border-radius:13px;padding:3px;gap:3px}
+.seg button{border:0;background:none;color:var(--muted);font:700 13.5px var(--body);padding:10px 4px;border-radius:10px;cursor:pointer;line-height:1.2}
+.seg button.on{background:var(--ink);color:var(--bg)}
+.seg button small{display:block;font-weight:600;font-size:11px;opacity:.75;margin-top:2px}
+.levels button.on[data-v="1"]{background:var(--verdad)} .levels button.on[data-v="2"]{background:var(--reto)} .levels button.on[data-v="3"]{background:var(--prenda)}
+.err{color:var(--reto)!important;font-weight:700;font-size:13px!important}
+.err:empty{display:none}
+.acts.one{grid-template-columns:1fr}
+.toast{position:fixed;left:50%;bottom:max(24px,env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--bg);font:700 14px var(--body);padding:11px 18px;border-radius:999px;z-index:30;white-space:nowrap}
+@media (prefers-reduced-motion:reduce){.card.in,.stage::before{animation:none}}
+@media (max-width:370px){h1{font-size:34px}.card p{font-size:21px}.board{grid-template-columns:1fr 1fr}}
+</style>
+<style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}</style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+</head>
+<body>
+<div class="app">
+  <header>
+    <h1>Dado <i>atrevido</i><sup>D10</sup><small>Para adultos · +18</small></h1>
+    <button class="btn sm ghost" id="cfg">Ajustes</button>
+  </header>
+
+  <div class="board" id="board"></div>
+
+  <div class="stage">
+    <div class="whose" id="whose"></div>
+    <div id="dieBox"><canvas id="die" width="480" height="480" role="button" tabindex="0" aria-label="Tirar el dado"></canvas></div>
+    <div class="hint" id="hint">Toca el dado para tirar</div>
+    <div class="legend" id="legend"></div>
+  </div>
+
+  <div class="card" id="card"></div>
+  <div class="acts" id="acts"></div>
+
+  <div class="foot">
+    <p>Si a alguien no le apetece algo, lo dice y bebe. Lo importante es que lo paséis bien todos.</p>
+    <button class="btn sm ghost" id="reset">Empezar de cero</button>
+  </div>
+  <p class="rules">Cómo se juega: cada uno tira por turnos un dado de diez caras. <b style="color:var(--verdad)">Verdad</b> y <b style="color:var(--reto)">Reto</b> salen dos veces cada una. Las demás caras salen una vez: <b style="color:var(--prenda)">Prenda</b> (te quitas la que tú elijas), <b style="color:var(--duelo)">Duelo</b> (piedra, papel o tijera con alguien, y quien pierde se quita una prenda), <b style="color:var(--mandas)">Tú mandas</b> (eliges a quién y le pones verdad o reto), <b style="color:var(--comodin)">Comodín</b> (te lo guardas y te libra de una carta sin beber), <b style="color:var(--brindis)">Brindis</b> (bebe todo el mundo) y <b style="color:var(--todos)">Todos</b> (una verdad que contestan todos). Quien no quiere cumplir, bebe y pasa el turno. Si a alguien ya no le quedan prendas, en vez de quitarse una le toca un reto o beber. Por parejas, las verdades y los retos van siempre dirigidos a tu pareja. Bebed con cabeza: también se puede jugar sin alcohol.</p>
+</div>
+
+<div class="veil" id="age" hidden>
+  <div class="vin">
+    <h2>Solo para <i>adultos</i></h2>
+    <p>Dado Atrevido es un juego para adultos, con preguntas y retos picantes. Jugad solo si todos tenéis más de 18 años y os apetece a todos.</p>
+    <button class="btn main" id="ageOk">Todos tenemos más de 18 años</button>
+    <a class="btn ghost" href="https://www.google.com" rel="noopener" style="text-decoration:none">Salir</a>
+  </div>
+</div>
+
+<div class="veil" id="setup" hidden>
+  <div class="vin">
+    <h2>Preparad <i>la noche</i></h2>
+    <div class="box">
+      <p class="lab">Cómo jugáis</p>
+      <div class="seg" id="mode"><button data-v="pareja">Por parejas<small>de 1 a 3 parejas</small></button><button data-v="solo">Cada uno<small>de 2 a 6 jugadores</small></button></div>
+      <p class="lab" id="cntLab">Número de parejas</p>
+      <div class="seg" id="cnt"></div>
+      <div class="names" id="names"></div>
+    </div>
+    <div class="box">
+      <p class="lab">Nivel</p>
+      <div class="seg levels" id="lvl"><button data-v="1">Suave<small>coqueto</small></button><button data-v="2">Picante<small>atrevido</small></button><button data-v="3">Muy picante<small>sin frenos</small></button></div>
+    </div>
+    <div class="box">
+      <p class="lab">Prendas con las que empieza cada uno</p>
+      <div class="seg" id="clo"><button data-v="3">3</button><button data-v="4">4</button><button data-v="5">5</button><button data-v="6">6</button><button data-v="7">7</button></div>
+      <p class="lab">Si alguien no cumple</p>
+      <div class="seg" id="pen"><button data-v="trago">Un trago</button><button data-v="chupito">Un chupito</button><button data-v="sin">Sin alcohol</button></div>
+    </div>
+    <p class="err" id="serr"></p>
+    <div class="acts" id="sacts"><button class="btn ghost" id="scancel">Cancelar</button><button class="btn main" id="sgo">¡A jugar!</button></div>
+  </div>
+</div>
+
+<script>
+(()=>{
+const $=id=>document.getElementById(id);
+const KEY='dado-atrevido-10-v1', AGE='dado-atrevido-18';
+const TEST=new URLSearchParams(location.search).has('test');
+const lsGet=k=>{try{return JSON.parse(localStorage.getItem(k))}catch(e){return null}};
+const lsSet=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}};
+const esc=t=>String(t).replace(/[&<>"']/g,c=>'&#'+c.charCodeAt(0)+';');
+const rnd=n=>{try{const a=new Uint32Array(1);crypto.getRandomValues(a);return a[0]%n}catch(e){return Math.floor(Math.random()*n)}};
+const TEAM=['#f2c26b','#ff5d73','#7cb7ff'];
+
+// ---------- cartas ({o} = a quien va dirigida) ----------
+const DECK={
+ verdad:{
+  1:["¿Qué fue lo primero que te gustó de {o}?","¿Qué detalle de {o} te encanta y nunca se lo has dicho?","¿Qué parte del cuerpo de {o} es tu favorita?","¿Qué prenda de {o} te encanta verle puesta?","¿Qué te gustaría que {o} hiciera más a menudo?","¿Dónde te escaparías con {o} un fin de semana, sin pensar en el dinero?","¿Qué gesto de {o} te derrite?","¿Qué canción pondrías para bailar lento con {o}?","¿Qué es lo más bonito que te ha dicho {o}?","¿Qué cita perfecta prepararías para {o}?","¿Qué pensaste de {o} la primera vez que le viste?","Del 1 al 10, ¿cómo de guapo o guapa ves a {o} esta noche?","¿Qué te gustaría aprender de {o}?","¿Qué es lo que más te hace reír de {o}?"],
+  2:["¿Qué es lo que más te atrae de {o}?","¿Dónde te gustaría que {o} te besara?","¿Qué zona de tu cuerpo es la más sensible?","¿Has tenido un sueño subido de tono con {o}? Cuéntalo.","¿Qué ropa interior te gustaría ver puesta a {o}?","¿En qué sitio poco habitual besarías a {o} apasionadamente?","Del 1 al 10, ¿cuántas ganas tienes de besar a {o} ahora mismo?","¿Qué te gustaría que {o} te hiciera esta noche?","¿Qué te pone más: seducir o que te seduzcan?","¿Qué es lo más atrevido que te gustaría probar con {o}?","¿Qué mensaje picante te gustaría recibir de {o}?","¿Qué es lo más sexy que tiene {o}?","¿Qué le quitarías primero a {o}?","¿Qué fantasía tienes en la que salga {o}?"],
+  3:["¿Qué fantasía no le has contado nunca a {o}?","¿Qué te gustaría que {o} te hiciera en la cama?","¿Qué juego o juguete te gustaría probar con {o}?","¿Cuál es el sitio más arriesgado donde te gustaría hacerlo con {o}?","¿Qué te gustaría que {o} te susurrara en el momento más intenso?","¿Qué postura te gustaría probar con {o}?","¿Prefieres que {o} tome el control o tomarlo tú? ¿Por qué?","¿Qué parte del cuerpo de {o} besarías durante horas?","¿Qué te gustaría que {o} llevara puesto, o no, la próxima vez?","¿Qué es lo que más te cuesta pedir en la cama? Pídeselo a {o}.","Describe en tres palabras cómo sería tu noche perfecta con {o}.","¿Qué es lo primero que harías si te quedaras a solas con {o} ahora?"]
+ },
+ reto:{
+  1:["Dale a {o} un beso en la mejilla y otro en el cuello.","Hazle a {o} un masaje de hombros durante un minuto.","Mira a {o} a los ojos 30 segundos sin reíros.","Susúrrale a {o} tres cosas que te gustan de su cuerpo.","Baila lento con {o} una canción, muy juntos.","Coge la mano de {o} y bésale cada dedo.","Dibuja con el dedo un corazón en la espalda de {o}.","Siéntate en las rodillas de {o} hasta tu próximo turno.","Dile a {o} un piropo con tu voz más seductora.","Cierra los ojos y deja que {o} te dé un beso donde quiera.","Hazle cosquillas suaves en la espalda a {o} durante 30 segundos.","Dale a {o} un abrazo de 20 segundos sin soltarle."],
+  2:["Bésale el cuello a {o} durante 20 segundos.","Haz un baile sensual para {o} durante 30 segundos.","Dale a {o} un masaje de un minuto donde elija.","Tapa los ojos a {o} y bésale en tres sitios: tiene que adivinar dónde.","Susúrrale a {o} al oído lo que le harías ahora mismo.","Muérdele suavemente el lóbulo de la oreja a {o}.","Siéntate a horcajadas sobre {o} hasta tu próximo turno.","Besa a {o} desde la muñeca hasta el hombro.","Deja que {o} te bese donde quiera durante 15 segundos.","Haz que {o} se estremezca solo con tu aliento en el cuello.","Bésale a {o} la espalda de arriba abajo.","Durante un minuto, solo puedes acariciar a {o} con los labios."],
+  3:["Bésale a {o} el cuerpo bajando desde el cuello, hasta donde {o} te deje.","Véndate los ojos y deja que {o} te guíe las manos durante un minuto.","Durante un minuto, {o} no puede tocarte y tú puedes besarle donde quieras.","Cuéntale a {o} al oído, con detalle, cómo empezaríais la noche.","Dale a {o} un masaje con aceite o crema donde elija, durante dos minutos.","Besa a {o} un minuto entero sin usar las manos.","Elige una parte del cuerpo de {o} y bésala durante 30 segundos.","Recorre a besos a {o} de los pies a la cabeza en menos de un minuto.","Deja que {o} invente un reto para ti: tienes que cumplirlo.","Túmbate y deja que {o} haga contigo lo que quiera durante un minuto.","Quítale a {o} una prenda con los dientes, sin usar las manos.","Haz que {o} te pida un beso sin que tú le toques."]
+ },
+ todos:{
+  1:["¿Cuál ha sido tu peor cita?","¿Qué es lo primero en lo que te fijas de alguien?","¿Cómo fue tu primer beso?","¿Qué canción pondrías para una noche romántica?","¿Qué es lo más vergonzoso que te ha pasado ligando?","¿Qué te parece irresistible en una persona?","¿Cuál es tu plan perfecto para una noche en pareja?","¿Qué famoso o famosa te parece más atractivo?"],
+  2:["¿Cuál es el sitio más raro donde te has besado con alguien?","¿Qué es lo más atrevido que has hecho para conquistar a alguien?","¿Qué prenda te hace sentir más sexy?","¿Qué parte de tu cuerpo te gusta más?","¿Has mandado alguna vez un mensaje picante a quien no debías?","¿Qué es lo que más te pone en una primera cita?","¿Cuál es tu fantasía más inocente… y la menos inocente?","¿Qué es lo más loco que has hecho una noche de fiesta?"],
+  3:["¿Cuál es tu fantasía pendiente?","¿Cuál es el sitio más arriesgado donde lo has hecho?","¿Qué no has probado nunca y te da curiosidad?","¿Prefieres dominar o que te dominen?","¿Cuál ha sido tu mejor noche y qué la hizo especial?","¿Qué te gusta que te digan al oído?","¿Qué es lo más atrevido que has hecho en tu vida?","Del 1 al 10, ¿cómo de atrevido o atrevida eres en la cama?"]
+ }
+};
+// las diez caras: cinco arriba y cinco abajo, alternando colores
+const FACES=['verdad','reto','prenda','mandas','brindis','reto','verdad','duelo','todos','comodin'];
+const LAB={verdad:'Verdad',reto:'Reto',prenda:'Prenda',duelo:'Duelo',mandas:'Tú mandas',comodin:'Comodín',brindis:'Brindis',todos:'Todos'};
+const HEX={verdad:'#f2c26b',reto:'#ff5d73',prenda:'#c58bff',duelo:'#ff8a4c',mandas:'#ffd166',comodin:'#7fe0a8',brindis:'#5fd3c9',todos:'#7cb7ff'};
+const PEN={trago:'Bebo un trago',chupito:'Bebo un chupito',sin:'Paso y bebo'};
+const PENS={trago:'un trago',chupito:'un chupito',sin:'un trago sin alcohol'};
+
+// ---------- estado ----------
+let S=lsGet(KEY);
+function fresh(c){
+  const n=c.players.length;
+  // turnos: por parejas se alternan las parejas (A1, B1, C1, A2, B2, C2)
+  let order=[...Array(n).keys()];
+  if(c.mode==='pareja'){const k=n/2;order=[];for(let r=0;r<2;r++)for(let t=0;t<k;t++)order.push(t*2+r)}
+  return {mode:c.mode,players:c.players,level:c.level,clothes:c.clothes,pen:c.pen,order,ti:rnd(n),
+    left:Array(n).fill(c.clothes),drinks:Array(n).fill(0),done:Array(n).fill(0),wild:Array(n).fill(0),used:{},card:null,q:null};
+}
+const save=()=>lsSet(KEY,S);
+const N=()=>S.players.length;
+const cur=()=>S.order[S.ti];
+const name=i=>S.players[i];
+const partner=i=>i^1;
+function targetFor(p){if(S.mode==='pareja')return partner(p);const o=[...Array(N()).keys()].filter(i=>i!==p);return o[rnd(o.length)]}
+function pick(kind){
+  const lv=S.level,pool=DECK[kind][lv],k=kind+lv,used=S.used[k]||[];
+  let free=pool.map((_,i)=>i).filter(i=>!used.includes(i));
+  if(!free.length){free=pool.map((_,i)=>i);S.used[k]=[]}
+  const i=free[rnd(free.length)];(S.used[k]=S.used[k]||[]).push(i);return pool[i];
+}
+const fill=(t,o)=>t.replaceAll('{o}',name(o));
+
+// ---------- decaedro en 3D (trapezoedro pentagonal) ----------
+let R=null;
+function initDie(){
+  if(!window.THREE){$('dieBox').innerHTML='<div class="flat" id="flat" role="button" tabindex="0">Tirar</div>';return null}
+  const cv=$('die'),T=THREE;
+  const ren=new T.WebGLRenderer({canvas:cv,antialias:true,alpha:true,preserveDrawingBuffer:true});
+  ren.setPixelRatio(1);ren.setSize(480,480,false);
+  const scene=new T.Scene(),cam=new T.PerspectiveCamera(32,1,.1,50);cam.position.set(0,0,6.2);
+  scene.add(new T.AmbientLight(0xffffff,.42));
+  const L1=new T.DirectionalLight(0xfff0e0,.75);L1.position.set(2.5,3,5);scene.add(L1);
+  const L2=new T.PointLight(0xff8fa8,.6,20);L2.position.set(-3,-2,3);scene.add(L2);
+  // vértices: dos polos y un anillo de diez en zigzag
+  const h=.1056,top=new T.Vector3(0,1,0),bot=new T.Vector3(0,-1,0),V=[];
+  for(let k=0;k<10;k++){const a=k*Math.PI/5;V.push(new T.Vector3(Math.cos(a),k%2?-h:h,Math.sin(a)))}
+  const kites=[];
+  for(let i=0;i<5;i++)kites.push([top,V[(2*i+2)%10],V[2*i+1],V[2*i]]);       // caras de arriba
+  for(let i=0;i<5;i++)kites.push([bot,V[2*i+1],V[(2*i+2)%10],V[(2*i+3)%10]]); // caras de abajo
+  const pos=[],uv=[],nor=[],mats=[],faces=[];const geo=new T.BufferGeometry();
+  kites.forEach((q,f)=>{
+    const c=q.reduce((s,v)=>s.add(v),new T.Vector3()).multiplyScalar(.25);
+    const n=new T.Vector3().subVectors(q[1],q[0]).cross(new T.Vector3().subVectors(q[3],q[0])).normalize();
+    if(n.dot(c)<0)n.negate();
+    // el texto se lee con el polo arriba
+    const up=new T.Vector3().subVectors(q[0],c);up.sub(n.clone().multiplyScalar(up.dot(n))).normalize();
+    const right=new T.Vector3().crossVectors(up,n).normalize();
+    const S2=2.3,P=q.map(v=>{const d=new T.Vector3().subVectors(v,c);return [d.dot(right)/S2+.5,d.dot(up)/S2+.5]});
+    const tri=[0,1,2,0,2,3];
+    // los dos triángulos del cometa, en el orden que mira hacia fuera
+    const test=new T.Vector3().subVectors(q[1],q[0]).cross(new T.Vector3().subVectors(q[2],q[0]));
+    const idx=test.dot(n)>0?tri:[0,2,1,0,3,2];
+    geo.addGroup(pos.length/3,6,f);
+    for(const k of idx){pos.push(q[k].x,q[k].y,q[k].z);uv.push(P[k][0],P[k][1]);nor.push(n.x,n.y,n.z)}
+    // centro del texto: algo por debajo del centro, donde el cometa es más ancho
+    const tc=new T.Vector3().addVectors(q[1],q[3]).multiplyScalar(.5).lerp(c,.35);
+    const t=[(new T.Vector3().subVectors(tc,c).dot(right))/S2+.5,(new T.Vector3().subVectors(tc,c).dot(up))/S2+.5];
+    mats.push(new T.MeshStandardMaterial({map:faceTex(FACES[f],t),roughness:.42,metalness:.08}));
+    faces.push({n,up,right});
+  });
+  geo.setAttribute('position',new T.Float32BufferAttribute(pos,3));geo.setAttribute('uv',new T.Float32BufferAttribute(uv,2));geo.setAttribute('normal',new T.Float32BufferAttribute(nor,3));
+  const mesh=new T.Mesh(geo,mats);mesh.scale.setScalar(1.25);
+  const edges=new T.LineSegments(new T.EdgesGeometry(geo,1),new T.LineBasicMaterial({color:0x3a0612}));mesh.add(edges);
+  scene.add(mesh);
+  // sombra suave en el suelo
+  const sh=new T.Mesh(new T.CircleGeometry(1.1,40),new T.MeshBasicMaterial({color:0x000000,transparent:true,opacity:.35}));sh.rotation.x=-Math.PI/2;sh.position.y=-1.65;sh.scale.set(1,.35,1);scene.add(sh);
+  const target=f=>{ // giro que deja la cara f mirando a cámara y derecha
+    const {n,up,right}=faces[f];const m=new T.Matrix4().makeBasis(right,up,n).transpose();
+    return new T.Quaternion().setFromRotationMatrix(m);
+  };
+  return {ren,scene,cam,mesh,sh,target,T,anim:null};
+}
+function faceTex(kind,t){
+  const c=document.createElement('canvas');c.width=c.height=512;const g=c.getContext('2d');
+  const gr=g.createRadialGradient(200,170,40,256,256,380);gr.addColorStop(0,'#a8223f');gr.addColorStop(.6,'#7d1530');gr.addColorStop(1,'#4c0a1b');
+  g.fillStyle=gr;g.fillRect(0,0,512,512);
+  const x=t[0]*512,y=(1-t[1])*512,w=LAB[kind];
+  g.fillStyle=HEX[kind];g.textAlign='center';g.textBaseline='middle';
+  // el texto se ajusta al ancho de la cara (unos 190 px en la textura) y "Tú mandas" va en dos líneas
+  const lines=w.toUpperCase().split(' '),fam='Outfit, system-ui, sans-serif';
+  let fs=64;g.font=`800 ${fs}px ${fam}`;
+  const wid=Math.max(...lines.map(l=>g.measureText(l).width));if(wid>190)fs=Math.floor(fs*190/wid);
+  g.font=`800 ${fs}px ${fam}`;g.shadowColor='rgba(0,0,0,.35)';g.shadowBlur=8;g.shadowOffsetY=3;
+  const lh=fs*1.02,y0=y-(lines.length-1)*lh/2;
+  g.lineJoin='round';g.lineWidth=fs*.16;g.strokeStyle='#3a0612';
+  lines.forEach((l,i)=>g.strokeText(l,x,y0+i*lh));g.shadowColor='transparent';
+  lines.forEach((l,i)=>g.fillText(l,x,y0+i*lh));
+  g.shadowBlur=0;g.beginPath();g.arc(x,y0-fs*.95,8,0,7);g.fill();
+  const tx=new THREE.CanvasTexture(c);tx.anisotropy=4;tx.__t=t;return tx;
+}
+function drawDie(){if(R)R.ren.render(R.scene,R.cam)}
+function setRest(f){if(!R)return;R.mesh.quaternion.copy(R.target(f));R.mesh.position.y=0;drawDie()}
+function spin(f,done){
+  if(!R){const el=$('flat');if(el){el.textContent=LAB[FACES[f]];el.style.color=HEX[FACES[f]]}setTimeout(done,TEST?10:500);return}
+  const T=R.T,q0=R.mesh.quaternion.clone(),q1=R.target(f),ax=new T.Vector3(rnd(100)-50,rnd(100)-50,rnd(100)-50).normalize();
+  const total=Math.PI*2*(3+rnd(2)),D=TEST?30:1700,t0=performance.now();
+  const tmp=new T.Quaternion(),mid=new T.Quaternion();
+  const step=now=>{
+    const k=Math.min(1,(now-t0)/D),e=1-Math.pow(1-k,3);
+    tmp.setFromAxisAngle(ax,total*e);mid.copy(q0).premultiply(tmp);
+    // primero gira libre y al final se asienta en la cara que ha salido
+    const s=Math.max(0,(k-.45)/.55),se=s*s*(3-2*s);
+    R.mesh.quaternion.copy(mid).slerp(q1,se);
+    R.mesh.position.y=Math.abs(Math.sin(k*Math.PI*3))*(1-k)*.9;
+    R.sh.scale.set(1-R.mesh.position.y*.3,.35,1);
+    drawDie();
+    if(k<1)requestAnimationFrame(step);else{R.mesh.quaternion.copy(q1);R.mesh.position.y=0;drawDie();done()}
+  };
+  requestAnimationFrame(step);
+}
+
+// ---------- interfaz ----------
+function renderBoard(){
+  const c=S.card,act=c&&c.who!=null?c.who:cur();
+  $('board').innerHTML=S.players.map((n,i)=>{const l=S.left[i];
+    return `<div class="pl${i===act?' on':''}">${S.mode==='pareja'?`<i class="tm" style="background:${TEAM[i>>1]}" title="Pareja ${(i>>1)+1}"></i>`:''}<b>${esc(n)}</b>
+    <div class="clothes" aria-label="${l} prendas">${Array.from({length:S.clothes},(_,k)=>`<i class="${k<l?'':'off'}"></i>`).join('')}</div>
+    <div class="row"><span>Prendas <em>${l}</em></span><span>Bebe <em>${S.drinks[i]}</em></span>${S.wild[i]?`<span style="color:var(--comodin)">Comodín <em>${S.wild[i]}</em></span>`:''}</div></div>`}).join('');
+}
+function btns(list){$('acts').innerHTML=list.map(([t,a,cls,d])=>`<button class="btn ${cls||''}" data-a="${a}"${d!=null?` data-d="${d}"`:''}>${esc(t)}</button>`).join('')}
+function ui(){
+  renderBoard();
+  const p=cur(),c=S.card;
+  $('whose').innerHTML=`Turno de <em>${esc(name(p))}</em>${S.mode==='pareja'?`<small>Pareja de ${esc(name(partner(p)))}</small>`:''}`;
+  $('hint').textContent=c?(c.rolling?'Rodando…':'Resolved la carta para pasar el turno'):'Toca el dado para tirar';
+  const card=$('card');
+  if(!c){card.style.setProperty('--k','var(--line)');card.innerHTML=`<p class="empty">Le toca a <b style="color:var(--ink)">${esc(name(p))}</b>. Tira el dado y que decida la suerte.</p>`;btns([]);return}
+  card.style.setProperty('--k',HEX[c.kind]);
+  card.innerHTML=`<span class="tag">${esc(c.tag||LAB[c.kind])}</span><p>${esc(c.text)}</p>${c.sub?`<span class="sub">${esc(c.sub)}</span>`:''}`;
+  if(c.rolling){btns([]);return}
+  const w=c.who;
+  if(c.step==='do'){const l=[[PEN[S.pen],'no','drink']];if(S.wild[w])l.push(['Usar comodín','wild','wild']);l.push(['¡Hecho!','yes','main']);btns(l)}
+  else if(c.step==='ok')btns([['Seguir','next','main']]);
+  else if(c.step==='rival')btns(S.players.map((n,i)=>i===p?null:[n,'rival','',i]).filter(Boolean));
+  else if(c.step==='duel')btns([[`Gana ${name(p)}`,'win','',p],[`Gana ${name(c.rival)}`,'win','',c.rival]]);
+  else if(c.step==='choose')btns([['Verdad','give','','verdad'],['Reto','give','main','reto']]);
+}
+function legend(){$('legend').innerHTML=Object.keys(LAB).map(k=>`<span><i style="background:${HEX[k]}"></i>${LAB[k]}${k==='verdad'||k==='reto'?' ×2':''}</span>`).join('')}
+function toast(t){let e=$('toast');if(!e){e=document.createElement('div');e.id='toast';e.className='toast';e.setAttribute('role','status');document.body.appendChild(e)}
+  e.textContent=t;e.hidden=false;clearTimeout(toast.t);toast.t=setTimeout(()=>e.hidden=true,1900)}
+function dealIn(){const el=$('card');el.classList.remove('in');void el.offsetWidth;el.classList.add('in')}
+
+// ---------- juego ----------
+let busy=false;
+function makeCard(face,p){
+  const o=targetFor(p);
+  switch(face){
+    case 'verdad':case 'reto':return {kind:face,who:p,step:'do',text:fill(pick(face),o)};
+    case 'prenda':
+      if(S.left[p]>0)return {kind:'prenda',tag:'Fuera una prenda',who:p,step:'do',strip:true,text:`${name(p)}, quítate una prenda. Tú eliges cuál.`,sub:`Te quedan ${S.left[p]} antes de quitártela.`};
+      return {kind:'reto',tag:'Prenda → Reto',who:p,step:'do',text:fill(pick('reto'),o),sub:'Ya no te quedan prendas, así que te toca un reto.'};
+    case 'duelo':
+      if(S.mode==='pareja'&&N()===2)return {kind:'duelo',who:p,rival:partner(p),step:'duel',text:`Piedra, papel o tijera contra ${name(partner(p))}. Quien pierda, fuera una prenda.`,sub:'A la de tres. Si a quien pierde no le quedan prendas, bebe.'};
+      return {kind:'duelo',who:p,step:'rival',text:'Elige a quién retas a piedra, papel o tijera. Quien pierda, fuera una prenda.'};
+    case 'mandas':return {kind:'mandas',who:p,step:'rival',text:`${name(p)} manda. Elige a quién le pones una verdad o un reto.`};
+    case 'comodin':S.wild[p]++;return {kind:'comodin',who:p,step:'ok',text:`${name(p)} se guarda un comodín.`,sub:'Úsalo cuando quieras para librarte de una carta sin beber.'};
+    case 'brindis':S.players.forEach((_,i)=>S.drinks[i]++);return {kind:'brindis',who:p,step:'ok',text:'¡Brindis! Bebe todo el mundo.',sub:S.pen==='sin'?'Sin alcohol, como habéis elegido.':'Un trago cada uno.'};
+    case 'todos':{const t=pick('todos');return {kind:'todos',who:p,step:'ok',text:t,sub:`Contestáis todos, empezando por ${name(p)}. Quien no quiera, bebe.`}}
+  }
+}
+function roll(){
+  if(!S||busy||S.card)return;busy=true;
+  const f=rnd(10),p=cur();
+  S.card=Object.assign(makeCard(FACES[f],p),{face:f,rolling:true});
+  S.card.textHidden=S.card.text;S.card.text='…';
+  ui();
+  spin(f,()=>{busy=false;S.card.text=S.card.textHidden;delete S.card.textHidden;delete S.card.rolling;S.q=f;save();ui();dealIn()});
+}
+function nextTurn(){S.card=null;S.ti=(S.ti+1)%S.order.length;save();ui()}
+$('acts').onclick=e=>{
+  const b=e.target.closest('[data-a]');if(!b||!S.card||busy)return;
+  const a=b.dataset.a,d=b.dataset.d,c=S.card,p=cur();
+  if(a==='yes'){S.done[c.who]++;if(c.strip)S.left[c.who]=Math.max(0,S.left[c.who]-1);toast(c.strip?'Una prenda menos':'¡Cumplido!');nextTurn()}
+  else if(a==='no'){S.drinks[c.who]++;toast(name(c.who)+' bebe '+PENS[S.pen]);nextTurn()}
+  else if(a==='wild'){S.wild[c.who]--;toast(name(c.who)+' usa su comodín');nextTurn()}
+  else if(a==='next')nextTurn();
+  else if(a==='rival'){const r=+d;
+    if(c.kind==='duelo'){c.rival=r;c.step='duel';c.text=`Piedra, papel o tijera: ${name(p)} contra ${name(r)}. Quien pierda, fuera una prenda.`;c.sub='A la de tres. Si a quien pierde no le quedan prendas, bebe.'}
+    else{c.rival=r;c.step='choose';c.text=`¿Qué le pones a ${name(r)}?`}
+    save();ui();dealIn()}
+  else if(a==='win'){const w=+d,l=w===p?c.rival:p;
+    if(S.left[l]>0){S.left[l]--;S.card={kind:'duelo',who:l,step:'ok',text:`Gana ${name(w)}. ${name(l)} se quita una prenda.`,sub:`A ${name(l)} le quedan ${S.left[l]}.`}}
+    else{S.drinks[l]++;S.card={kind:'duelo',who:l,step:'ok',text:`Gana ${name(w)}. Como a ${name(l)} no le quedan prendas, bebe ${PENS[S.pen]}.`}}
+    save();ui();dealIn()}
+  else if(a==='give'){const r=c.rival;
+    // por parejas, la carta va dirigida a la pareja de quien la cumple; si no, a quien la manda
+    const tgt=S.mode==='pareja'?partner(r):p;
+    S.card={kind:d,tag:'Tú mandas · '+LAB[d],who:r,step:'do',text:fill(pick(d),tgt),sub:`Se lo manda ${name(p)}.`};save();ui();dealIn()}
+};
+const tap=()=>roll();
+function bindDie(){const el=$('die')||$('flat');if(!el)return;el.onclick=tap;el.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();tap()}}}
+
+// ---------- configuración ----------
+let D;
+function seg(id,v){$(id).querySelectorAll('button').forEach(b=>b.classList.toggle('on',b.dataset.v===String(v)))}
+function renderSetup(){
+  seg('mode',D.mode);seg('lvl',D.level);seg('clo',D.clothes);seg('pen',D.pen);
+  const pr=D.mode==='pareja';
+  $('cntLab').textContent=pr?'Número de parejas':'Número de jugadores';
+  const opts=pr?[1,2,3]:[2,3,4,5,6];
+  if(!opts.includes(D.count))D.count=pr?1:2;
+  $('cnt').innerHTML=opts.map(v=>`<button data-v="${v}" class="${v===D.count?'on':''}">${v}</button>`).join('');
+  const n=pr?D.count*2:D.count;while(D.names.length<n)D.names.push('');
+  let h='';
+  if(pr)for(let t=0;t<D.count;t++)h+=`<div class="pair"><i class="dot" style="background:${TEAM[t]}"></i>${[0,1].map(k=>`<input class="inp" data-i="${t*2+k}" maxlength="14" placeholder="Pareja ${t+1}" value="${esc(D.names[t*2+k]||'')}" autocomplete="off">`).join('')}</div>`;
+  else for(let i=0;i<n;i+=2)h+=`<div class="pair">${[i,i+1].filter(k=>k<n).map(k=>`<input class="inp" data-i="${k}" maxlength="14" placeholder="Jugador ${k+1}" value="${esc(D.names[k]||'')}" autocomplete="off">`).join('')}</div>`;
+  $('names').innerHTML=h;$('names').classList.toggle('solo',!pr);
+}
+function openSetup(){
+  D=S?{mode:S.mode,count:S.mode==='pareja'?N()/2:N(),names:S.players.slice(),level:S.level,clothes:S.clothes,pen:S.pen}:{mode:'pareja',count:1,names:[],level:1,clothes:5,pen:'trago'};
+  $('scancel').hidden=!S;$('sacts').classList.toggle('one',!S);$('serr').textContent='';$('sgo').textContent=S?'Guardar y empezar':'¡A jugar!';
+  renderSetup();$('setup').hidden=false;
+}
+$('names').oninput=e=>{const i=e.target.dataset.i;if(i!=null)D.names[+i]=e.target.value};
+$('mode').onclick=e=>{const b=e.target.closest('button');if(b){D.mode=b.dataset.v;renderSetup()}};
+$('cnt').onclick=e=>{const b=e.target.closest('button');if(b){D.count=+b.dataset.v;renderSetup()}};
+for(const [id,k,num] of [['lvl','level',1],['clo','clothes',1],['pen','pen',0]])
+  $(id).onclick=e=>{const b=e.target.closest('button');if(!b)return;D[k]=num?+b.dataset.v:b.dataset.v;seg(id,D[k])};
+$('sgo').onclick=()=>{
+  const n=D.mode==='pareja'?D.count*2:D.count;
+  const names=D.names.slice(0,n).map(v=>String(v||'').replace(/[<>]/g,'').replace(/\s+/g,' ').trim().slice(0,14));
+  if(names.some(v=>!v)){$('serr').textContent='Escribid todos los nombres para saber a quién le toca.';return}
+  if(new Set(names.map(v=>v.toLowerCase())).size<names.length){$('serr').textContent='Poned nombres distintos para no liaros con los turnos.';return}
+  const same=S&&S.mode===D.mode&&N()===n;
+  if(same){S.players=names;S.level=D.level;S.pen=D.pen;const dc=D.clothes-S.clothes;if(dc){S.clothes=D.clothes;S.left=S.left.map(x=>Math.max(0,Math.min(S.clothes,x+dc)))}if(S.card&&!S.card.rolling)S.card=null}
+  else S=fresh({mode:D.mode,players:names,level:D.level,clothes:D.clothes,pen:D.pen});
+  save();$('setup').hidden=true;ui();
+};
+$('scancel').onclick=()=>$('setup').hidden=true;
+$('cfg').onclick=openSetup;
+let arm=0;
+$('reset').onclick=()=>{
+  if(!S)return;
+  if(Date.now()-arm>3000){arm=Date.now();$('reset').textContent='¿Seguro? Toca otra vez';setTimeout(()=>$('reset').textContent='Empezar de cero',3000);return}
+  S=fresh({mode:S.mode,players:S.players,level:S.level,clothes:S.clothes,pen:S.pen});save();$('reset').textContent='Empezar de cero';ui();toast('Partida nueva');
+};
+
+// ---------- arranque ----------
+legend();
+try{R=initDie()}catch(e){R=null;$('dieBox').innerHTML='<div class="flat" id="flat" role="button" tabindex="0">Tirar</div>'}
+bindDie();
+if(S&&S.card&&S.card.rolling){S.card.text=S.card.textHidden||S.card.text;delete S.card.textHidden;delete S.card.rolling}
+// al abrir, el dado enseña una cara al azar (o la última que salió)
+const show=()=>setRest(S&&S.q!=null?S.q:rnd(10));
+// cuando carga la fuente, se repintan las caras con ella
+document.fonts&&document.fonts.load('800 60px Outfit').then(()=>{if(R){R.mesh.material.forEach((m,i)=>{const t=m.map.__t;m.map.dispose();m.map=faceTex(FACES[i],t);m.needsUpdate=true});drawDie()}}).catch(()=>{});
+function start(){if(!S)openSetup();else ui();show()}
+if(TEST||lsGet(AGE))start();else{$('age').hidden=false;show()}
+$('ageOk').onclick=()=>{lsSet(AGE,true);$('age').hidden=true;start()};
+if(TEST)window.__t={get S(){return S},roll,FACES,DECK,get busy(){return busy},click:(a,d)=>{const b=[...$('acts').querySelectorAll('[data-a]')].find(x=>x.dataset.a===a&&(d==null||x.dataset.d==String(d)));if(b)b.click();return !!b}};
+})();
+</script>
+</body>
+</html>
