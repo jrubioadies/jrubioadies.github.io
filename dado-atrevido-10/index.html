@@ -6,6 +6,11 @@
 <title>Dado Atrevido 10</title>
 <meta name="robots" content="noindex">
 <meta name="theme-color" content="#1c0910">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Dado Atrevido">
+<link rel="apple-touch-icon" href="icono.png">
 <meta name="description" content="Juego para adultos (+18), por parejas o de 2 a 6 jugadores: un dado de diez caras con verdad, reto, prenda, duelo, comodín, brindis y más.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Outfit:wght@400;600;700;800&display=swap">
@@ -109,6 +114,45 @@ button:focus-visible,input:focus-visible{outline:3px solid var(--verdad);outline
 .err:empty{display:none}
 .acts.one{grid-template-columns:1fr}
 .toast{position:fixed;left:50%;bottom:max(24px,env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--bg);font:700 14px var(--body);padding:11px 18px;border-radius:999px;z-index:30;white-space:nowrap}
+
+/* ---------- tableta: más grande en vertical ---------- */
+@media (min-width:700px){
+  .app{max-width:680px;gap:16px}
+  h1{font-size:50px}
+  .board{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .board[data-n="3"],.board[data-n="6"]{grid-template-columns:repeat(3,minmax(0,1fr))}
+  .pl b{font-size:23px}
+  #die{width:340px;height:340px}
+  .card p{font-size:30px}
+  .card .sub,.rules,.foot p{font-size:14.5px}
+  .acts .btn{padding:18px 12px;font-size:17px}
+  .whose{font-size:30px}
+  .vin{max-width:560px}
+}
+/* ---------- tableta en horizontal: dado a la izquierda, juego a la derecha ---------- */
+@media (min-width:900px) and (orientation:landscape){
+  .app{max-width:1240px;display:grid;grid-template-columns:minmax(0,1.08fr) minmax(0,1fr);
+    grid-template-areas:"head head" "stage board" "stage card" "stage acts" "stage foot" "rules rules";grid-template-rows:auto auto auto auto 1fr auto;
+    column-gap:24px;row-gap:14px;align-content:start;padding-block:18px 28px}
+  header{grid-area:head} #board{grid-area:board} .stage{grid-area:stage;justify-content:center;gap:10px;min-height:min(640px,calc(100vh - 140px))}
+  #card{grid-area:card;align-self:start} #acts{grid-area:acts;align-self:start} .foot{grid-area:foot;align-self:end} .rules{grid-area:rules}
+  .board{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .board[data-n="3"],.board[data-n="6"]{grid-template-columns:repeat(3,minmax(0,1fr))}
+  #die{width:min(460px,56vh);height:min(460px,56vh)}
+  .flat{width:260px;height:260px;font-size:26px}
+  .whose{font-size:34px}
+  .legend{font-size:13px;gap:6px 14px}
+  .card{min-height:180px;padding:22px}
+  .card p{font-size:31px}
+  .vin{max-width:960px;display:grid;grid-template-columns:1fr 1fr;align-content:center;gap:16px}
+  .vin>h2,.vin>p,.vin>.err,.vin>.acts,.vin>.btn,.vin>a{grid-column:1/-1}
+  #setup .vin>.box:first-of-type{grid-row:span 2}
+  #age .vin{max-width:560px;display:flex}
+}
+@media (min-width:900px) and (orientation:landscape) and (max-height:700px){
+  #die{width:min(380px,52vh);height:min(380px,52vh)}
+  .card p{font-size:26px}
+}
 @media (prefers-reduced-motion:reduce){.card.in,.stage::before{animation:none}}
 @media (max-width:370px){h1{font-size:34px}.card p{font-size:21px}.board{grid-template-columns:1fr 1fr}}
 </style>
@@ -126,7 +170,7 @@ button:focus-visible,input:focus-visible{outline:3px solid var(--verdad);outline
 
   <div class="stage">
     <div class="whose" id="whose"></div>
-    <div id="dieBox"><canvas id="die" width="480" height="480" role="button" tabindex="0" aria-label="Tirar el dado"></canvas></div>
+    <div id="dieBox"><canvas id="die" width="720" height="720" role="button" tabindex="0" aria-label="Tirar el dado"></canvas></div>
     <div class="hint" id="hint">Toca el dado para tirar</div>
     <div class="legend" id="legend"></div>
   </div>
@@ -241,7 +285,7 @@ function initDie(){
   if(!window.THREE){$('dieBox').innerHTML='<div class="flat" id="flat" role="button" tabindex="0">Tirar</div>';return null}
   const cv=$('die'),T=THREE;
   const ren=new T.WebGLRenderer({canvas:cv,antialias:true,alpha:true,preserveDrawingBuffer:true});
-  ren.setPixelRatio(1);ren.setSize(480,480,false);
+  ren.setPixelRatio(1);ren.setSize(720,720,false);
   const scene=new T.Scene(),cam=new T.PerspectiveCamera(32,1,.1,50);cam.position.set(0,0,6.2);
   scene.add(new T.AmbientLight(0xffffff,.42));
   const L1=new T.DirectionalLight(0xfff0e0,.75);L1.position.set(2.5,3,5);scene.add(L1);
@@ -326,7 +370,7 @@ function spin(f,done){
 
 // ---------- interfaz ----------
 function renderBoard(){
-  const c=S.card,act=c&&c.who!=null?c.who:cur();
+  const c=S.card,act=c&&c.who!=null?c.who:cur();$('board').dataset.n=N();
   $('board').innerHTML=S.players.map((n,i)=>{const l=S.left[i];
     return `<div class="pl${i===act?' on':''}">${S.mode==='pareja'?`<i class="tm" style="background:${TEAM[i>>1]}" title="Pareja ${(i>>1)+1}"></i>`:''}<b>${esc(n)}</b>
     <div class="clothes" aria-label="${l} prendas">${Array.from({length:S.clothes},(_,k)=>`<i class="${k<l?'':'off'}"></i>`).join('')}</div>
