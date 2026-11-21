@@ -1,0 +1,332 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Dado Atrevido</title>
+<meta name="robots" content="noindex">
+<meta name="theme-color" content="#1c0910">
+<meta name="description" content="Juego para parejas (+18): tirad el dado y toca verdad, reto o fuera una prenda. Quien no cumple, bebe y pasa el turno.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Outfit:wght@400;600;700;800&display=swap">
+<style>
+/* Una sola atmósfera, a propósito: luz de vela sobre terciopelo granate. Dado de lacre, tres palos (verdad, reto, prenda) */
+:root{
+  --bg:#1c0910; --bg2:#2e0f1b; --card:#2a111b; --card2:#3a1726; --ink:#fbeef0; --muted:#d3a9b3; --line:#4a2232;
+  --verdad:#f2c26b; --reto:#ff5d73; --prenda:#c58bff; --die:#7d1530; --dieE:#4c0a1b; --ok:#7fe0a8;
+  --display:"DM Serif Display",Georgia,"Times New Roman",serif;
+  --body:"Outfit",system-ui,-apple-system,"Segoe UI",sans-serif;
+  color-scheme:dark;
+}
+[hidden]{display:none!important}
+*{box-sizing:border-box}
+html{background:var(--bg)}
+body{margin:0;min-height:100vh;color:var(--ink);font-family:var(--body);
+  background:radial-gradient(120% 70% at 50% 0%,var(--bg2) 0%,var(--bg) 62%) fixed,var(--bg);
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));
+  -webkit-tap-highlight-color:transparent}
+.app{max-width:480px;margin:0 auto;display:flex;flex-direction:column;gap:14px;padding-block:16px 28px}
+header{display:flex;align-items:flex-end;justify-content:space-between;gap:12px}
+h1{font:400 40px/.95 var(--display);margin:0;letter-spacing:-.3px}
+h1 i{color:var(--reto)}
+h1 small{display:block;font:700 12px var(--body);letter-spacing:.2em;text-transform:uppercase;color:var(--muted);margin-top:6px}
+.btn{border:0;border-radius:14px;padding:12px 16px;font:700 15px var(--body);cursor:pointer;background:var(--card2);color:var(--ink);display:inline-flex;align-items:center;justify-content:center;gap:8px}
+.btn.main{background:var(--ink);color:var(--bg)}
+.btn.ghost{background:transparent;box-shadow:inset 0 0 0 2px var(--line)}
+.btn.sm{padding:9px 12px;font-size:13px;border-radius:11px}
+.btn:disabled{opacity:.4;cursor:default}
+button:focus-visible,input:focus-visible{outline:3px solid var(--verdad);outline-offset:2px}
+
+/* marcador */
+.duo{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.pl{background:var(--card);border-radius:18px;padding:12px 14px;display:flex;flex-direction:column;gap:6px;border:2px solid transparent;transition:border-color .25s,transform .25s;min-width:0}
+.pl.on{border-color:var(--verdad);transform:translateY(-2px)}
+.pl b{font:400 24px/1.05 var(--display);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pl .row{display:flex;gap:12px;font-size:12.5px;color:var(--muted);flex-wrap:wrap}
+.pl .row span{display:flex;align-items:center;gap:5px;white-space:nowrap}
+.pl .row em{font-style:normal;font-weight:800;color:var(--ink);font-variant-numeric:tabular-nums}
+.clothes{display:flex;gap:4px}
+.clothes i{width:14px;height:6px;border-radius:3px;background:var(--prenda)}
+.clothes i.off{background:var(--line)}
+
+/* mesa y dado */
+.stage{position:relative;background:radial-gradient(70% 60% at 50% 45%,#4a1426 0%,#22090f 100%);border-radius:26px;padding:22px 16px 18px;display:flex;flex-direction:column;align-items:center;gap:16px;
+  box-shadow:inset 0 0 0 1px var(--line),0 18px 40px rgba(0,0,0,.45);overflow:hidden}
+.stage::before{content:"";position:absolute;inset:-40% -20% auto;height:80%;background:radial-gradient(closest-side,rgba(242,194,107,.16),transparent);pointer-events:none;animation:glow 4s ease-in-out infinite}
+@keyframes glow{50%{opacity:.55;transform:translateY(6px)}}
+.whose{font:400 26px/1.1 var(--display);text-align:center;z-index:1}
+.whose em{font-style:italic;color:var(--verdad)}
+.scene{width:150px;height:150px;perspective:700px;cursor:pointer;z-index:1;margin:6px 0 4px}
+.cube{width:100%;height:100%;position:relative;transform-style:preserve-3d;transition:transform 1.25s cubic-bezier(.2,.75,.25,1)}
+.face{position:absolute;inset:0;border-radius:24px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;
+  background:radial-gradient(85% 85% at 30% 25%,#a3213f 0%,var(--die) 55%,var(--dieE) 100%);box-shadow:inset 0 0 0 3px rgba(255,255,255,.12),inset 0 -10px 22px rgba(0,0,0,.35);backface-visibility:hidden}
+.face svg{width:54px;height:54px}
+.face span{font:800 15px var(--body);letter-spacing:.14em;text-transform:uppercase}
+.f1{transform:rotateY(0deg) translateZ(75px)} .f2{transform:rotateY(90deg) translateZ(75px)} .f3{transform:rotateY(180deg) translateZ(75px)}
+.f4{transform:rotateY(-90deg) translateZ(75px)} .f5{transform:rotateX(90deg) translateZ(75px)} .f6{transform:rotateX(-90deg) translateZ(75px)}
+.shadow{width:130px;height:16px;border-radius:50%;background:rgba(0,0,0,.45);filter:blur(6px);margin-top:-8px;z-index:0}
+.hint{font-size:13px;color:var(--muted);z-index:1;text-align:center}
+
+/* carta */
+.card{background:var(--card);border-radius:22px;padding:18px;display:flex;flex-direction:column;gap:14px;box-shadow:0 1px 0 var(--line);position:relative;overflow:hidden;min-height:132px}
+.card::before{content:"";position:absolute;left:0;top:0;bottom:0;width:6px;background:var(--k,var(--line))}
+.card .tag{display:inline-flex;align-items:center;gap:8px;font:800 12px var(--body);letter-spacing:.18em;text-transform:uppercase;color:var(--k)}
+.card .tag svg{width:20px;height:20px}
+.card p{margin:0;font:400 25px/1.25 var(--display);text-wrap:balance}
+.card .sub{font:400 13.5px/1.45 var(--body);color:var(--muted)}
+.card.in{animation:deal .45s cubic-bezier(.2,.9,.3,1.15)}
+@keyframes deal{from{opacity:0;transform:translateY(18px) rotate(-1.5deg)}}
+.acts{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.acts .btn{padding:15px 12px;font-size:16px}
+.acts.one{grid-template-columns:1fr}
+.acts .btn.drink{background:transparent;box-shadow:inset 0 0 0 2px var(--reto);color:var(--ink)}
+.card p.empty{color:var(--muted);font-size:21px}
+.foot{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+.foot p{margin:0;font-size:12.5px;color:var(--muted);line-height:1.45;flex:1 1 220px}
+.rules{font-size:13px;color:var(--muted);line-height:1.55;margin:0}
+
+/* capas: edad y configuración */
+.veil{position:fixed;inset:0;z-index:20;background:rgba(18,5,10,.94);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);overflow-y:auto;
+  padding:max(20px,env(safe-area-inset-top,0px)) max(16px,env(safe-area-inset-right,0px)) max(24px,env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px))}
+.vin{max-width:440px;margin:0 auto;min-height:100%;display:flex;flex-direction:column;justify-content:center;gap:16px}
+.veil h2{font:400 38px/1 var(--display);margin:0}
+.veil h2 i{color:var(--reto)}
+.veil p{margin:0;font-size:15px;line-height:1.5;color:var(--muted)}
+.box{background:var(--card);border-radius:20px;padding:16px;display:flex;flex-direction:column;gap:12px}
+.lab{font:800 11.5px var(--body);letter-spacing:.16em;text-transform:uppercase;color:var(--muted);margin:0}
+.names{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.inp{width:100%;min-width:0;font:600 17px var(--body);color:var(--ink);background:var(--bg);border:2px solid var(--line);border-radius:13px;padding:12px}
+.inp:focus{border-color:var(--verdad);outline:none}
+.seg{display:grid;grid-auto-flow:column;grid-auto-columns:1fr;background:var(--bg);border-radius:13px;padding:3px;gap:3px}
+.seg button{border:0;background:none;color:var(--muted);font:700 13.5px var(--body);padding:10px 6px;border-radius:10px;cursor:pointer;line-height:1.2}
+.seg button.on{background:var(--ink);color:var(--bg)}
+.seg button small{display:block;font-weight:600;font-size:11px;opacity:.75;margin-top:2px}
+.levels button.on[data-v="1"]{background:var(--verdad)} .levels button.on[data-v="2"]{background:var(--reto)} .levels button.on[data-v="3"]{background:var(--prenda)}
+.err{color:var(--reto)!important;font-weight:700;font-size:13px!important}
+.err:empty{display:none}
+.note{font-size:12.5px!important;border-left:3px solid var(--verdad);padding-left:10px}
+.toast{position:fixed;left:50%;bottom:max(24px,env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--bg);font:700 14px var(--body);padding:11px 18px;border-radius:999px;z-index:30;white-space:nowrap}
+@media (prefers-reduced-motion:reduce){.cube{transition-duration:.01s}.card.in,.stage::before{animation:none}}
+@media (max-width:370px){h1{font-size:34px}.card p{font-size:22px}.pl b{font-size:21px}}
+</style>
+<style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}</style>
+</head>
+<body>
+<div class="app">
+  <header>
+    <h1>Dado <i>atrevido</i><small>Juego para parejas · +18</small></h1>
+    <button class="btn sm ghost" id="cfg">Ajustes</button>
+  </header>
+
+  <div class="duo">
+    <div class="pl" id="p0"></div>
+    <div class="pl" id="p1"></div>
+  </div>
+
+  <div class="stage">
+    <div class="whose" id="whose"></div>
+    <div class="scene" id="scene" role="button" tabindex="0" aria-label="Tirar el dado">
+      <div class="cube" id="cube"></div>
+    </div>
+    <div class="shadow"></div>
+    <div class="hint" id="hint">Toca el dado para tirar</div>
+  </div>
+
+  <div class="card" id="card"></div>
+  <div class="acts" id="acts" hidden>
+    <button class="btn drink" id="no"></button>
+    <button class="btn main" id="yes">¡Hecho!</button>
+  </div>
+
+  <div class="foot">
+    <p>Si a alguno no le apetece algo, se dice y se bebe. Lo importante es que os lo paséis bien los dos.</p>
+    <button class="btn sm ghost" id="reset">Empezar de cero</button>
+  </div>
+  <p class="rules">Cómo se juega: cada uno tira por turnos. El dado tiene dos caras de cada: <b style="color:var(--verdad)">Verdad</b> (contesta con sinceridad), <b style="color:var(--reto)">Reto</b> (haz lo que dice la carta) y <b style="color:var(--prenda)">Prenda</b> (quítate una prenda, la que tú elijas). Quien no quiere cumplir, bebe y pasa el turno. Cuando a alguien ya no le quedan prendas, la cara de Prenda se convierte en un reto. Podéis subir de nivel en Ajustes cuando os apetezca. Bebed con cabeza: también se puede jugar sin alcohol.</p>
+</div>
+
+<div class="veil" id="age" hidden>
+  <div class="vin">
+    <h2>Solo para <i>adultos</i></h2>
+    <p>Dado Atrevido es un juego para parejas adultas, con preguntas y retos picantes. Jugad solo si los dos tenéis más de 18 años y os apetece a ambos.</p>
+    <button class="btn main" id="ageOk">Tenemos más de 18 años</button>
+    <a class="btn ghost" href="https://www.google.com" rel="noopener" style="text-decoration:none">Salir</a>
+  </div>
+</div>
+
+<div class="veil" id="setup" hidden>
+  <div class="vin">
+    <h2>Preparad <i>la noche</i></h2>
+    <div class="box">
+      <p class="lab">Vuestros nombres</p>
+      <div class="names"><input class="inp" id="n0" maxlength="14" placeholder="Jugador 1" autocomplete="off"><input class="inp" id="n1" maxlength="14" placeholder="Jugador 2" autocomplete="off"></div>
+    </div>
+    <div class="box">
+      <p class="lab">Nivel</p>
+      <div class="seg levels" id="lvl"><button data-v="1">Suave<small>coqueto</small></button><button data-v="2">Picante<small>atrevido</small></button><button data-v="3">Muy picante<small>sin frenos</small></button></div>
+    </div>
+    <div class="box">
+      <p class="lab">Prendas con las que empieza cada uno</p>
+      <div class="seg" id="clo"><button data-v="3">3</button><button data-v="4">4</button><button data-v="5">5</button><button data-v="6">6</button><button data-v="7">7</button></div>
+      <p class="lab">Si alguien no cumple</p>
+      <div class="seg" id="pen"><button data-v="trago">Un trago</button><button data-v="chupito">Un chupito</button><button data-v="sin">Sin alcohol</button></div>
+    </div>
+    <p class="err" id="serr"></p>
+    <div class="acts"><button class="btn ghost" id="scancel">Cancelar</button><button class="btn main" id="sgo">¡A jugar!</button></div>
+  </div>
+</div>
+
+<script>
+(()=>{
+const $=id=>document.getElementById(id);
+const KEY='dado-atrevido-v1', AGE='dado-atrevido-18';
+const TEST=new URLSearchParams(location.search).has('test');
+const lsGet=k=>{try{return JSON.parse(localStorage.getItem(k))}catch(e){return null}};
+const lsSet=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}};
+const esc=t=>String(t).replace(/[&<>"']/g,c=>'&#'+c.charCodeAt(0)+';');
+// azar de verdad: crypto si existe
+const rnd=n=>{try{const a=new Uint32Array(1);crypto.getRandomValues(a);return a[0]%n}catch(e){return Math.floor(Math.random()*n)}};
+
+// ---------- cartas ({o} = la otra persona) ----------
+const DECK={
+ verdad:{
+  1:["¿Qué fue lo primero que te gustó de {o}?","¿Cuál ha sido vuestra mejor cita y por qué?","¿Qué canción te recuerda a {o}?","¿Qué detalle de {o} te encanta y nunca se lo has dicho?","¿Qué parte del cuerpo de {o} es tu favorita?","¿Qué pensaste la primera vez que besaste a {o}?","¿Qué prenda de {o} te encanta verle puesta?","¿Qué te gustaría que {o} hiciera más a menudo?","¿Dónde te escaparías con {o} un fin de semana, sin pensar en el dinero?","¿Cuál es tu recuerdo favorito juntos?","¿Qué es lo más romántico que alguien ha hecho por ti?","¿Qué gesto de {o} te derrite?","¿Cuándo te has puesto celoso o celosa por {o}?","¿Qué te enamoró de la forma de ser de {o}?"],
+  2:["¿Qué es lo que más te excita de {o}?","¿Cuál es tu fantasía favorita con {o}? Cuéntala con detalle.","¿Dónde te gusta más que {o} te bese?","¿Qué zona de tu cuerpo es la más sensible?","¿Has tenido un sueño subido de tono con {o}? Cuéntalo.","¿Cuál ha sido el momento más caliente que habéis vivido juntos?","¿Qué ropa interior te gustaría ver puesta a {o}?","¿En qué sitio poco habitual te gustaría besar a {o} apasionadamente?","Del 1 al 10, ¿cuántas ganas tienes de {o} ahora mismo?","¿Qué te gustaría que {o} te hiciera esta noche?","¿Qué te pone más: seducir o que te seduzcan?","¿Qué es lo más atrevido que te gustaría probar con {o}?","¿Qué es lo primero que harías si {o} entrara ahora sin ropa?","¿Qué mensaje picante te gustaría recibir de {o}?"],
+  3:["¿Qué fantasía no le has contado nunca a {o}?","¿Qué es lo que más te gusta que {o} te haga en la cama?","¿Qué juego o juguete te gustaría probar con {o}?","¿Cuál es el sitio más arriesgado donde lo habéis hecho, o donde te gustaría hacerlo?","¿Qué te gustaría que {o} te susurrara en el momento más intenso?","¿Qué postura te gustaría probar con {o}?","¿Prefieres que {o} tome el control o tomarlo tú? ¿Por qué?","Describe en tres palabras cómo sería vuestra noche perfecta.","¿Qué parte del cuerpo de {o} besarías durante horas?","¿Qué es lo más atrevido que has hecho nunca?","¿Qué te gustaría que {o} llevara puesto, o no, la próxima vez?","¿Qué es lo que más te cuesta pedirle a {o}? Pídelo ahora."]
+ },
+ reto:{
+  1:["Dale a {o} un beso en la mejilla y otro en el cuello.","Hazle a {o} un masaje de hombros durante un minuto.","Mira a {o} a los ojos 30 segundos sin reíros.","Susúrrale a {o} tres cosas que te gustan de su cuerpo.","Bailad lento una canción, muy juntos.","Dale a {o} un beso de película.","Coge la mano de {o} y bésale cada dedo.","Dibuja con el dedo un corazón en la espalda de {o}.","Siéntate en las rodillas de {o} hasta tu próximo turno.","Dile a {o} un piropo con tu voz más seductora.","Cierra los ojos y deja que {o} te dé un beso donde quiera.","Hazle cosquillas suaves en la espalda a {o} durante 30 segundos."],
+  2:["Bésale el cuello a {o} durante 20 segundos.","Haz un baile sensual para {o} durante 30 segundos.","Dale a {o} un masaje de un minuto donde elija.","Tapa los ojos a {o} y bésale en tres sitios: tiene que adivinar dónde.","Susúrrale a {o} al oído lo que le harías ahora mismo.","Muérdele suavemente el lóbulo de la oreja a {o}.","Siéntate a horcajadas sobre {o} hasta tu próximo turno.","Besa a {o} desde la muñeca hasta el hombro.","Deja que {o} te bese donde quiera durante 15 segundos.","Haz que {o} se estremezca solo con tu aliento en el cuello.","Bésale a {o} la espalda de arriba abajo.","Durante un minuto, solo puedes acariciar a {o} con los labios."],
+  3:["Bésale a {o} el cuerpo bajando desde el cuello, hasta donde {o} te deje.","Véndate los ojos y deja que {o} te guíe las manos durante un minuto.","Durante un minuto, {o} no puede tocarte y tú puedes besarle donde quieras.","Cuéntale a {o} al oído, con detalle, cómo empezaría vuestra noche.","Dale a {o} un masaje con aceite o crema donde elija, durante dos minutos.","Besaos un minuto entero sin usar las manos.","Elige una parte del cuerpo de {o} y bésala durante 30 segundos.","Recorre a besos a {o} de los pies a la cabeza en menos de un minuto.","Deja que {o} invente un reto para ti: tienes que cumplirlo.","Túmbate y deja que {o} haga contigo lo que quiera durante un minuto.","Quítale a {o} una prenda con los dientes, sin usar las manos.","Haz que {o} te pida un beso sin que tú le toques."]
+ }
+};
+const ICON={
+  verdad:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.1 9a3 3 0 1 1 4.2 2.7c-.8.4-1.3 1.1-1.3 2v.3"/><circle cx="12" cy="17.6" r=".6" fill="currentColor"/><circle cx="12" cy="12" r="10"/></svg>',
+  reto:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2c1.5 3.5 5 5.3 5 9.5A5 5 0 0 1 12 17a5 5 0 0 1-5-5.5c0-2 1-3.5 2-4.5.3 1.6 1.2 2.5 2 2.8C11 7 11.3 4.4 12 2z"/><path d="M8 21h8"/></svg>',
+  prenda:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3 4 5.5 2.5 10l3 1.2V21h13V11.2l3-1.2L20 5.5 16 3a4 4 0 0 1-8 0z"/></svg>',
+  copa:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 3h10l-1 6a4 4 0 0 1-8 0z"/><path d="M12 13v7M8 21h8"/></svg>'
+};
+const FACES=['verdad','reto','prenda','verdad','reto','prenda'];
+const LABEL={verdad:'Verdad',reto:'Reto',prenda:'Prenda'};
+const COLOR={verdad:'var(--verdad)',reto:'var(--reto)',prenda:'var(--prenda)'};
+// giro final del cubo para dejar arriba cada cara
+const ROT=[[0,0],[0,-90],[0,180],[0,90],[-90,0],[90,0]];
+const PEN={trago:'Bebo un trago',chupito:'Bebo un chupito',sin:'Paso y bebo'};
+const PENS={trago:'un trago',chupito:'un chupito',sin:'un trago sin alcohol'};
+
+// ---------- estado ----------
+let S=lsGet(KEY);
+function fresh(cfg){return {names:cfg.names,level:cfg.level,clothes:cfg.clothes,pen:cfg.pen,left:[cfg.clothes,cfg.clothes],drinks:[0,0],done:[0,0],turn:rnd(2),card:null,used:{},rx:0,ry:0}}
+const save=()=>lsSet(KEY,S);
+const other=p=>S.names[1-p];
+function pick(kind){
+  const lv=S.level,pool=DECK[kind][lv],k=kind+lv,used=S.used[k]||[];
+  let free=pool.map((_,i)=>i).filter(i=>!used.includes(i));
+  if(!free.length){free=pool.map((_,i)=>i);S.used[k]=[]}
+  const i=free[rnd(free.length)];(S.used[k]=S.used[k]||[]).push(i);
+  return pool[i];
+}
+
+// ---------- dibujo ----------
+function buildCube(){$('cube').innerHTML=FACES.map((f,i)=>`<div class="face f${i+1}" style="color:${COLOR[f]}">${ICON[f]}<span>${LABEL[f]}</span></div>`).join('')}
+function renderPlayers(){
+  for(const p of [0,1]){
+    const el=$('p'+p),n=S.left[p];
+    el.className='pl'+(S.turn===p?' on':'');
+    el.innerHTML=`<b>${esc(S.names[p])}</b><div class="clothes" aria-label="${n} prendas">${Array.from({length:S.clothes},(_,i)=>`<i class="${i<n?'':'off'}"></i>`).join('')}</div>
+      <div class="row"><span>Prendas <em>${n}</em></span><span>${ICON.copa.replace('<svg','<svg width="13" height="13"')} <em>${S.drinks[p]}</em></span><span>Cumplidas <em>${S.done[p]}</em></span></div>`;
+  }
+}
+function renderCard(){
+  const c=S.card,card=$('card'),acts=$('acts');
+  if(!c){card.style.setProperty('--k','var(--line)');
+    card.innerHTML=`<p class="empty">Le toca a <b style="color:var(--ink)">${esc(S.names[S.turn])}</b>. Tira el dado y que la suerte decida: verdad, reto o fuera una prenda.</p>`;
+    acts.hidden=true;return}
+  card.style.setProperty('--k',COLOR[c.kind]);
+  card.innerHTML=`<span class="tag">${ICON[c.kind]}${c.kind==='prenda'?'Fuera una prenda':LABEL[c.kind]}</span><p>${esc(c.text)}</p>${c.sub?`<span class="sub">${esc(c.sub)}</span>`:''}`;
+  acts.hidden=!!c.rolling;$('no').textContent=PEN[S.pen];
+}
+function ui(){
+  renderPlayers();
+  $('whose').innerHTML=`Turno de <em>${esc(S.names[S.turn])}</em>`;
+  $('hint').textContent=S.card?(S.card.rolling?'Rodando…':'Cumple o bebe para pasar el turno'):'Toca el dado para tirar';
+  renderCard();
+}
+function toast(t){let e=$('toast');if(!e){e=document.createElement('div');e.id='toast';e.className='toast';e.setAttribute('role','status');document.body.appendChild(e)}
+  e.textContent=t;e.hidden=false;clearTimeout(toast.t);toast.t=setTimeout(()=>e.hidden=true,1900)}
+
+// ---------- juego ----------
+let rolling=false;
+function roll(){
+  if(!S||rolling||S.card)return;
+  rolling=true;
+  const f=rnd(6),kind=FACES[f],p=S.turn;
+  // varias vueltas completas y aterriza en la cara que ha salido
+  const [tx,ty]=ROT[f],spinX=360*(2+rnd(2)),spinY=360*(2+rnd(2));
+  S.rx=Math.ceil(S.rx/360)*360+spinX+tx;S.ry=Math.ceil(S.ry/360)*360+spinY+ty;
+  $('cube').style.transform=`rotateX(${S.rx}deg) rotateY(${S.ry}deg)`;
+  let c;
+  if(kind==='prenda'&&S.left[p]>0)c={kind,text:`${S.names[p]}, quítate una prenda. Tú eliges cuál.`,sub:`Te quedan ${S.left[p]} ${S.left[p]===1?'prenda':'prendas'} antes de quitártela.`};
+  else if(kind==='prenda')c={kind:'reto',text:pick('reto').replaceAll('{o}',other(p)),sub:'Ya no te quedan prendas, así que te toca un reto.'};
+  else c={kind,text:pick(kind).replaceAll('{o}',other(p))};
+  S.card=Object.assign(c,{face:kind,rolling:true});ui();
+  setTimeout(()=>{rolling=false;delete S.card.rolling;save();ui();const el=$('card');el.classList.remove('in');void el.offsetWidth;el.classList.add('in')},TEST?20:1300);
+}
+function resolve(ok){
+  if(!S||!S.card||rolling)return;
+  const p=S.turn,c=S.card;
+  if(ok){S.done[p]++;if(c.face==='prenda'&&c.kind==='prenda')S.left[p]=Math.max(0,S.left[p]-1);
+    toast(c.kind==='prenda'?'Una prenda menos':'¡Cumplido!')}
+  else{S.drinks[p]++;toast(S.names[p]+' bebe '+PENS[S.pen])}
+  S.card=null;S.turn=1-p;save();ui();
+  if(ok&&S.left[0]===0&&S.left[1]===0&&!S.bothOut){S.bothOut=true;save();toast('¡Sin prendas los dos! Seguimos con retos');}
+}
+$('scene').onclick=roll;
+$('scene').onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();roll()}};
+$('yes').onclick=()=>resolve(true);
+$('no').onclick=()=>resolve(false);
+
+// ---------- configuración ----------
+let draft;
+function seg(id,val){$(id).querySelectorAll('button').forEach(b=>b.classList.toggle('on',b.dataset.v===String(val)))}
+function openSetup(first){
+  draft=S?{names:S.names.slice(),level:S.level,clothes:S.clothes,pen:S.pen}:{names:['',''],level:1,clothes:5,pen:'trago'};
+  $('n0').value=draft.names[0];$('n1').value=draft.names[1];seg('lvl',draft.level);seg('clo',draft.clothes);seg('pen',draft.pen);
+  $('scancel').hidden=!S;$('scancel').parentNode.classList.toggle('one',!S);$('serr').textContent='';
+  $('sgo').textContent=S?'Guardar':'¡A jugar!';
+  $('setup').hidden=false;if(first&&!TEST)setTimeout(()=>$('n0').focus(),50);
+}
+for(const [id,k,num] of [['lvl','level',1],['clo','clothes',1],['pen','pen',0]])
+  $(id).onclick=e=>{const b=e.target.closest('button');if(!b)return;draft[k]=num?+b.dataset.v:b.dataset.v;seg(id,draft[k])};
+$('sgo').onclick=()=>{
+  const n=[$('n0').value,$('n1').value].map(v=>v.replace(/[<>]/g,'').replace(/\s+/g,' ').trim().slice(0,14));
+  if(!n[0]||!n[1]){$('serr').textContent='Escribid los dos nombres para saber a quién le toca.';return}
+  if(n[0].toLowerCase()===n[1].toLowerCase()){$('serr').textContent='Poned nombres distintos para no liaros con los turnos.';return}
+  if(!S)S=fresh(Object.assign(draft,{names:n}));
+  else{ // cambiar ajustes sin perder la partida
+    const dc=draft.clothes-S.clothes;S.names=n;S.level=draft.level;S.pen=draft.pen;
+    if(dc){S.clothes=draft.clothes;S.left=S.left.map(x=>Math.max(0,Math.min(S.clothes,x+dc)))}
+    if(S.card&&!S.card.rolling)S.card=null;
+  }
+  save();$('setup').hidden=true;ui();
+};
+$('scancel').onclick=()=>{$('setup').hidden=true};
+$('cfg').onclick=()=>openSetup(false);
+let arm=0;
+$('reset').onclick=()=>{
+  if(Date.now()-arm>3000){arm=Date.now();$('reset').textContent='¿Seguro? Toca otra vez';setTimeout(()=>$('reset').textContent='Empezar de cero',3000);return}
+  const keep=S&&{names:S.names,level:S.level,clothes:S.clothes,pen:S.pen};S=fresh(keep);save();$('cube').style.transform='';$('reset').textContent='Empezar de cero';ui();toast('Partida nueva');
+};
+
+// ---------- arranque ----------
+buildCube();
+if(S&&S.card&&S.card.rolling)delete S.card.rolling;
+function start(){if(!S)openSetup(true);else{$('cube').style.transform=`rotateX(${S.rx}deg) rotateY(${S.ry}deg)`;ui()}}
+if(TEST||lsGet(AGE))start();else $('age').hidden=false;
+$('ageOk').onclick=()=>{lsSet(AGE,true);$('age').hidden=true;start()};
+if(!S){S=null}
+if(TEST)window.__t={get S(){return S},roll,resolve,DECK,FACES};
+})();
+</script>
+</body>
+</html>
