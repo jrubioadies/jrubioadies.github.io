@@ -17,7 +17,7 @@ Juego para adultos (+18) en el navegador del móvil, **por parejas** (de 1 a 3 p
 
 El dado suena al rodar (traqueteo, tres botes y una campanita); se puede silenciar con el botón del altavoz.
 
-Quien no quiere cumplir, bebe y pasa el turno. Por parejas, las verdades y los retos van siempre dirigidos a tu pareja. Tres niveles (suave, picante y muy picante), de 3 a 7 prendas por persona y castigo a elegir (trago, chupito o sin alcohol).
+Quien no quiere cumplir, bebe y pasa el turno. Si una carta no os convence, se puede cambiar una vez con «Otra carta». El dado no repite la misma cara dos veces seguidas ni a un jugador la que le salió la vez anterior, y las cartas no se repiten hasta agotar el mazo. Por parejas, las verdades y los retos van siempre dirigidos a tu pareja. Tres niveles (suave, picante y muy picante), de 3 a 7 prendas por persona y castigo a elegir (trago, chupito o sin alcohol).
 
 **Juega aquí:** https://jrubioadies.github.io/dado-atrevido-10/
 
