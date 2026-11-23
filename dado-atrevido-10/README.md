@@ -15,6 +15,8 @@ Juego para adultos (+18) en el navegador del móvil, **por parejas** (de 1 a 3 p
 | Brindis | Bebe todo el mundo |
 | Todos | Una acción que hacéis todos a la vez (besar a tu pareja, enseñar una parte del cuerpo, quitaros una prenda…) |
 
+Las cartas con tiempo («durante 20 segundos», «un minuto»…) traen un contador: se toca para empezar, se puede pausar y pita en los tres últimos segundos y al terminar.
+
 El dado suena al rodar (traqueteo, tres botes y una campanita); se puede silenciar con el botón del altavoz.
 
 Quien no quiere cumplir, bebe y pasa el turno. Si una carta no os convence, se puede cambiar una vez con «Otra carta». El dado no repite la misma cara dos veces seguidas ni a un jugador la que le salió la vez anterior, y las cartas no se repiten hasta agotar el mazo. Por parejas, las verdades y los retos van siempre dirigidos a tu pareja. Tres niveles (suave, picante y muy picante), de 3 a 7 prendas por persona y castigo a elegir (trago, chupito o sin alcohol).

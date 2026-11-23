@@ -156,6 +156,21 @@ button:focus-visible,input:focus-visible{outline:3px solid var(--verdad);outline
   #die{width:min(380px,52vh);height:min(380px,52vh)}
   .card p{font-size:26px}
 }
+
+/* contador para los retos con tiempo */
+.timer{display:flex;align-items:center;gap:14px;margin-top:2px}
+.tbtn{position:relative;width:70px;height:70px;border:0;padding:0;background:none;cursor:pointer;flex:none;color:var(--ink);border-radius:50%}
+.tbtn svg{width:100%;height:100%;transform:rotate(-90deg);display:block}
+.tr0{fill:rgba(0,0,0,.28);stroke:var(--line);stroke-width:5}
+.tr1{fill:none;stroke:var(--k);stroke-width:5;stroke-linecap:round;stroke-dasharray:176;transition:stroke-dashoffset .25s linear}
+.tbtn b{position:absolute;inset:0;display:grid;place-items:center;font:800 23px var(--body);font-variant-numeric:tabular-nums}
+.tbtn.run b{color:var(--k)}
+.tbtn.done{animation:tpulse .5s ease-in-out 4}
+@keyframes tpulse{50%{transform:scale(1.12)}}
+.tinfo{display:flex;flex-direction:column;gap:3px;align-items:flex-start;min-width:0}
+.tgo{border:0;background:none;color:var(--ink);font:700 16px var(--body);padding:0;cursor:pointer;text-align:left}
+.tlink{border:0;background:none;color:var(--muted);font:600 13px var(--body);padding:0;cursor:pointer;text-decoration:underline;text-underline-offset:3px}
+@media (min-width:900px) and (orientation:landscape){.tbtn{width:84px;height:84px}.tbtn b{font-size:27px}}
 @media (prefers-reduced-motion:reduce){.card.in,.stage::before{animation:none}}
 @media (max-width:370px){h1{font-size:34px}.card p{font-size:21px}.board{grid-template-columns:1fr 1fr}}
 </style>
@@ -186,7 +201,7 @@ button:focus-visible,input:focus-visible{outline:3px solid var(--verdad);outline
     <p>Si a alguien no le apetece algo, lo dice y bebe. Lo importante es que lo paséis bien todos.</p>
     <button class="btn sm ghost" id="reset">Empezar de cero</button>
   </div>
-  <p class="rules">Cómo se juega: cada uno tira por turnos un dado de diez caras: <b style="color:var(--verdad)">Verdad</b>, <b style="color:var(--reto)">Reto</b>, <b style="color:var(--caricia)">Caricia</b> (una caricia al azar: qué, dónde y cuántos segundos), <b style="color:var(--desnuda)">Desnúdame</b> (le quitas una prenda a tu pareja, la que tú elijas), <b style="color:var(--prenda)">Prenda</b> (te quitas la que tú elijas), <b style="color:var(--duelo)">Duelo</b> (piedra, papel o tijera con alguien, y quien pierde se quita una prenda), <b style="color:var(--mandas)">Tú mandas</b> (eliges a quién y le pones verdad o reto), <b style="color:var(--comodin)">Comodín</b> (te lo guardas y te libra de una carta sin beber), <b style="color:var(--brindis)">Brindis</b> (bebe todo el mundo) y <b style="color:var(--todos)">Todos</b> (una acción que hacéis todos a la vez con vuestra pareja, o con quien tengáis a la derecha si jugáis cada uno). Quien no quiere cumplir, bebe y pasa el turno; si una carta no os convence, se puede cambiar una vez con «Otra carta». El dado no repite la misma cara dos veces seguidas. Si a alguien ya no le quedan prendas, en vez de quitarse una le toca un reto o beber. Por parejas, las verdades y los retos van siempre dirigidos a tu pareja. Bebed con cabeza: también se puede jugar sin alcohol.</p>
+  <p class="rules">Cómo se juega: cada uno tira por turnos un dado de diez caras: <b style="color:var(--verdad)">Verdad</b>, <b style="color:var(--reto)">Reto</b>, <b style="color:var(--caricia)">Caricia</b> (una caricia al azar: qué, dónde y cuántos segundos), <b style="color:var(--desnuda)">Desnúdame</b> (le quitas una prenda a tu pareja, la que tú elijas), <b style="color:var(--prenda)">Prenda</b> (te quitas la que tú elijas), <b style="color:var(--duelo)">Duelo</b> (piedra, papel o tijera con alguien, y quien pierde se quita una prenda), <b style="color:var(--mandas)">Tú mandas</b> (eliges a quién y le pones verdad o reto), <b style="color:var(--comodin)">Comodín</b> (te lo guardas y te libra de una carta sin beber), <b style="color:var(--brindis)">Brindis</b> (bebe todo el mundo) y <b style="color:var(--todos)">Todos</b> (una acción que hacéis todos a la vez con vuestra pareja, o con quien tengáis a la derecha si jugáis cada uno). Quien no quiere cumplir, bebe y pasa el turno; si una carta no os convence, se puede cambiar una vez con «Otra carta». Las cartas con tiempo traen un contador: tocadlo para empezar. El dado no repite la misma cara dos veces seguidas. Si a alguien ya no le quedan prendas, en vez de quitarse una le toca un reto o beber. Por parejas, las verdades y los retos van siempre dirigidos a tu pareja. Bebed con cabeza: también se puede jugar sin alcohol.</p>
 </div>
 
 <div class="veil" id="age" hidden>
@@ -390,7 +405,7 @@ function ui(){
   const card=$('card');
   if(!c){card.style.setProperty('--k','var(--line)');card.innerHTML=`<p class="empty">Le toca a <b style="color:var(--ink)">${esc(name(p))}</b>. Tira el dado y que decida la suerte.</p>`;btns([]);return}
   card.style.setProperty('--k',HEX[c.kind]);
-  card.innerHTML=`<span class="tag">${esc(c.tag||LAB[c.kind])}</span><p>${esc(c.text)}</p>${c.sub?`<span class="sub">${esc(c.sub)}</span>`:''}`;
+  card.innerHTML=`<span class="tag">${esc(c.tag||LAB[c.kind])}</span><p>${esc(c.text)}</p>${c.sub?`<span class="sub">${esc(c.sub)}</span>`:''}`+timerHTML(c);
   if(c.rolling){btns([]);return}
   const w=c.who;
   const other=!c.changed&&(['verdad','reto','caricia'].includes(c.kind)||(c.kind==='todos'&&c.step==='ok'))?[['Otra carta','other','ghost']]:[];
@@ -401,6 +416,7 @@ function ui(){
   else if(c.step==='duel')btns([[`Gana ${name(p)}`,'win','',p],[`Gana ${name(c.rival)}`,'win','',c.rival]]);
   else if(c.step==='choose')btns([['Verdad','give','','verdad'],['Reto','give','main','reto']]);
 }
+const _ui=ui;ui=function(){_ui();paintTimer()};
 function legend(){$('legend').innerHTML=Object.keys(LAB).map(k=>`<span><i style="background:${HEX[k]}"></i>${LAB[k]}</span>`).join('')}
 function toast(t){let e=$('toast');if(!e){e=document.createElement('div');e.id='toast';e.className='toast';e.setAttribute('role','status');document.body.appendChild(e)}
   e.textContent=t;e.hidden=false;clearTimeout(toast.t);toast.t=setTimeout(()=>e.hidden=true,1900)}
@@ -494,6 +510,49 @@ $('acts').onclick=e=>{
     const tgt=S.mode==='pareja'?partner(r):p;
     S.card={kind:d,tag:'Tú mandas · '+LAB[d],who:r,o:tgt,step:'do',text:fill(pick(d),tgt),sub:`Se lo manda ${name(p)}.`};save();ui();dealIn()}
 };
+
+// ---------- contador para las cartas con tiempo ----------
+let TM={key:null,total:0,left:0,run:false,end:0,last:-1},WL=null;
+function secsOf(t){const m=t.match(/(\d+)\s*segundos?/);if(m)return +m[1];if(/dos minutos/.test(t))return 120;if(/(un|1) minuto/.test(t))return 60;if(/medio minuto/.test(t))return 30;return 0}
+const fmtS=n=>n>=60&&n%60===0?(n/60)+' min':n+' s';
+function timerHTML(c){
+  const n=c.rolling?0:secsOf(c.text);
+  if(!n){stopTimer();TM.key=null;return ''}
+  const key=c.text+'|'+S.ti+'|'+S.handN;
+  if(TM.key!==key){stopTimer();TM={key,total:n,left:n,run:false,end:0,last:-1}}
+  return `<div class="timer"><button class="tbtn" id="tbtn" aria-label="Contador"><svg viewBox="0 0 64 64"><circle cx="32" cy="32" r="28" class="tr0"/><circle cx="32" cy="32" r="28" class="tr1" id="tring"/></svg><b id="tnum"></b></button>
+    <div class="tinfo"><button class="tgo" id="tgo"></button><button class="tlink" id="treset">Reiniciar</button></div></div>`;
+}
+const tLeft=()=>TM.run?Math.max(0,(TM.end-performance.now())/1000):TM.left;
+function paintTimer(){
+  const n=$('tnum');if(!n||!TM.total)return;const l=tLeft();
+  n.textContent=Math.ceil(l);$('tring').style.strokeDashoffset=String(176*(1-l/TM.total));
+  $('tgo').textContent=TM.run?'Pausar':l<=0?'¡Tiempo! Otra vez':l<TM.total?'Seguir':'Empezar · '+fmtS(TM.total);
+  $('treset').hidden=TM.run||l>=TM.total||l<=0;
+  $('tbtn').classList.toggle('run',TM.run);$('tbtn').classList.toggle('done',l<=0);
+}
+function beep(f,d,v){const a=audio();if(!a)return;const t=a.currentTime+.01,o=a.createOscillator(),g=a.createGain();o.type='sine';o.frequency.value=f;
+  g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(v,t+.01);g.gain.exponentialRampToValueAtTime(.001,t+d);o.connect(g);g.connect(a.destination);o.start(t);o.stop(t+d+.02)}
+function wake(on){try{if(on&&navigator.wakeLock&&!WL)navigator.wakeLock.request('screen').then(w=>WL=w,()=>{});if(!on&&WL){WL.release();WL=null}}catch(e){}}
+function stopTimer(){if(TM.run){TM.left=tLeft();TM.run=false}wake(false)}
+function toggleTimer(){
+  if(!TM.total)return;
+  if(TM.run){stopTimer();paintTimer();return}
+  if(tLeft()<=0)TM.left=TM.total;
+  TM.end=performance.now()+TM.left*1000;TM.run=true;TM.last=Math.ceil(TM.left);beep(660,.12,.25);wake(true);paintTimer();
+}
+(function tloop(){
+  if(TM.run){const l=tLeft(),c=Math.ceil(l);
+    if(c!==TM.last){TM.last=c;if(c<=3&&c>0)beep(880,.12,.3)}
+    if(l<=0){TM.run=false;TM.left=0;wake(false);beep(1320,.18,.35);setTimeout(()=>beep(1320,.18,.35),220);setTimeout(()=>beep(1760,.4,.35),440);
+      try{navigator.vibrate&&navigator.vibrate([200,100,200])}catch(e){}toast('¡Tiempo!')}
+    paintTimer()}
+  requestAnimationFrame(tloop);
+})();
+$('card').addEventListener('click',e=>{
+  if(e.target.closest('#tbtn,#tgo'))toggleTimer();
+  else if(e.target.closest('#treset')){stopTimer();TM.left=TM.total;paintTimer()}
+});
 const tap=()=>roll();
 function bindDie(){const el=$('die')||$('flat');if(!el)return;el.onclick=tap;el.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();tap()}}}
 
