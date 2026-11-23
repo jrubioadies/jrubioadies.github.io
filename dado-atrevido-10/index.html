@@ -513,19 +513,42 @@ function makeCard0(face,p,o){
 }
 // caricia al azar: acción + zona + segundos; cada nivel añade acciones y zonas más atrevidas
 const CAR={
-  v:[['Besa','Acaricia','Sopla despacio sobre','Recorre con la punta de la nariz'],['Muerde con suavidad','Besa muy despacio','Recorre con los labios'],['Recorre con la lengua','Llena de besos']],
-  z:[['el cuello','la oreja','la nuca','el hombro','la muñeca','los labios'],['la espalda','el ombligo','la cintura','el muslo','la clavícula','el abdomen'],['la cara interna del muslo','el pecho','la parte baja de la espalda','la zona que elija {o}']],
+  v:[['Besa','Acaricia','Sopla despacio sobre','Recorre con la punta de la nariz','Da besitos en','Acaricia con la yema de los dedos','Roza con los labios'],
+     ['Muerde con suavidad','Besa muy despacio','Recorre con los labios','Mordisquea','Masajea'],
+     ['Recorre con la lengua','Llena de besos','Besa con mucha calma','Acaricia con aceite o crema']],
+  z:[['el cuello','la oreja','la nuca','el hombro','la muñeca','los labios','la mejilla','la mano','el lóbulo de la oreja'],
+     ['la espalda','el ombligo','la cintura','el muslo','la clavícula','el abdomen','la parte de atrás de la rodilla','el costado'],
+     ['la cara interna del muslo','el pecho','la parte baja de la espalda','la zona que elija {o}','las caderas']],
   t:[[10,15,20],[15,20,30],[20,30,45]]
 };
+// saca al azar de una bolsa barajada: no se repite nada hasta que han salido todos
+function draw(key,list){
+  const B=S.used.bag||(S.used.bag={}),sig=list.join('|');
+  let b=B[key];
+  if(!b||b.sig!==sig||!b.left.length){
+    const last=b&&b.last,L=list.slice();
+    for(let i=L.length-1;i>0;i--){const j=rnd(i+1);[L[i],L[j]]=[L[j],L[i]]}
+    if(L.length>1&&L[L.length-1]===last)[L[0],L[L.length-1]]=[L[L.length-1],L[0]]; // al rebarajar, que no repita la última
+    b=B[key]={sig,left:L,last};
+  }
+  const x=b.left.pop();b.last=x;return x;
+}
 function caricia(p,o){
-  const lv=S.level,V=CAR.v.slice(0,lv).flat(),Z=CAR.z.slice(0,lv).flat(),T=CAR.t[lv-1];
-  // en el nivel más alto, las zonas nuevas salen más a menudo
-  // ni la zona ni la forma se repiten hasta pasadas varias caricias
-  const R=S.used.car||(S.used.car={z:[],v:[]});
-  const fresh=(list,seen,keep)=>{const f=list.filter(x=>!seen.includes(x));return f.length?f:list.filter(x=>x!==seen[seen.length-1])};
-  const zNew=lv>1?fresh(CAR.z[lv-1],R.z):[],zAll=fresh(Z,R.z),vAll=fresh(V,R.v);
-  const z=zNew.length&&rnd(2)?zNew[rnd(zNew.length)]:zAll[rnd(zAll.length)],v=vAll[rnd(vAll.length)];
-  R.z.push(z);R.v.push(v);R.z=R.z.slice(-Math.floor(Z.length*.6));R.v=R.v.slice(-Math.floor(V.length*.6));
+  const lv=S.level,V=CAR.v.slice(0,lv).flat(),T=CAR.t[lv-1];
+  // las zonas del nivel elegido entran dos veces en la bolsa, para que el nivel se note
+  const Z=CAR.z.slice(0,lv).flat().concat(lv>1?CAR.z[lv-1]:[]);
+  const z=draw('z'+lv,Z);
+  // la forma se elige para que la combinación forma + zona no haya salido aún en la partida
+  const C=S.used.combo||(S.used.combo={}),seen=C[lv]||(C[lv]=[]),total=V.length*new Set(Z).size;
+  if(seen.length>=total*.85)seen.length=0;
+  let v=draw('v'+lv,V);
+  if(seen.includes(v+'|'+z)){const bag=S.used.bag['v'+lv].left,k=bag.findIndex(x=>!seen.includes(x+'|'+z));
+    if(k>=0){bag.push(v);v=bag.splice(k,1)[0];S.used.bag['v'+lv].last=v}
+    else{const alt=V.filter(x=>!seen.includes(x+'|'+z));if(alt.length)v=alt[rnd(alt.length)]}}
+  // que la forma y la zona no usen la misma parte del cuerpo («roza con los labios los labios…»)
+  const part=w=>(w.match(/labios|nariz|dedos|lengua/)||[''])[0];
+  if(part(v)&&z.includes(part(v))){const alt=V.filter(x=>!z.includes(part(x)||'#')&&!seen.includes(x+'|'+z));if(alt.length)v=alt[rnd(alt.length)]}
+  seen.push(v+'|'+z);
   const zona=z.includes('{o}')?fill(z,o):`${z} de ${name(o)}`;
   return {kind:'caricia',who:p,o,step:'do',text:`${v} ${zona} durante ${T[rnd(T.length)]} segundos.`,sub:'El tiempo lo cuenta quien recibe.'};
 }
