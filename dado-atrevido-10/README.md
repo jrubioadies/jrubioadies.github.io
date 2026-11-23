@@ -21,6 +21,8 @@ Las cartas con tiempo («durante 20 segundos», «un minuto»…) traen un conta
 
 El dado suena al rodar (traqueteo, tres botes y una campanita); se puede silenciar con el botón del altavoz.
 
+Cada jugador indica si es chico o chica (para que los textos concuerden) y, si jugáis cada uno, qué le gusta: las cartas se dirigen a alguien compatible de la mesa.
+
 Quien no quiere cumplir, bebe y pasa el turno. Si una carta no os convence, se puede cambiar una vez con «Otra carta». El dado no repite la misma cara dos veces seguidas ni a un jugador la que le salió la vez anterior, y las cartas no se repiten hasta agotar el mazo. Por parejas, las verdades y los retos van siempre dirigidos a tu pareja. Tres niveles (suave, picante y muy picante), prendas iniciales distintas para cada persona (de 0 a 10; en Ajustes se pueden corregir en mitad de la partida) y castigo a elegir (trago, chupito o sin alcohol).
 
 **Juega aquí:** https://jrubioadies.github.io/dado-atrevido-10/

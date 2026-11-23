@@ -105,7 +105,12 @@ button:focus-visible,input:focus-visible{outline:3px solid var(--verdad);outline
 .names{display:flex;flex-direction:column;gap:10px}
 .pair{display:grid;grid-template-columns:auto 1fr 1fr;gap:8px;align-items:center}
 .pair .dot{width:12px;height:12px;border-radius:50%}
-.names.solo .pair{grid-template-columns:1fr 1fr}
+.names.solo .pair{grid-template-columns:1fr}
+.pin .seg button{padding:7px 4px;font-size:12.5px}
+.pin .gl{display:grid;grid-template-columns:1fr 1.4fr;gap:6px}
+.pin .gl .seg{min-width:0}
+.pin .glab{font:700 10.5px var(--body);letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin:2px 0 -2px}
+.pin.miss .gseg{box-shadow:0 0 0 2px var(--reto)}
 .pin{display:flex;flex-direction:column;gap:6px;min-width:0}
 .stp{display:flex;align-items:center;justify-content:space-between;gap:6px;background:var(--bg);border-radius:11px;padding:3px 3px 3px 10px;font-size:12px;color:var(--muted)}
 .stp b{font:800 16px var(--body);color:var(--ink);min-width:18px;text-align:center;font-variant-numeric:tabular-nums}
@@ -222,7 +227,7 @@ textarea.inp{resize:vertical;min-height:76px;font-size:15.5px;line-height:1.4}
     <p>Si a alguien no le apetece algo, lo dice y bebe. Lo importante es que lo paséis bien todos.</p>
     <button class="btn sm ghost" id="reset">Empezar de cero</button>
   </div>
-  <p class="rules">Cómo se juega: cada uno tira por turnos un dado de diez caras: <b style="color:var(--verdad)">Verdad</b>, <b style="color:var(--reto)">Reto</b>, <b style="color:var(--caricia)">Caricia</b> (una caricia al azar: qué, dónde y cuántos segundos), <b style="color:var(--desnuda)">Desnúdame</b> (le quitas una prenda a tu pareja, la que tú elijas), <b style="color:var(--prenda)">Prenda</b> (te quitas la que tú elijas), <b style="color:var(--duelo)">Duelo</b> (piedra, papel o tijera con alguien, y quien pierde se quita una prenda), <b style="color:var(--mandas)">Tú mandas</b> (eliges a quién y le pones verdad o reto), <b style="color:var(--comodin)">Comodín</b> (te lo guardas y te libra de una carta sin beber), <b style="color:var(--brindis)">Brindis</b> (bebe todo el mundo) y <b style="color:var(--todos)">Todos</b> (una acción que hacéis todos a la vez con vuestra pareja, o con quien tengáis a la derecha si jugáis cada uno). Quien no quiere cumplir, bebe y pasa el turno; si una carta no os convence, se puede cambiar una vez con «Otra carta». En Ajustes podéis escribir vuestras propias cartas. Las cartas con tiempo traen un contador: tocadlo para empezar. El dado no repite la misma cara dos veces seguidas. Si a alguien ya no le quedan prendas, en vez de quitarse una le toca un reto o beber. Por parejas, las verdades y los retos van siempre dirigidos a tu pareja. Bebed con cabeza: también se puede jugar sin alcohol.</p>
+  <p class="rules">Cómo se juega: cada uno tira por turnos un dado de diez caras: <b style="color:var(--verdad)">Verdad</b>, <b style="color:var(--reto)">Reto</b>, <b style="color:var(--caricia)">Caricia</b> (una caricia al azar: qué, dónde y cuántos segundos), <b style="color:var(--desnuda)">Desnúdame</b> (le quitas una prenda a tu pareja, la que tú elijas), <b style="color:var(--prenda)">Prenda</b> (te quitas la que tú elijas), <b style="color:var(--duelo)">Duelo</b> (piedra, papel o tijera con alguien, y quien pierde se quita una prenda), <b style="color:var(--mandas)">Tú mandas</b> (eliges a quién y le pones verdad o reto), <b style="color:var(--comodin)">Comodín</b> (te lo guardas y te libra de una carta sin beber), <b style="color:var(--brindis)">Brindis</b> (bebe todo el mundo) y <b style="color:var(--todos)">Todos</b> (una acción que hacéis todos a la vez con vuestra pareja, o con quien tengáis a la derecha si jugáis cada uno). Quien no quiere cumplir, bebe y pasa el turno; si una carta no os convence, se puede cambiar una vez con «Otra carta». En Ajustes podéis escribir vuestras propias cartas. Las cartas con tiempo traen un contador: tocadlo para empezar. El dado no repite la misma cara dos veces seguidas. Si a alguien ya no le quedan prendas, en vez de quitarse una le toca un reto o beber. Por parejas, las verdades y los retos van siempre dirigidos a tu pareja; si jugáis cada uno, a alguien de la mesa que os guste según lo que indicó cada jugador. Bebed con cabeza: también se puede jugar sin alcohol.</p>
 </div>
 
 <div class="veil" id="age" hidden>
@@ -284,7 +289,7 @@ const TEAM=['#f2c26b','#ff5d73','#7cb7ff'];
 // ---------- cartas ({o} = a quien va dirigida) ----------
 const DECK={
  verdad:{
-  1:["¿Qué fue lo primero que te gustó de {o}?","¿Qué detalle de {o} te encanta y nunca se lo has dicho?","¿Qué parte del cuerpo de {o} es tu favorita?","¿Qué prenda de {o} te encanta verle puesta?","¿Qué te gustaría que {o} hiciera más a menudo?","¿Dónde te escaparías con {o} un fin de semana, sin pensar en el dinero?","¿Qué gesto de {o} te derrite?","¿Qué canción pondrías para bailar lento con {o}?","¿Qué es lo más bonito que te ha dicho {o}?","¿Qué cita perfecta prepararías para {o}?","¿Qué pensaste de {o} la primera vez que le viste?","Del 1 al 10, ¿cómo de guapo o guapa ves a {o} esta noche?","¿Qué te gustaría aprender de {o}?","¿Qué es lo que más te hace reír de {o}?"],
+  1:["¿Qué fue lo primero que te gustó de {o}?","¿Qué detalle de {o} te encanta y nunca se lo has dicho?","¿Qué parte del cuerpo de {o} es tu favorita?","¿Qué prenda de {o} te encanta verle puesta?","¿Qué te gustaría que {o} hiciera más a menudo?","¿Dónde te escaparías con {o} un fin de semana, sin pensar en el dinero?","¿Qué gesto de {o} te derrite?","¿Qué canción pondrías para bailar lento con {o}?","¿Qué es lo más bonito que te ha dicho {o}?","¿Qué cita perfecta prepararías para {o}?","¿Qué pensaste de {o} la primera vez que le viste?","Del 1 al 10, ¿cómo de {t:guapo|guapa} ves a {o} esta noche?","¿Qué te gustaría aprender de {o}?","¿Qué es lo que más te hace reír de {o}?"],
   2:["¿Qué es lo que más te atrae de {o}?","¿Dónde te gustaría que {o} te besara?","¿Qué zona de tu cuerpo es la más sensible?","¿Has tenido un sueño subido de tono con {o}? Cuéntalo.","¿Qué ropa interior te gustaría ver puesta a {o}?","¿En qué sitio poco habitual besarías a {o} apasionadamente?","Del 1 al 10, ¿cuántas ganas tienes de besar a {o} ahora mismo?","¿Qué te gustaría que {o} te hiciera esta noche?","¿Qué te pone más: seducir o que te seduzcan?","¿Qué es lo más atrevido que te gustaría probar con {o}?","¿Qué mensaje picante te gustaría recibir de {o}?","¿Qué es lo más sexy que tiene {o}?","¿Qué le quitarías primero a {o}?","¿Qué fantasía tienes en la que salga {o}?"],
   3:["¿Qué fantasía no le has contado nunca a {o}?","¿Qué te gustaría que {o} te hiciera en la cama?","¿Qué juego o juguete te gustaría probar con {o}?","¿Cuál es el sitio más arriesgado donde te gustaría hacerlo con {o}?","¿Qué te gustaría que {o} te susurrara en el momento más intenso?","¿Qué postura te gustaría probar con {o}?","¿Prefieres que {o} tome el control o tomarlo tú? ¿Por qué?","¿Qué parte del cuerpo de {o} besarías durante horas?","¿Qué te gustaría que {o} llevara puesto, o no, la próxima vez?","¿Qué es lo que más te cuesta pedir en la cama? Pídeselo a {o}.","Describe en tres palabras cómo sería tu noche perfecta con {o}.","¿Qué es lo primero que harías si te quedaras a solas con {o} ahora?"]
  },
@@ -314,7 +319,7 @@ function fresh(c){
   let order=[...Array(n).keys()];
   if(c.mode==='pareja'){const k=n/2;order=[];for(let r=0;r<2;r++)for(let t=0;t<k;t++)order.push(t*2+r)}
   const start=Array.from({length:n},(_,i)=>c.start&&c.start[i]!=null?c.start[i]:c.clothes);
-  return {mode:c.mode,players:c.players,level:c.level,clothes:c.clothes,pen:c.pen,order,ti:rnd(n),start,
+  return {mode:c.mode,players:c.players,level:c.level,clothes:c.clothes,pen:c.pen,order,ti:rnd(n),start,g:c.g||[],likes:c.likes||[],
     left:start.slice(),drinks:Array(n).fill(0),done:Array(n).fill(0),wild:Array(n).fill(0),used:{},card:null,q:null};
 }
 const save=()=>lsSet(KEY,S);
@@ -322,7 +327,23 @@ const N=()=>S.players.length;
 const cur=()=>S.order[S.ti];
 const name=i=>S.players[i];
 const partner=i=>i^1;
-function targetFor(p){if(S.mode==='pareja')return partner(p);const o=[...Array(N()).keys()].filter(i=>i!==p);return o[rnd(o.length)]}
+const likesOf=i=>(S.likes&&S.likes[i])||'a',gOf=i=>(S.g&&S.g[i])||'';
+const wants=(a,b)=>{const l=likesOf(a),g=gOf(b);return l==='a'||!g||l===g};
+function targetFor(p){
+  if(S.mode==='pareja')return partner(p);
+  const o=[...Array(N()).keys()].filter(i=>i!==p);
+  // primero quien os gustáis mutuamente; si no hay, a quien le guste a quien tira; si tampoco, cualquiera
+  const both=o.filter(i=>wants(p,i)&&wants(i,p)),one=o.filter(i=>wants(p,i)),L=both.length?both:one.length?one:o;
+  return L[rnd(L.length)];
+}
+// concordancia: «atrevido o atrevida» según quien hace la carta
+// {s:x|y} concuerda con quien hace la carta y {t:x|y} con a quien va dirigida
+function gram(t,who,o){
+  const pickG=(g,x,y)=>g==='m'?y:g==='h'?x:x+' o '+y;
+  t=t.replace(/\{s:([^|}]*)\|([^}]*)\}/g,(m,x,y)=>pickG(gOf(who),x,y)).replace(/\{t:([^|}]*)\|([^}]*)\}/g,(m,x,y)=>pickG(o!=null?gOf(o):'',x,y));
+  const g=gOf(who);if(!g)return t;
+  return t.replace(/\b(\p{L}+)o o (\p{L}+)a\b/gu,(m,a,b)=>a===b?(g==='m'?b+'a':a+'o'):m);
+}
 // cartas propias (Ajustes → Vuestras cartas), guardadas solo en este dispositivo
 const MKEY2='dado-atrevido-10-mis';
 let MIS=(()=>{const v=lsGet(MKEY2);return Array.isArray(v)?v.filter(c=>c&&typeof c.t==='string'):[]})();
@@ -447,7 +468,7 @@ function ui(){
   const card=$('card');
   if(!c){card.style.setProperty('--k','var(--line)');card.innerHTML=`<p class="empty">Le toca a <b style="color:var(--ink)">${esc(name(p))}</b>. Tira el dado y que decida la suerte.</p>${S.left.every(x=>x<=0)?'<span class="sub">Ya no le quedan prendas a nadie: Prenda, Desnúdame y Duelo se convierten en caricias, retos o tragos. Si alguien se vuelve a vestir, corregidlo en Ajustes.</span>':''}`;btns([]);return}
   card.style.setProperty('--k',HEX[c.kind]);
-  card.innerHTML=`<span class="tag">${esc(c.tag||LAB[c.kind])}</span><p>${esc(c.text)}</p>${c.sub?`<span class="sub">${esc(c.sub)}</span>`:''}`+timerHTML(c);
+  card.innerHTML=`<span class="tag">${esc(c.tag||LAB[c.kind])}</span><p>${esc(gram(c.text,c.who,c.o))}</p>${c.sub?`<span class="sub">${esc(c.sub)}</span>`:''}`+timerHTML(c);
   if(c.rolling){btns([]);return}
   const w=c.who;
   const other=!c.changed&&(['verdad','reto','caricia'].includes(c.kind)||(c.kind==='todos'&&c.step==='ok'))?[['Otra carta','other','ghost']]:[];
@@ -608,25 +629,33 @@ function renderSetup(){
   const opts=pr?[1,2,3]:[2,3,4,5,6];
   if(!opts.includes(D.count))D.count=pr?1:2;
   $('cnt').innerHTML=opts.map(v=>`<button data-v="${v}" class="${v===D.count?'on':''}">${v}</button>`).join('');
-  const n=pr?D.count*2:D.count;while(D.names.length<n)D.names.push('');while(D.cl.length<n)D.cl.push(D.clothes);
+  const n=pr?D.count*2:D.count;while(D.names.length<n)D.names.push('');while(D.cl.length<n)D.cl.push(D.clothes);while(D.g.length<n)D.g.push('');while(D.likes.length<n)D.likes.push('');
   // en mitad de una partida el contador corrige las prendas que le quedan a cada uno
   const lab=D.live?'Le quedan':'Prendas';
   const cell=(k,ph)=>`<div class="pin"><input class="inp" data-i="${k}" maxlength="14" placeholder="${ph}" value="${esc(D.names[k]||'')}" autocomplete="off">
-    <div class="stp"><span>${lab}</span><button data-s="-1" data-k="${k}" aria-label="Una prenda menos" ${D.cl[k]<=0?'disabled':''}>−</button><b>${D.cl[k]}</b><button data-s="1" data-k="${k}" aria-label="Una prenda más" ${D.cl[k]>=10?'disabled':''}>+</button></div></div>`;
+    <div class="stp"><span>${lab}</span><button data-s="-1" data-k="${k}" aria-label="Una prenda menos" ${D.cl[k]<=0?'disabled':''}>−</button><b>${D.cl[k]}</b><button data-s="1" data-k="${k}" aria-label="Una prenda más" ${D.cl[k]>=10?'disabled':''}>+</button></div>
+    ${pr?gseg(k):`<div class="gl"><div><p class="glab">Es</p>${gseg(k)}</div><div><p class="glab">Le gustan</p><div class="seg">${[['h','Chicos'],['m','Chicas'],['a','Ambos']].map(([v,l])=>`<button data-lk="${v}" data-k="${k}" class="${D.likes[k]===v?'on':''}">${l}</button>`).join('')}</div></div></div>`}</div>`;
+  const gseg=k=>`<div class="seg gseg">${[['h','Chico'],['m','Chica']].map(([v,l])=>`<button data-gn="${v}" data-k="${k}" class="${D.g[k]===v?'on':''}">${l}</button>`).join('')}</div>`;
   let h='';
   if(pr)for(let t=0;t<D.count;t++)h+=`<div class="pair"><i class="dot" style="background:${TEAM[t]}"></i>${[0,1].map(k=>cell(t*2+k,'Pareja '+(t+1))).join('')}</div>`;
-  else for(let i=0;i<n;i+=2)h+=`<div class="pair">${[i,i+1].filter(k=>k<n).map(k=>cell(k,'Jugador '+(k+1))).join('')}</div>`;
+  else for(let i=0;i<n;i++)h+=`<div class="pair">${cell(i,'Jugador '+(i+1))}</div>`;
   $('names').innerHTML=h;$('names').classList.toggle('solo',!pr);
   $('cloLab').textContent=D.live?'Poner a todos las mismas prendas que les quedan':'Prendas con las que empieza cada uno (luego podéis cambiarlo por persona)';
 }
 function openSetup(){
-  D=S?{mode:S.mode,count:S.mode==='pareja'?N()/2:N(),names:S.players.slice(),level:S.level,clothes:S.clothes,pen:S.pen,cl:S.left.slice(),live:true}
-     :{mode:'pareja',count:1,names:[],level:1,clothes:5,pen:'trago',cl:[],live:false};
+  D=S?{mode:S.mode,count:S.mode==='pareja'?N()/2:N(),names:S.players.slice(),level:S.level,clothes:S.clothes,pen:S.pen,cl:S.left.slice(),g:(S.g||[]).slice(),likes:(S.likes||[]).slice(),live:true}
+     :{mode:'pareja',count:1,names:[],level:1,clothes:5,pen:'trago',cl:[],g:[],likes:[],live:false};
   $('scancel').hidden=!S;$('sacts').classList.toggle('one',!S);$('serr').textContent='';$('sgo').textContent=S?'Guardar':'¡A jugar!';
   renderSetup();renderMis();$('setup').hidden=false;
 }
 $('names').oninput=e=>{const i=e.target.dataset.i;if(i!=null)D.names[+i]=e.target.value};
-$('names').onclick=e=>{const b=e.target.closest('[data-s]');if(!b)return;const k=+b.dataset.k;D.cl[k]=Math.max(0,Math.min(10,D.cl[k]+ +b.dataset.s));renderSetup()};
+$('names').onclick=e=>{
+  const b=e.target.closest('[data-s],[data-gn],[data-lk]');if(!b)return;const k=+b.dataset.k;
+  if(b.dataset.s)D.cl[k]=Math.max(0,Math.min(10,D.cl[k]+ +b.dataset.s));
+  else if(b.dataset.gn){D.g[k]=b.dataset.gn;if(!D.likes[k])D.likes[k]=D.g[k]==='h'?'m':'h'} // por defecto, el otro género
+  else D.likes[k]=b.dataset.lk;
+  renderSetup();
+};
 $('mode').onclick=e=>{const b=e.target.closest('button');if(b){D.mode=b.dataset.v;D.live=false;renderSetup()}};
 $('cnt').onclick=e=>{const b=e.target.closest('button');if(b){D.count=+b.dataset.v;D.live=false;renderSetup()}};
 for(const [id,k,num] of [['lvl','level',1],['pen','pen',0]])
@@ -638,11 +667,12 @@ $('sgo').onclick=()=>{
   const names=D.names.slice(0,n).map(v=>String(v||'').replace(/[<>]/g,'').replace(/\s+/g,' ').trim().slice(0,14));
   if(names.some(v=>!v)){$('serr').textContent='Escribid todos los nombres para saber a quién le toca.';return}
   if(new Set(names.map(v=>v.toLowerCase())).size<names.length){$('serr').textContent='Poned nombres distintos para no liaros con los turnos.';return}
-  const cl=D.cl.slice(0,n);
+  const cl=D.cl.slice(0,n),g=D.g.slice(0,n),likes=D.likes.slice(0,n).map((l,i)=>l||'a');
+  if(g.some(x=>!x)){$('serr').textContent='Indicad si cada jugador es chico o chica.';renderSetup();document.querySelectorAll('.pin').forEach((el,i)=>el.classList.toggle('miss',!g[i]));return}
   const same=S&&S.mode===D.mode&&N()===n;
-  if(same){S.players=names;S.level=D.level;S.pen=D.pen;S.clothes=D.clothes;
+  if(same){S.players=names;S.level=D.level;S.pen=D.pen;S.clothes=D.clothes;S.g=g;S.likes=likes;
     S.start=(S.start||S.left.map(()=>S.clothes)).map((x,i)=>Math.max(x,cl[i]));S.left=cl;if(S.card&&!S.card.rolling)S.card=null}
-  else S=fresh({mode:D.mode,players:names,level:D.level,clothes:D.clothes,pen:D.pen,start:cl});
+  else S=fresh({mode:D.mode,players:names,level:D.level,clothes:D.clothes,pen:D.pen,start:cl,g,likes});
   save();$('setup').hidden=true;ui();
 };
 
@@ -669,7 +699,7 @@ let arm=0;
 $('reset').onclick=()=>{
   if(!S)return;
   if(Date.now()-arm>3000){arm=Date.now();$('reset').textContent='¿Seguro? Toca otra vez';setTimeout(()=>$('reset').textContent='Empezar de cero',3000);return}
-  S=fresh({mode:S.mode,players:S.players,level:S.level,clothes:S.clothes,pen:S.pen,start:S.start});save();$('reset').textContent='Empezar de cero';ui();toast('Partida nueva');
+  S=fresh({mode:S.mode,players:S.players,level:S.level,clothes:S.clothes,pen:S.pen,start:S.start,g:S.g,likes:S.likes});save();$('reset').textContent='Empezar de cero';ui();toast('Partida nueva');
 };
 
 
