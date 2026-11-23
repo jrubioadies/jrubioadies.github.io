@@ -15,6 +15,8 @@ Juego para adultos (+18) en el navegador del móvil, **por parejas** (de 1 a 3 p
 | Brindis | Bebe todo el mundo |
 | Todos | Una acción que hacéis todos a la vez (besar a tu pareja, enseñar una parte del cuerpo, quitaros una prenda…) |
 
+En Ajustes → «Vuestras cartas» podéis escribir retos y verdades propios (con el nombre de la pareja, el nivel desde el que salen y la opción de que solo salgan por parejas). Se guardan solo en el dispositivo y salen más a menudo que las del juego.
+
 Las cartas con tiempo («durante 20 segundos», «un minuto»…) traen un contador: se toca para empezar, se puede pausar y pita en los tres últimos segundos y al terminar.
 
 El dado suena al rodar (traqueteo, tres botes y una campanita); se puede silenciar con el botón del altavoz.

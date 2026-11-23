@@ -164,6 +164,20 @@ button:focus-visible,input:focus-visible{outline:3px solid var(--verdad);outline
   .card p{font-size:26px}
 }
 
+
+/* vuestras cartas */
+.mnote{font-size:13px!important;line-height:1.45}
+.mlist{display:flex;flex-direction:column;gap:6px}
+.mlist:empty{display:none}
+.mc{display:flex;gap:10px;align-items:flex-start;background:var(--bg);border-radius:12px;padding:10px 10px 10px 12px}
+.mc div{flex:1;min-width:0;font-size:14px;line-height:1.4;color:var(--ink);overflow-wrap:anywhere}
+.mc small{display:block;font-size:11.5px;color:var(--muted);margin-top:3px;letter-spacing:.04em}
+.mc mark{background:none;color:var(--verdad);font-weight:700}
+.mc button{flex:none;width:32px;height:32px;border:0;border-radius:9px;background:var(--card2);color:var(--muted);font:700 16px var(--body);cursor:pointer}
+textarea.inp{resize:vertical;min-height:76px;font-size:15.5px;line-height:1.4}
+#misIns{align-self:flex-start}
+.chk{display:flex;gap:10px;align-items:flex-start;font-size:13.5px;color:var(--muted);line-height:1.4;cursor:pointer}
+.chk input{width:20px;height:20px;accent-color:var(--reto);flex:none;margin:0}
 /* contador para los retos con tiempo */
 .timer{display:flex;align-items:center;gap:14px;margin-top:2px}
 .tbtn{position:relative;width:70px;height:70px;border:0;padding:0;background:none;cursor:pointer;flex:none;color:var(--ink);border-radius:50%}
@@ -208,7 +222,7 @@ button:focus-visible,input:focus-visible{outline:3px solid var(--verdad);outline
     <p>Si a alguien no le apetece algo, lo dice y bebe. Lo importante es que lo paséis bien todos.</p>
     <button class="btn sm ghost" id="reset">Empezar de cero</button>
   </div>
-  <p class="rules">Cómo se juega: cada uno tira por turnos un dado de diez caras: <b style="color:var(--verdad)">Verdad</b>, <b style="color:var(--reto)">Reto</b>, <b style="color:var(--caricia)">Caricia</b> (una caricia al azar: qué, dónde y cuántos segundos), <b style="color:var(--desnuda)">Desnúdame</b> (le quitas una prenda a tu pareja, la que tú elijas), <b style="color:var(--prenda)">Prenda</b> (te quitas la que tú elijas), <b style="color:var(--duelo)">Duelo</b> (piedra, papel o tijera con alguien, y quien pierde se quita una prenda), <b style="color:var(--mandas)">Tú mandas</b> (eliges a quién y le pones verdad o reto), <b style="color:var(--comodin)">Comodín</b> (te lo guardas y te libra de una carta sin beber), <b style="color:var(--brindis)">Brindis</b> (bebe todo el mundo) y <b style="color:var(--todos)">Todos</b> (una acción que hacéis todos a la vez con vuestra pareja, o con quien tengáis a la derecha si jugáis cada uno). Quien no quiere cumplir, bebe y pasa el turno; si una carta no os convence, se puede cambiar una vez con «Otra carta». Las cartas con tiempo traen un contador: tocadlo para empezar. El dado no repite la misma cara dos veces seguidas. Si a alguien ya no le quedan prendas, en vez de quitarse una le toca un reto o beber. Por parejas, las verdades y los retos van siempre dirigidos a tu pareja. Bebed con cabeza: también se puede jugar sin alcohol.</p>
+  <p class="rules">Cómo se juega: cada uno tira por turnos un dado de diez caras: <b style="color:var(--verdad)">Verdad</b>, <b style="color:var(--reto)">Reto</b>, <b style="color:var(--caricia)">Caricia</b> (una caricia al azar: qué, dónde y cuántos segundos), <b style="color:var(--desnuda)">Desnúdame</b> (le quitas una prenda a tu pareja, la que tú elijas), <b style="color:var(--prenda)">Prenda</b> (te quitas la que tú elijas), <b style="color:var(--duelo)">Duelo</b> (piedra, papel o tijera con alguien, y quien pierde se quita una prenda), <b style="color:var(--mandas)">Tú mandas</b> (eliges a quién y le pones verdad o reto), <b style="color:var(--comodin)">Comodín</b> (te lo guardas y te libra de una carta sin beber), <b style="color:var(--brindis)">Brindis</b> (bebe todo el mundo) y <b style="color:var(--todos)">Todos</b> (una acción que hacéis todos a la vez con vuestra pareja, o con quien tengáis a la derecha si jugáis cada uno). Quien no quiere cumplir, bebe y pasa el turno; si una carta no os convence, se puede cambiar una vez con «Otra carta». En Ajustes podéis escribir vuestras propias cartas. Las cartas con tiempo traen un contador: tocadlo para empezar. El dado no repite la misma cara dos veces seguidas. Si a alguien ya no le quedan prendas, en vez de quitarse una le toca un reto o beber. Por parejas, las verdades y los retos van siempre dirigidos a tu pareja. Bebed con cabeza: también se puede jugar sin alcohol.</p>
 </div>
 
 <div class="veil" id="age" hidden>
@@ -239,6 +253,17 @@ button:focus-visible,input:focus-visible{outline:3px solid var(--verdad);outline
       <div class="seg" id="clo"><button data-v="3">3</button><button data-v="4">4</button><button data-v="5">5</button><button data-v="6">6</button><button data-v="7">7</button></div>
       <p class="lab">Si alguien no cumple</p>
       <div class="seg" id="pen"><button data-v="trago">Un trago</button><button data-v="chupito">Un chupito</button><button data-v="sin">Sin alcohol</button></div>
+    </div>
+    <div class="box mis" id="misBox">
+      <p class="lab">Vuestras cartas</p>
+      <p class="mnote">Escribid vuestros propios retos o verdades. Se mezclan con los del juego y se guardan solo en este dispositivo.</p>
+      <div class="mlist" id="misList"></div>
+      <textarea class="inp" id="misT" rows="3" maxlength="220" placeholder="Por ejemplo: Dale a [pareja] un beso donde más le guste"></textarea>
+      <button class="btn sm ghost" id="misIns" type="button">+ Nombre de la pareja</button>
+      <div class="seg" id="misK"><button data-v="reto">Reto</button><button data-v="verdad">Verdad</button></div>
+      <div class="seg" id="misL"><button data-v="1">Todos los niveles</button><button data-v="2">Desde picante</button><button data-v="3">Solo muy picante</button></div>
+      <label class="chk"><input type="checkbox" id="misP" checked> Solo cuando jugáis por parejas (así solo le toca a tu pareja)</label>
+      <button class="btn main" id="misAdd" type="button">Añadir carta</button>
     </div>
     <p class="err" id="serr"></p>
     <div class="acts" id="sacts"><button class="btn ghost" id="scancel">Cancelar</button><button class="btn main" id="sgo">¡A jugar!</button></div>
@@ -298,11 +323,20 @@ const cur=()=>S.order[S.ti];
 const name=i=>S.players[i];
 const partner=i=>i^1;
 function targetFor(p){if(S.mode==='pareja')return partner(p);const o=[...Array(N()).keys()].filter(i=>i!==p);return o[rnd(o.length)]}
+// cartas propias (Ajustes → Vuestras cartas), guardadas solo en este dispositivo
+const MKEY2='dado-atrevido-10-mis';
+let MIS=(()=>{const v=lsGet(MKEY2);return Array.isArray(v)?v.filter(c=>c&&typeof c.t==='string'):[]})();
+const saveMis=()=>lsSet(MKEY2,MIS);
 function pick(kind){
-  const lv=S.level,pool=DECK[kind][lv],k=kind+lv,used=S.used[k]||[];
-  let free=pool.map((_,i)=>i).filter(i=>!used.includes(i));
-  if(!free.length){free=pool.map((_,i)=>i);S.used[k]=[]}
-  const i=free[rnd(free.length)];(S.used[k]=S.used[k]||[]).push(i);return pool[i];
+  const lv=S.level,base=(DECK[kind]&&DECK[kind][lv])||[],k=kind+lv;
+  const mine=MIS.filter(c=>c.k===kind&&c.lv<=lv&&(!c.pareja||S.mode==='pareja')).map(c=>c.t.replace(/\[pareja\]/gi,'{o}'));
+  if(!Array.isArray(S.used[k])||typeof S.used[k][0]==='number')S.used[k]=[];
+  const used=S.used[k];
+  let fm=mine.filter(t=>!used.includes(t)),fb=base.filter(t=>!used.includes(t));
+  if(!fm.length&&!fb.length){S.used[k]=[];fm=mine.slice();fb=base.slice()}
+  // vuestras cartas salen más a menudo que las del juego (un 40 % de las veces mientras queden)
+  const L=fm.length&&(!fb.length||rnd(100)<40)?fm:fb,t=L[rnd(L.length)];
+  S.used[k].push(t);return t;
 }
 const fill=(t,o)=>t.replaceAll('{o}',name(o));
 
@@ -589,7 +623,7 @@ function openSetup(){
   D=S?{mode:S.mode,count:S.mode==='pareja'?N()/2:N(),names:S.players.slice(),level:S.level,clothes:S.clothes,pen:S.pen,cl:S.left.slice(),live:true}
      :{mode:'pareja',count:1,names:[],level:1,clothes:5,pen:'trago',cl:[],live:false};
   $('scancel').hidden=!S;$('sacts').classList.toggle('one',!S);$('serr').textContent='';$('sgo').textContent=S?'Guardar':'¡A jugar!';
-  renderSetup();$('setup').hidden=false;
+  renderSetup();renderMis();$('setup').hidden=false;
 }
 $('names').oninput=e=>{const i=e.target.dataset.i;if(i!=null)D.names[+i]=e.target.value};
 $('names').onclick=e=>{const b=e.target.closest('[data-s]');if(!b)return;const k=+b.dataset.k;D.cl[k]=Math.max(0,Math.min(10,D.cl[k]+ +b.dataset.s));renderSetup()};
@@ -611,6 +645,24 @@ $('sgo').onclick=()=>{
   else S=fresh({mode:D.mode,players:names,level:D.level,clothes:D.clothes,pen:D.pen,start:cl});
   save();$('setup').hidden=true;ui();
 };
+
+// ---------- vuestras cartas: alta, lista y borrado ----------
+let MD={k:'reto',lv:3};
+const LVN=['','Todos los niveles','Desde picante','Solo muy picante'];
+function renderMis(){
+  seg('misK',MD.k);seg('misL',MD.lv);
+  $('misList').innerHTML=MIS.map((c,i)=>`<div class="mc"><div>${esc(c.t).replace(/\[pareja\]/gi,'<mark>[pareja]</mark>')}<small>${c.k==='reto'?'Reto':'Verdad'} · ${LVN[c.lv]}${c.pareja?' · Solo por parejas':''}</small></div><button data-del="${i}" aria-label="Borrar carta">×</button></div>`).join('');
+}
+$('misK').onclick=e=>{const b=e.target.closest('button');if(b){MD.k=b.dataset.v;renderMis()}};
+$('misL').onclick=e=>{const b=e.target.closest('button');if(b){MD.lv=+b.dataset.v;renderMis()}};
+$('misIns').onclick=()=>{const t=$('misT');t.focus();try{t.setRangeText('[pareja]',t.selectionStart,t.selectionEnd,'end')}catch(e){t.value+='[pareja]'}};
+$('misAdd').onclick=()=>{
+  const t=$('misT').value.replace(/[<>]/g,'').replace(/\s+/g,' ').trim();
+  if(t.length<3){toast('Escribe la carta primero');return}
+  if(MIS.some(c=>c.t.toLowerCase()===t.toLowerCase()&&c.k===MD.k)){toast('Esa carta ya está');return}
+  MIS.push({t,k:MD.k,lv:MD.lv,pareja:$('misP').checked});saveMis();$('misT').value='';renderMis();toast('Carta añadida');
+};
+$('misList').onclick=e=>{const b=e.target.closest('[data-del]');if(!b)return;MIS.splice(+b.dataset.del,1);saveMis();renderMis();toast('Carta borrada')};
 $('scancel').onclick=()=>$('setup').hidden=true;
 $('cfg').onclick=openSetup;
 let arm=0;
