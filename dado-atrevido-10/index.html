@@ -106,6 +106,13 @@ button:focus-visible,input:focus-visible{outline:3px solid var(--verdad);outline
 .pair{display:grid;grid-template-columns:auto 1fr 1fr;gap:8px;align-items:center}
 .pair .dot{width:12px;height:12px;border-radius:50%}
 .names.solo .pair{grid-template-columns:1fr 1fr}
+.pin{display:flex;flex-direction:column;gap:6px;min-width:0}
+.stp{display:flex;align-items:center;justify-content:space-between;gap:6px;background:var(--bg);border-radius:11px;padding:3px 3px 3px 10px;font-size:12px;color:var(--muted)}
+.stp b{font:800 16px var(--body);color:var(--ink);min-width:18px;text-align:center;font-variant-numeric:tabular-nums}
+.stp button{width:30px;height:30px;border:0;border-radius:8px;background:var(--card2);color:var(--ink);font:800 17px var(--body);cursor:pointer;flex:none}
+.stp button:disabled{opacity:.35}
+.stp span{flex:1;white-space:nowrap}
+.pair .dot{align-self:start;margin-top:16px}
 .inp{width:100%;min-width:0;font:600 16px var(--body);color:var(--ink);background:var(--bg);border:2px solid var(--line);border-radius:13px;padding:11px}
 .inp:focus{border-color:var(--verdad);outline:none}
 .seg{display:grid;grid-auto-flow:column;grid-auto-columns:1fr;background:var(--bg);border-radius:13px;padding:3px;gap:3px}
@@ -228,7 +235,7 @@ button:focus-visible,input:focus-visible{outline:3px solid var(--verdad);outline
       <div class="seg levels" id="lvl"><button data-v="1">Suave<small>coqueto</small></button><button data-v="2">Picante<small>atrevido</small></button><button data-v="3">Muy picante<small>sin frenos</small></button></div>
     </div>
     <div class="box">
-      <p class="lab">Prendas con las que empieza cada uno</p>
+      <p class="lab" id="cloLab">Prendas con las que empieza cada uno</p>
       <div class="seg" id="clo"><button data-v="3">3</button><button data-v="4">4</button><button data-v="5">5</button><button data-v="6">6</button><button data-v="7">7</button></div>
       <p class="lab">Si alguien no cumple</p>
       <div class="seg" id="pen"><button data-v="trago">Un trago</button><button data-v="chupito">Un chupito</button><button data-v="sin">Sin alcohol</button></div>
@@ -281,8 +288,9 @@ function fresh(c){
   // turnos: por parejas se alternan las parejas (A1, B1, C1, A2, B2, C2)
   let order=[...Array(n).keys()];
   if(c.mode==='pareja'){const k=n/2;order=[];for(let r=0;r<2;r++)for(let t=0;t<k;t++)order.push(t*2+r)}
-  return {mode:c.mode,players:c.players,level:c.level,clothes:c.clothes,pen:c.pen,order,ti:rnd(n),
-    left:Array(n).fill(c.clothes),drinks:Array(n).fill(0),done:Array(n).fill(0),wild:Array(n).fill(0),used:{},card:null,q:null};
+  const start=Array.from({length:n},(_,i)=>c.start&&c.start[i]!=null?c.start[i]:c.clothes);
+  return {mode:c.mode,players:c.players,level:c.level,clothes:c.clothes,pen:c.pen,order,ti:rnd(n),start,
+    left:start.slice(),drinks:Array(n).fill(0),done:Array(n).fill(0),wild:Array(n).fill(0),used:{},card:null,q:null};
 }
 const save=()=>lsSet(KEY,S);
 const N=()=>S.players.length;
@@ -393,7 +401,7 @@ function renderBoard(){
   const c=S.card,act=c&&c.who!=null?c.who:cur();$('board').dataset.n=N();
   $('board').innerHTML=S.players.map((n,i)=>{const l=S.left[i];
     return `<div class="pl${i===act?' on':''}">${S.mode==='pareja'?`<i class="tm" style="background:${TEAM[i>>1]}" title="Pareja ${(i>>1)+1}"></i>`:''}<b>${esc(n)}</b>
-    <div class="clothes" aria-label="${l} prendas">${Array.from({length:S.clothes},(_,k)=>`<i class="${k<l?'':'off'}"></i>`).join('')}</div>
+    <div class="clothes" aria-label="${l} prendas">${Array.from({length:Math.max(S.start?S.start[i]:S.clothes,l)},(_,k)=>`<i class="${k<l?'':'off'}"></i>`).join('')}</div>
     <div class="row"><span>Prendas <em>${l}</em></span><span>Bebe <em>${S.drinks[i]}</em></span>${S.wild[i]?`<span style="color:var(--comodin)">Comodín <em>${S.wild[i]}</em></span>`:''}</div></div>`}).join('');
 }
 function btns(list){$('acts').innerHTML=list.map(([t,a,cls,d])=>`<button class="btn ${cls||''}" data-a="${a}"${d!=null?` data-d="${d}"`:''}>${esc(t)}</button>`).join('')}
@@ -403,7 +411,7 @@ function ui(){
   $('whose').innerHTML=`Turno de <em>${esc(name(p))}</em>${S.mode==='pareja'?`<small>Pareja de ${esc(name(partner(p)))}</small>`:''}`;
   $('hint').textContent=c?(c.rolling?'Rodando…':'Resolved la carta para pasar el turno'):'Toca el dado para tirar';
   const card=$('card');
-  if(!c){card.style.setProperty('--k','var(--line)');card.innerHTML=`<p class="empty">Le toca a <b style="color:var(--ink)">${esc(name(p))}</b>. Tira el dado y que decida la suerte.</p>`;btns([]);return}
+  if(!c){card.style.setProperty('--k','var(--line)');card.innerHTML=`<p class="empty">Le toca a <b style="color:var(--ink)">${esc(name(p))}</b>. Tira el dado y que decida la suerte.</p>${S.left.every(x=>x<=0)?'<span class="sub">Ya no le quedan prendas a nadie: Prenda, Desnúdame y Duelo se convierten en caricias, retos o tragos. Si alguien se vuelve a vestir, corregidlo en Ajustes.</span>':''}`;btns([]);return}
   card.style.setProperty('--k',HEX[c.kind]);
   card.innerHTML=`<span class="tag">${esc(c.tag||LAB[c.kind])}</span><p>${esc(c.text)}</p>${c.sub?`<span class="sub">${esc(c.sub)}</span>`:''}`+timerHTML(c);
   if(c.rolling){btns([]);return}
@@ -566,30 +574,41 @@ function renderSetup(){
   const opts=pr?[1,2,3]:[2,3,4,5,6];
   if(!opts.includes(D.count))D.count=pr?1:2;
   $('cnt').innerHTML=opts.map(v=>`<button data-v="${v}" class="${v===D.count?'on':''}">${v}</button>`).join('');
-  const n=pr?D.count*2:D.count;while(D.names.length<n)D.names.push('');
+  const n=pr?D.count*2:D.count;while(D.names.length<n)D.names.push('');while(D.cl.length<n)D.cl.push(D.clothes);
+  // en mitad de una partida el contador corrige las prendas que le quedan a cada uno
+  const lab=D.live?'Le quedan':'Prendas';
+  const cell=(k,ph)=>`<div class="pin"><input class="inp" data-i="${k}" maxlength="14" placeholder="${ph}" value="${esc(D.names[k]||'')}" autocomplete="off">
+    <div class="stp"><span>${lab}</span><button data-s="-1" data-k="${k}" aria-label="Una prenda menos" ${D.cl[k]<=0?'disabled':''}>−</button><b>${D.cl[k]}</b><button data-s="1" data-k="${k}" aria-label="Una prenda más" ${D.cl[k]>=10?'disabled':''}>+</button></div></div>`;
   let h='';
-  if(pr)for(let t=0;t<D.count;t++)h+=`<div class="pair"><i class="dot" style="background:${TEAM[t]}"></i>${[0,1].map(k=>`<input class="inp" data-i="${t*2+k}" maxlength="14" placeholder="Pareja ${t+1}" value="${esc(D.names[t*2+k]||'')}" autocomplete="off">`).join('')}</div>`;
-  else for(let i=0;i<n;i+=2)h+=`<div class="pair">${[i,i+1].filter(k=>k<n).map(k=>`<input class="inp" data-i="${k}" maxlength="14" placeholder="Jugador ${k+1}" value="${esc(D.names[k]||'')}" autocomplete="off">`).join('')}</div>`;
+  if(pr)for(let t=0;t<D.count;t++)h+=`<div class="pair"><i class="dot" style="background:${TEAM[t]}"></i>${[0,1].map(k=>cell(t*2+k,'Pareja '+(t+1))).join('')}</div>`;
+  else for(let i=0;i<n;i+=2)h+=`<div class="pair">${[i,i+1].filter(k=>k<n).map(k=>cell(k,'Jugador '+(k+1))).join('')}</div>`;
   $('names').innerHTML=h;$('names').classList.toggle('solo',!pr);
+  $('cloLab').textContent=D.live?'Poner a todos las mismas prendas que les quedan':'Prendas con las que empieza cada uno (luego podéis cambiarlo por persona)';
 }
 function openSetup(){
-  D=S?{mode:S.mode,count:S.mode==='pareja'?N()/2:N(),names:S.players.slice(),level:S.level,clothes:S.clothes,pen:S.pen}:{mode:'pareja',count:1,names:[],level:1,clothes:5,pen:'trago'};
-  $('scancel').hidden=!S;$('sacts').classList.toggle('one',!S);$('serr').textContent='';$('sgo').textContent=S?'Guardar y empezar':'¡A jugar!';
+  D=S?{mode:S.mode,count:S.mode==='pareja'?N()/2:N(),names:S.players.slice(),level:S.level,clothes:S.clothes,pen:S.pen,cl:S.left.slice(),live:true}
+     :{mode:'pareja',count:1,names:[],level:1,clothes:5,pen:'trago',cl:[],live:false};
+  $('scancel').hidden=!S;$('sacts').classList.toggle('one',!S);$('serr').textContent='';$('sgo').textContent=S?'Guardar':'¡A jugar!';
   renderSetup();$('setup').hidden=false;
 }
 $('names').oninput=e=>{const i=e.target.dataset.i;if(i!=null)D.names[+i]=e.target.value};
-$('mode').onclick=e=>{const b=e.target.closest('button');if(b){D.mode=b.dataset.v;renderSetup()}};
-$('cnt').onclick=e=>{const b=e.target.closest('button');if(b){D.count=+b.dataset.v;renderSetup()}};
-for(const [id,k,num] of [['lvl','level',1],['clo','clothes',1],['pen','pen',0]])
+$('names').onclick=e=>{const b=e.target.closest('[data-s]');if(!b)return;const k=+b.dataset.k;D.cl[k]=Math.max(0,Math.min(10,D.cl[k]+ +b.dataset.s));renderSetup()};
+$('mode').onclick=e=>{const b=e.target.closest('button');if(b){D.mode=b.dataset.v;D.live=false;renderSetup()}};
+$('cnt').onclick=e=>{const b=e.target.closest('button');if(b){D.count=+b.dataset.v;D.live=false;renderSetup()}};
+for(const [id,k,num] of [['lvl','level',1],['pen','pen',0]])
   $(id).onclick=e=>{const b=e.target.closest('button');if(!b)return;D[k]=num?+b.dataset.v:b.dataset.v;seg(id,D[k])};
+// elegir un número aquí lo pone a todos; luego se ajusta por persona
+$('clo').onclick=e=>{const b=e.target.closest('button');if(!b)return;D.clothes=+b.dataset.v;D.cl=D.cl.map(()=>D.clothes);renderSetup()};
 $('sgo').onclick=()=>{
   const n=D.mode==='pareja'?D.count*2:D.count;
   const names=D.names.slice(0,n).map(v=>String(v||'').replace(/[<>]/g,'').replace(/\s+/g,' ').trim().slice(0,14));
   if(names.some(v=>!v)){$('serr').textContent='Escribid todos los nombres para saber a quién le toca.';return}
   if(new Set(names.map(v=>v.toLowerCase())).size<names.length){$('serr').textContent='Poned nombres distintos para no liaros con los turnos.';return}
+  const cl=D.cl.slice(0,n);
   const same=S&&S.mode===D.mode&&N()===n;
-  if(same){S.players=names;S.level=D.level;S.pen=D.pen;const dc=D.clothes-S.clothes;if(dc){S.clothes=D.clothes;S.left=S.left.map(x=>Math.max(0,Math.min(S.clothes,x+dc)))}if(S.card&&!S.card.rolling)S.card=null}
-  else S=fresh({mode:D.mode,players:names,level:D.level,clothes:D.clothes,pen:D.pen});
+  if(same){S.players=names;S.level=D.level;S.pen=D.pen;S.clothes=D.clothes;
+    S.start=(S.start||S.left.map(()=>S.clothes)).map((x,i)=>Math.max(x,cl[i]));S.left=cl;if(S.card&&!S.card.rolling)S.card=null}
+  else S=fresh({mode:D.mode,players:names,level:D.level,clothes:D.clothes,pen:D.pen,start:cl});
   save();$('setup').hidden=true;ui();
 };
 $('scancel').onclick=()=>$('setup').hidden=true;
@@ -598,7 +617,7 @@ let arm=0;
 $('reset').onclick=()=>{
   if(!S)return;
   if(Date.now()-arm>3000){arm=Date.now();$('reset').textContent='¿Seguro? Toca otra vez';setTimeout(()=>$('reset').textContent='Empezar de cero',3000);return}
-  S=fresh({mode:S.mode,players:S.players,level:S.level,clothes:S.clothes,pen:S.pen});save();$('reset').textContent='Empezar de cero';ui();toast('Partida nueva');
+  S=fresh({mode:S.mode,players:S.players,level:S.level,clothes:S.clothes,pen:S.pen,start:S.start});save();$('reset').textContent='Empezar de cero';ui();toast('Partida nueva');
 };
 
 
