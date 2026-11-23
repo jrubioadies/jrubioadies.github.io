@@ -13,7 +13,7 @@ Juego para adultos (+18) en el navegador del móvil, **por parejas** (de 1 a 3 p
 | Tú mandas | Eliges a quién y le pones verdad o reto |
 | Comodín | Te lo guardas: te libra de una carta sin beber |
 | Brindis | Bebe todo el mundo |
-| Todos | Una verdad que contestan todos |
+| Todos | Una acción que hacéis todos a la vez (besar a tu pareja, enseñar una parte del cuerpo, quitaros una prenda…) |
 
 El dado suena al rodar (traqueteo, tres botes y una campanita); se puede silenciar con el botón del altavoz.
 

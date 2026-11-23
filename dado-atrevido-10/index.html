@@ -186,7 +186,7 @@ button:focus-visible,input:focus-visible{outline:3px solid var(--verdad);outline
     <p>Si a alguien no le apetece algo, lo dice y bebe. Lo importante es que lo paséis bien todos.</p>
     <button class="btn sm ghost" id="reset">Empezar de cero</button>
   </div>
-  <p class="rules">Cómo se juega: cada uno tira por turnos un dado de diez caras: <b style="color:var(--verdad)">Verdad</b>, <b style="color:var(--reto)">Reto</b>, <b style="color:var(--caricia)">Caricia</b> (una caricia al azar: qué, dónde y cuántos segundos), <b style="color:var(--desnuda)">Desnúdame</b> (le quitas una prenda a tu pareja, la que tú elijas), <b style="color:var(--prenda)">Prenda</b> (te quitas la que tú elijas), <b style="color:var(--duelo)">Duelo</b> (piedra, papel o tijera con alguien, y quien pierde se quita una prenda), <b style="color:var(--mandas)">Tú mandas</b> (eliges a quién y le pones verdad o reto), <b style="color:var(--comodin)">Comodín</b> (te lo guardas y te libra de una carta sin beber), <b style="color:var(--brindis)">Brindis</b> (bebe todo el mundo) y <b style="color:var(--todos)">Todos</b> (una verdad que contestan todos). Quien no quiere cumplir, bebe y pasa el turno. Si a alguien ya no le quedan prendas, en vez de quitarse una le toca un reto o beber. Por parejas, las verdades y los retos van siempre dirigidos a tu pareja. Bebed con cabeza: también se puede jugar sin alcohol.</p>
+  <p class="rules">Cómo se juega: cada uno tira por turnos un dado de diez caras: <b style="color:var(--verdad)">Verdad</b>, <b style="color:var(--reto)">Reto</b>, <b style="color:var(--caricia)">Caricia</b> (una caricia al azar: qué, dónde y cuántos segundos), <b style="color:var(--desnuda)">Desnúdame</b> (le quitas una prenda a tu pareja, la que tú elijas), <b style="color:var(--prenda)">Prenda</b> (te quitas la que tú elijas), <b style="color:var(--duelo)">Duelo</b> (piedra, papel o tijera con alguien, y quien pierde se quita una prenda), <b style="color:var(--mandas)">Tú mandas</b> (eliges a quién y le pones verdad o reto), <b style="color:var(--comodin)">Comodín</b> (te lo guardas y te libra de una carta sin beber), <b style="color:var(--brindis)">Brindis</b> (bebe todo el mundo) y <b style="color:var(--todos)">Todos</b> (una acción que hacéis todos a la vez con vuestra pareja, o con quien tengáis a la derecha si jugáis cada uno). Quien no quiere cumplir, bebe y pasa el turno. Si a alguien ya no le quedan prendas, en vez de quitarse una le toca un reto o beber. Por parejas, las verdades y los retos van siempre dirigidos a tu pareja. Bebed con cabeza: también se puede jugar sin alcohol.</p>
 </div>
 
 <div class="veil" id="age" hidden>
@@ -246,10 +246,10 @@ const DECK={
   2:["Bésale el cuello a {o} durante 20 segundos.","Haz un baile sensual para {o} durante 30 segundos.","Dale a {o} un masaje de un minuto donde elija.","Tapa los ojos a {o} y bésale en tres sitios: tiene que adivinar dónde.","Susúrrale a {o} al oído lo que le harías ahora mismo.","Muérdele suavemente el lóbulo de la oreja a {o}.","Siéntate a horcajadas sobre {o} hasta tu próximo turno.","Besa a {o} desde la muñeca hasta el hombro.","Deja que {o} te bese donde quiera durante 15 segundos.","Haz que {o} se estremezca solo con tu aliento en el cuello.","Bésale a {o} la espalda de arriba abajo.","Durante un minuto, solo puedes acariciar a {o} con los labios."],
   3:["Bésale a {o} el cuerpo bajando desde el cuello, hasta donde {o} te deje.","Véndate los ojos y deja que {o} te guíe las manos durante un minuto.","Durante un minuto, {o} no puede tocarte y tú puedes besarle donde quieras.","Cuéntale a {o} al oído, con detalle, cómo empezaríais la noche.","Dale a {o} un masaje con aceite o crema donde elija, durante dos minutos.","Besa a {o} un minuto entero sin usar las manos.","Elige una parte del cuerpo de {o} y bésala durante 30 segundos.","Recorre a besos a {o} de los pies a la cabeza en menos de un minuto.","Deja que {o} invente un reto para ti: tienes que cumplirlo.","Túmbate y deja que {o} haga contigo lo que quiera durante un minuto.","Quítale a {o} una prenda con los dientes, sin usar las manos.","Haz que {o} te pida un beso sin que tú le toques."]
  },
- todos:{
-  1:["¿Cuál ha sido tu peor cita?","¿Qué es lo primero en lo que te fijas de alguien?","¿Cómo fue tu primer beso?","¿Qué canción pondrías para una noche romántica?","¿Qué es lo más vergonzoso que te ha pasado ligando?","¿Qué te parece irresistible en una persona?","¿Cuál es tu plan perfecto para una noche en pareja?","¿Qué famoso o famosa te parece más atractivo?"],
-  2:["¿Cuál es el sitio más raro donde te has besado con alguien?","¿Qué es lo más atrevido que has hecho para conquistar a alguien?","¿Qué prenda te hace sentir más sexy?","¿Qué parte de tu cuerpo te gusta más?","¿Has mandado alguna vez un mensaje picante a quien no debías?","¿Qué es lo que más te pone en una primera cita?","¿Cuál es tu fantasía más inocente… y la menos inocente?","¿Qué es lo más loco que has hecho una noche de fiesta?"],
-  3:["¿Cuál es tu fantasía pendiente?","¿Cuál es el sitio más arriesgado donde lo has hecho?","¿Qué no has probado nunca y te da curiosidad?","¿Prefieres dominar o que te dominen?","¿Cuál ha sido tu mejor noche y qué la hizo especial?","¿Qué te gusta que te digan al oído?","¿Qué es lo más atrevido que has hecho en tu vida?","Del 1 al 10, ¿cómo de atrevido o atrevida eres en la cama?"]
+ todos:{ // acciones que hacen todos a la vez; {p} = vuestra pareja, o quien tengáis a la derecha si jugáis cada uno
+  1:["Todos dais un beso a {p}.","Todos enseñáis un tatuaje, un lunar o una cicatriz que no se vea a simple vista.","Todos susurráis un piropo al oído de {p}.","Todos bailáis 20 segundos agarrados a {p}.","Todos enseñáis el hombro de la forma más sexy que sepáis.","Todos dais un masaje de 30 segundos en los hombros a {p}.","Todos miráis a los ojos a {p} 15 segundos sin reíros.","Todos os quitáis los zapatos o los calcetines (no cuenta como prenda)."],
+  2:["Todos dais a {p} un beso de 10 segundos.","Todos enseñáis la parte de vuestro cuerpo que más os gusta.","Todos besáis el cuello de {p}.","Todos enseñáis un segundo la ropa interior.","Todos os sentáis encima de {p} hasta el próximo turno.","Todos hacéis 15 segundos de baile sensual.","Todos enseñáis el ombligo… y un poco más abajo.","Todos mordéis con suavidad la oreja de {p}."],
+  3:["Todos os quitáis una prenda.|strip","Todos enseñáis una parte del cuerpo que normalmente no se ve.","Todos dais a {p} un beso apasionado de 20 segundos.","Todos besáis a {p} donde elija.","Todos recorréis con los labios la espalda de {p}.","Todos enseñáis la ropa interior durante 10 segundos.","Todos os tumbáis y os dejáis besar por {p} donde quiera.","Todos le quitáis una prenda a {p}.|strip"]
  }
 };
 // las diez caras: cinco arriba y cinco abajo, alternando colores
@@ -395,6 +395,7 @@ function ui(){
   const w=c.who;
   if(c.step==='do'){const l=[[PEN[S.pen],'no','drink']];if(S.wild[w])l.push(['Usar comodín','wild','wild']);l.push(['¡Hecho!','yes','main']);btns(l)}
   else if(c.step==='ok')btns([['Seguir','next','main']]);
+  else if(c.step==='all')btns([['¡Hecho!','allstrip','main']]);
   else if(c.step==='rival')btns(S.players.map((n,i)=>i===p?null:[n,'rival','',i]).filter(Boolean));
   else if(c.step==='duel')btns([[`Gana ${name(p)}`,'win','',p],[`Gana ${name(c.rival)}`,'win','',c.rival]]);
   else if(c.step==='choose')btns([['Verdad','give','','verdad'],['Reto','give','main','reto']]);
@@ -424,7 +425,9 @@ function makeCard(face,p){
       if(S.left[o]>0)return {kind:'desnuda',tag:'Desnúdame',who:p,step:'do',stripOther:o,text:`Quítale a ${name(o)} una prenda. Tú eliges cuál.`,
         sub:[`A ${name(o)} le quedan ${S.left[o]}.`,'Despacio, sin prisa.','Con los dientes, si te atreves.'][S.level-1]};
       return Object.assign(caricia(p,o),{sub:`A ${name(o)} ya no le quedan prendas, así que toca una caricia.`});
-    case 'todos':{const t=pick('todos');return {kind:'todos',who:p,step:'ok',text:t,sub:`Contestáis todos, empezando por ${name(p)}. Quien no quiera, bebe.`}}
+    case 'todos':{const [t,fx]=pick('todos').split('|'),pp=S.mode==='pareja'?'vuestra pareja':'quien tengáis a la derecha';
+      return {kind:'todos',who:p,step:fx?'all':'ok',allStrip:!!fx,text:t.replaceAll('{p}',pp),
+        sub:fx?'Cada uno pierde una prenda en el marcador. A quien ya no le quede ninguna, bebe.':'Lo hacéis todos a la vez. Quien no quiera, bebe.'}}
   }
 }
 // caricia al azar: acción + zona + segundos; cada nivel añade acciones y zonas más atrevidas
@@ -456,6 +459,7 @@ $('acts').onclick=e=>{
   else if(a==='no'){S.drinks[c.who]++;toast(name(c.who)+' bebe '+PENS[S.pen]);nextTurn()}
   else if(a==='wild'){S.wild[c.who]--;toast(name(c.who)+' usa su comodín');nextTurn()}
   else if(a==='next')nextTurn();
+  else if(a==='allstrip'){S.players.forEach((_,i)=>{if(S.left[i]>0)S.left[i]--;else S.drinks[i]++});toast('Una prenda menos para todos');nextTurn()}
   else if(a==='rival'){const r=+d;
     if(c.kind==='duelo'){c.rival=r;c.step='duel';c.text=`Piedra, papel o tijera: ${name(p)} contra ${name(r)}. Quien pierda, fuera una prenda.`;c.sub='A la de tres. Si a quien pierde no le quedan prendas, bebe.'}
     else{c.rival=r;c.step='choose';c.text=`¿Qué le pones a ${name(r)}?`}
