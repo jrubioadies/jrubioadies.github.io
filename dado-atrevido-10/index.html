@@ -43,8 +43,13 @@ h1 small{display:block;font:700 12px var(--body);letter-spacing:.2em;text-transf
 .snd{position:absolute;top:12px;right:12px;z-index:2;width:40px;height:40px;padding:0;background:rgba(0,0,0,.2)}
 .snd svg{width:20px;height:20px}
 .snd[aria-pressed="false"]{opacity:.6}
+.lang{appearance:none;-webkit-appearance:none;border:0;border-radius:11px;background:rgba(0,0,0,.2);box-shadow:inset 0 0 0 2px var(--line);color:var(--ink);font:700 13px var(--body);padding:0 11px;height:40px;cursor:pointer}
+.lang option{background:var(--card);color:var(--ink)}
+.stage>.lang{position:absolute;top:12px;left:12px;z-index:2}
+.vlang{align-self:flex-start;padding:0 14px}
+.card p.empty b{color:var(--ink);font-weight:400}
 .btn:disabled{opacity:.4;cursor:default}
-button:focus-visible,input:focus-visible{outline:3px solid var(--verdad);outline-offset:2px}
+button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid var(--verdad);outline-offset:2px}
 
 /* marcador: una ficha por jugador */
 .board{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:8px}
@@ -64,7 +69,7 @@ button:focus-visible,input:focus-visible{outline:3px solid var(--verdad);outline
   box-shadow:inset 0 0 0 1px var(--line),0 18px 40px rgba(0,0,0,.45);overflow:hidden}
 .stage::before{content:"";position:absolute;inset:-40% -20% auto;height:80%;background:radial-gradient(closest-side,rgba(242,194,107,.16),transparent);pointer-events:none;animation:glow 4s ease-in-out infinite}
 @keyframes glow{50%{opacity:.55;transform:translateY(6px)}}
-.whose{font:400 25px/1.1 var(--display);text-align:center;z-index:1}
+.whose{font:400 25px/1.1 var(--display);text-align:center;z-index:1;padding-inline:54px}
 .whose em{font-style:italic;color:var(--verdad)}
 .whose small{display:block;font:600 13px var(--body);color:var(--muted);margin-top:3px}
 #die{width:240px;height:240px;max-width:100%;cursor:pointer;z-index:1;touch-action:manipulation;display:block}
@@ -109,6 +114,8 @@ button:focus-visible,input:focus-visible{outline:3px solid var(--verdad);outline
 .pin .seg button{padding:7px 4px;font-size:12.5px}
 .pin .gl{display:grid;grid-template-columns:1fr 1.4fr;gap:6px}
 .pin .gl .seg{min-width:0}
+.names:not(.solo) .pin .gl{grid-template-columns:1fr}
+.pin .gl>div{min-width:0}
 .pin .glab{font:700 10.5px var(--body);letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin:2px 0 -2px}
 .pin.miss .gseg{box-shadow:0 0 0 2px var(--reto)}
 .pin{display:flex;flex-direction:column;gap:6px;min-width:0}
@@ -137,6 +144,7 @@ button:focus-visible,input:focus-visible{outline:3px solid var(--verdad);outline
   .board{grid-template-columns:repeat(2,minmax(0,1fr))}
   .board[data-n="3"],.board[data-n="6"]{grid-template-columns:repeat(3,minmax(0,1fr))}
   .pl b{font-size:23px}
+  .names:not(.solo) .pin .gl{grid-template-columns:1fr 1.4fr}
   #die{width:340px;height:340px}
   .card p{font-size:30px}
   .card .sub,.rules,.foot p{font-size:14.5px}
@@ -160,7 +168,8 @@ button:focus-visible,input:focus-visible{outline:3px solid var(--verdad);outline
   .card{min-height:180px;padding:22px}
   .card p{font-size:31px}
   .vin{max-width:960px;display:grid;grid-template-columns:1fr 1fr;align-content:center;gap:16px}
-  .vin>h2,.vin>p,.vin>.err,.vin>.acts,.vin>.btn,.vin>a{grid-column:1/-1}
+  .vin>h2,.vin>p,.vin>.err,.vin>.acts,.vin>.btn,.vin>a,.vin>select{grid-column:1/-1}
+  .vin>select{justify-self:start}
   #setup .vin>.box:first-of-type{grid-row:span 2}
   #age .vin{max-width:560px;display:flex}
 }
@@ -198,7 +207,9 @@ textarea.inp{resize:vertical;min-height:76px;font-size:15.5px;line-height:1.4}
 .tlink{border:0;background:none;color:var(--muted);font:600 13px var(--body);padding:0;cursor:pointer;text-decoration:underline;text-underline-offset:3px}
 @media (min-width:900px) and (orientation:landscape){.tbtn{width:84px;height:84px}.tbtn b{font-size:27px}}
 @media (prefers-reduced-motion:reduce){.card.in,.stage::before{animation:none}}
-@media (max-width:370px){h1{font-size:34px}.card p{font-size:21px}.board{grid-template-columns:1fr 1fr}}
+h1{white-space:nowrap}h1 small{white-space:normal}#cfg{white-space:nowrap;flex:none}
+@media (max-width:480px){html:lang(fr) h1,html:lang(it) h1{font-size:33px}}
+@media (max-width:370px){h1{font-size:34px}html:lang(fr) h1,html:lang(it) h1{font-size:27px}.card p{font-size:21px}.board{grid-template-columns:1fr 1fr}}
 </style>
 <style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}</style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
@@ -206,17 +217,18 @@ textarea.inp{resize:vertical;min-height:76px;font-size:15.5px;line-height:1.4}
 <body>
 <div class="app">
   <header>
-    <h1>Dado <i>atrevido</i><sup>D10</sup><small>Para adultos · +18</small></h1>
-    <button class="btn sm ghost" id="cfg">Ajustes</button>
+    <h1>Dado <i>atrevido</i><sup>D10</sup><small data-t="adults"></small></h1>
+    <button class="btn sm ghost" id="cfg" data-t="cfg"></button>
   </header>
 
   <div class="board" id="board"></div>
 
   <div class="stage">
-    <button class="btn sm ghost snd" id="snd" aria-pressed="true" aria-label="Sonido"></button>
+    <select class="lang" id="lang" aria-label="Language"></select>
+    <button class="btn sm ghost snd" id="snd" aria-pressed="true"></button>
     <div class="whose" id="whose"></div>
-    <div id="dieBox"><canvas id="die" width="720" height="720" role="button" tabindex="0" aria-label="Tirar el dado"></canvas></div>
-    <div class="hint" id="hint">Toca el dado para tirar</div>
+    <div id="dieBox"><canvas id="die" width="720" height="720" role="button" tabindex="0" data-ta="roll_aria"></canvas></div>
+    <div class="hint" id="hint" data-t="hint_tap"></div>
     <div class="legend" id="legend"></div>
   </div>
 
@@ -224,62 +236,65 @@ textarea.inp{resize:vertical;min-height:76px;font-size:15.5px;line-height:1.4}
   <div class="acts" id="acts"></div>
 
   <div class="foot">
-    <p>Si a alguien no le apetece algo, lo dice y bebe. Lo importante es que lo paséis bien todos.</p>
-    <button class="btn sm ghost" id="reset">Empezar de cero</button>
+    <p data-t="foot"></p>
+    <button class="btn sm ghost" id="reset" data-t="reset"></button>
   </div>
-  <p class="rules">Cómo se juega: cada uno tira por turnos un dado de diez caras: <b style="color:var(--verdad)">Verdad</b>, <b style="color:var(--reto)">Reto</b>, <b style="color:var(--caricia)">Caricia</b> (una caricia al azar: qué, dónde y cuántos segundos), <b style="color:var(--desnuda)">Desnúdame</b> (le quitas una prenda a tu pareja, la que tú elijas), <b style="color:var(--prenda)">Prenda</b> (te quitas la que tú elijas), <b style="color:var(--duelo)">Duelo</b> (un desafío al azar contra tu pareja o contra quien elijas; quien pierde paga lo que os jugáis: una prenda, un reto, una caricia…), <b style="color:var(--mandas)">Tú mandas</b> (eliges a quién y le pones verdad o reto), <b style="color:var(--comodin)">Comodín</b> (te lo guardas y te libra de una carta sin beber), <b style="color:var(--brindis)">Brindis</b> (bebe todo el mundo) y <b style="color:var(--todos)">Todos</b> (una acción que hacéis todos a la vez con vuestra pareja, o con quien tengáis a la derecha si jugáis cada uno). Quien no quiere cumplir, bebe y pasa el turno; si una carta no os convence, se puede cambiar una vez con «Otra carta». En Ajustes podéis escribir vuestras propias cartas. Las cartas con tiempo traen un contador: tocadlo para empezar. El dado no repite la misma cara dos veces seguidas. El dado solo cae en caras que se pueden cumplir: si ya no te quedan prendas no sale Prenda, y si a quien te toca desnudar no le quedan, no sale Desnúdame. Por parejas, las cartas van a tu pareja, salvo que con varias parejas elijáis duelos cruzados o todo cruzado; si jugáis cada uno, a alguien de la mesa que os guste según lo que indicó cada jugador. Bebed con cabeza: también se puede jugar sin alcohol.</p>
+  <p class="rules" id="rules"></p>
 </div>
 
 <div class="veil" id="age" hidden>
   <div class="vin">
-    <h2>Solo para <i>adultos</i></h2>
-    <p>Dado Atrevido es un juego para adultos, con preguntas y retos picantes. Jugad solo si todos tenéis más de 18 años y os apetece a todos.</p>
-    <button class="btn main" id="ageOk">Todos tenemos más de 18 años</button>
-    <a class="btn ghost" href="https://www.google.com" rel="noopener" style="text-decoration:none">Salir</a>
+    <select class="lang vlang" aria-label="Language"></select>
+    <h2 data-t="age_h"></h2>
+    <p data-t="age_p"></p>
+    <button class="btn main" id="ageOk" data-t="age_ok"></button>
+    <a class="btn ghost" href="https://www.google.com" rel="noopener" style="text-decoration:none" data-t="age_exit"></a>
   </div>
 </div>
 
 <div class="veil" id="setup" hidden>
   <div class="vin">
-    <h2>Preparad <i>la noche</i></h2>
+    <select class="lang vlang" aria-label="Language"></select>
+    <h2 data-t="setup_h"></h2>
     <div class="box">
-      <p class="lab">Cómo jugáis</p>
-      <div class="seg" id="mode"><button data-v="pareja">Por parejas<small>de 1 a 3 parejas</small></button><button data-v="solo">Cada uno<small>de 2 a 6 jugadores</small></button></div>
-      <p class="lab" id="cntLab">Número de parejas</p>
+      <p class="lab" data-t="how"></p>
+      <div class="seg" id="mode"><button data-v="pareja" data-t="mode_pareja"></button><button data-v="solo" data-t="mode_solo"></button></div>
+      <p class="lab" id="cntLab"></p>
       <div class="seg" id="cnt"></div>
       <div id="crossBox" hidden>
-        <p class="lab">Juego entre parejas</p>
-        <div class="seg" id="cross"><button data-v="no">Solo con tu pareja</button><button data-v="duelo">Duelos cruzados</button><button data-v="todo">Todo cruzado</button></div>
+        <p class="lab" data-t="cross_lab"></p>
+        <div class="seg" id="cross"><button data-v="no" data-t="cross_no"></button><button data-v="duelo" data-t="cross_duelo"></button><button data-v="todo" data-t="cross_todo"></button></div>
         <p class="mnote" id="crossNote"></p>
       </div>
       <div class="names" id="names"></div>
     </div>
     <div class="box">
-      <p class="lab">Nivel</p>
-      <div class="seg levels" id="lvl"><button data-v="1">Suave<small>coqueto</small></button><button data-v="2">Picante<small>atrevido</small></button><button data-v="3">Muy picante<small>sin frenos</small></button></div>
+      <p class="lab" data-t="level"></p>
+      <div class="seg levels" id="lvl"><button data-v="1" data-t="lv1"></button><button data-v="2" data-t="lv2"></button><button data-v="3" data-t="lv3"></button></div>
     </div>
     <div class="box">
-      <p class="lab" id="cloLab">Prendas con las que empieza cada uno</p>
+      <p class="lab" id="cloLab"></p>
       <div class="seg" id="clo"><button data-v="3">3</button><button data-v="4">4</button><button data-v="5">5</button><button data-v="6">6</button><button data-v="7">7</button></div>
-      <p class="lab">Si alguien no cumple</p>
-      <div class="seg" id="pen"><button data-v="trago">Un trago</button><button data-v="chupito">Un chupito</button><button data-v="sin">Sin alcohol</button></div>
+      <p class="lab" data-t="pen_lab"></p>
+      <div class="seg" id="pen"><button data-v="trago" data-t="pen_trago"></button><button data-v="chupito" data-t="pen_chupito"></button><button data-v="sin" data-t="pen_sin"></button></div>
     </div>
     <div class="box mis" id="misBox">
-      <p class="lab">Vuestras cartas</p>
-      <p class="mnote">Escribid vuestros propios retos o verdades. Se mezclan con los del juego y se guardan solo en este dispositivo.</p>
+      <p class="lab" data-t="mis_lab"></p>
+      <p class="mnote" data-t="mis_note"></p>
       <div class="mlist" id="misList"></div>
-      <textarea class="inp" id="misT" rows="3" maxlength="220" placeholder="Por ejemplo: Dale a [pareja] un beso donde más le guste"></textarea>
-      <button class="btn sm ghost" id="misIns" type="button">+ Nombre de la pareja</button>
-      <div class="seg" id="misK"><button data-v="reto">Reto</button><button data-v="verdad">Verdad</button></div>
-      <div class="seg" id="misL"><button data-v="1">Todos los niveles</button><button data-v="2">Desde picante</button><button data-v="3">Solo muy picante</button></div>
-      <label class="chk"><input type="checkbox" id="misP" checked> Solo cuando jugáis por parejas (así solo le toca a tu pareja)</label>
-      <button class="btn main" id="misAdd" type="button">Añadir carta</button>
+      <textarea class="inp" id="misT" rows="3" maxlength="220" data-tp="mis_ph"></textarea>
+      <button class="btn sm ghost" id="misIns" type="button" data-t="mis_ins"></button>
+      <div class="seg" id="misK"><button data-v="reto" data-tl="reto"></button><button data-v="verdad" data-tl="verdad"></button></div>
+      <div class="seg" id="misL"><button data-v="1" data-t="misL1"></button><button data-v="2" data-t="misL2"></button><button data-v="3" data-t="misL3"></button></div>
+      <label class="chk"><input type="checkbox" id="misP" checked> <span data-t="mis_only"></span></label>
+      <button class="btn main" id="misAdd" type="button" data-t="mis_add"></button>
     </div>
     <p class="err" id="serr"></p>
-    <div class="acts" id="sacts"><button class="btn ghost" id="scancel">Cancelar</button><button class="btn main" id="sgo">¡A jugar!</button></div>
+    <div class="acts" id="sacts"><button class="btn ghost" id="scancel" data-t="cancel"></button><button class="btn main" id="sgo"></button></div>
   </div>
 </div>
 
+<script src="i18n.js"></script>
 <script>
 (()=>{
 const $=id=>document.getElementById(id);
@@ -291,30 +306,23 @@ const esc=t=>String(t).replace(/[&<>"']/g,c=>'&#'+c.charCodeAt(0)+';');
 const rnd=n=>{try{const a=new Uint32Array(1);crypto.getRandomValues(a);return a[0]%n}catch(e){return Math.floor(Math.random()*n)}};
 const TEAM=['#f2c26b','#ff5d73','#7cb7ff'];
 
-// ---------- cartas ({o} = a quien va dirigida) ----------
-const DECK={
- verdad:{
-  1:["¿Qué fue lo primero que te gustó de {o}?","¿Qué detalle de {o} te encanta y nunca se lo has dicho?","¿Qué parte del cuerpo de {o} es tu favorita?","¿Qué prenda de {o} te encanta verle puesta?","¿Qué te gustaría que {o} hiciera más a menudo?","¿Dónde te escaparías con {o} un fin de semana, sin pensar en el dinero?","¿Qué gesto de {o} te derrite?","¿Qué canción pondrías para bailar lento con {o}?","¿Qué es lo más bonito que te ha dicho {o}?","¿Qué cita perfecta prepararías para {o}?","¿Qué pensaste de {o} la primera vez que le viste?","Del 1 al 10, ¿cómo de {t:guapo|guapa} ves a {o} esta noche?","¿Qué te gustaría aprender de {o}?","¿Qué es lo que más te hace reír de {o}?"],
-  2:["¿Qué es lo que más te atrae de {o}?","¿Dónde te gustaría que {o} te besara?","¿Qué zona de tu cuerpo es la más sensible?","¿Has tenido un sueño subido de tono con {o}? Cuéntalo.","¿Qué ropa interior te gustaría ver puesta a {o}?","¿En qué sitio poco habitual besarías a {o} apasionadamente?","Del 1 al 10, ¿cuántas ganas tienes de besar a {o} ahora mismo?","¿Qué te gustaría que {o} te hiciera esta noche?","¿Qué te pone más: seducir o que te seduzcan?","¿Qué es lo más atrevido que te gustaría probar con {o}?","¿Qué mensaje picante te gustaría recibir de {o}?","¿Qué es lo más sexy que tiene {o}?","¿Qué le quitarías primero a {o}?","¿Qué fantasía tienes en la que salga {o}?"],
-  3:["¿Qué fantasía no le has contado nunca a {o}?","¿Qué te gustaría que {o} te hiciera en la cama?","¿Qué juego o juguete te gustaría probar con {o}?","¿Cuál es el sitio más arriesgado donde te gustaría hacerlo con {o}?","¿Qué te gustaría que {o} te susurrara en el momento más intenso?","¿Qué postura te gustaría probar con {o}?","¿Prefieres que {o} tome el control o tomarlo tú? ¿Por qué?","¿Qué parte del cuerpo de {o} besarías durante horas?","¿Qué te gustaría que {o} llevara puesto, o no, la próxima vez?","¿Qué es lo que más te cuesta pedir en la cama? Pídeselo a {o}.","Describe en tres palabras cómo sería tu noche perfecta con {o}.","¿Qué es lo primero que harías si te quedaras a solas con {o} ahora?"]
- },
- reto:{
-  1:["Dale a {o} un beso en la mejilla y otro en el cuello.","Hazle a {o} un masaje de hombros durante un minuto.","Mira a {o} a los ojos 30 segundos sin reíros.","Susúrrale a {o} tres cosas que te gustan de su cuerpo.","Baila lento con {o} una canción, muy juntos.","Coge la mano de {o} y bésale cada dedo.","Dibuja con el dedo un corazón en la espalda de {o}.","Siéntate en las rodillas de {o} hasta tu próximo turno.","Dile a {o} un piropo con tu voz más seductora.","Cierra los ojos y deja que {o} te dé un beso donde quiera.","Hazle cosquillas suaves en la espalda a {o} durante 30 segundos.","Dale a {o} un abrazo de 20 segundos sin soltarle."],
-  2:["Bésale el cuello a {o} durante 20 segundos.","Haz un baile sensual para {o} durante 30 segundos.","Dale a {o} un masaje de un minuto donde elija.","Tapa los ojos a {o} y bésale en tres sitios: tiene que adivinar dónde.","Susúrrale a {o} al oído lo que le harías ahora mismo.","Muérdele suavemente el lóbulo de la oreja a {o}.","Siéntate a horcajadas sobre {o} hasta tu próximo turno.","Besa a {o} desde la muñeca hasta el hombro.","Deja que {o} te bese donde quiera durante 15 segundos.","Haz que {o} se estremezca solo con tu aliento en el cuello.","Bésale a {o} la espalda de arriba abajo.","Durante un minuto, solo puedes acariciar a {o} con los labios."],
-  3:["Bésale a {o} el cuerpo bajando desde el cuello, hasta donde {o} te deje.","Véndate los ojos y deja que {o} te guíe las manos durante un minuto.","Durante un minuto, {o} no puede tocarte y tú puedes besarle donde quieras.","Cuéntale a {o} al oído, con detalle, cómo empezaríais la noche.","Dale a {o} un masaje con aceite o crema donde elija, durante dos minutos.","Besa a {o} un minuto entero sin usar las manos.","Elige una parte del cuerpo de {o} y bésala durante 30 segundos.","Recorre a besos a {o} de los pies a la cabeza en menos de un minuto.","Deja que {o} invente un reto para ti: tienes que cumplirlo.","Túmbate y deja que {o} haga contigo lo que quiera durante un minuto.","Quítale a {o} una prenda con los dientes, sin usar las manos.","Haz que {o} te pida un beso sin que tú le toques."]
- },
- todos:{ // acciones que hacen todos a la vez; {p} = vuestra pareja, o quien tengáis a la derecha si jugáis cada uno
-  1:["Todos dais un beso a {p}.","Todos enseñáis un tatuaje, un lunar o una cicatriz que no se vea a simple vista.","Todos susurráis un piropo al oído de {p}.","Todos bailáis 20 segundos agarrados a {p}.","Todos enseñáis el hombro de la forma más sexy que sepáis.","Todos dais un masaje de 30 segundos en los hombros a {p}.","Todos miráis a los ojos a {p} 15 segundos sin reíros.","Todos os quitáis los zapatos o los calcetines (no cuenta como prenda)."],
-  2:["Todos dais a {p} un beso de 10 segundos.","Todos enseñáis la parte de vuestro cuerpo que más os gusta.","Todos besáis el cuello de {p}.","Todos enseñáis un segundo la ropa interior.","Todos os sentáis encima de {p} hasta el próximo turno.","Todos hacéis 15 segundos de baile sensual.","Todos enseñáis el ombligo… y un poco más abajo.","Todos mordéis con suavidad la oreja de {p}."],
-  3:["Todos os quitáis una prenda.|strip","Todos enseñáis una parte del cuerpo que normalmente no se ve.","Todos dais a {p} un beso apasionado de 20 segundos.","Todos besáis a {p} donde elija.","Todos recorréis con los labios la espalda de {p}.","Todos enseñáis la ropa interior durante 10 segundos.","Todos os tumbáis y os dejáis besar por {p} donde quiera.","Todos le quitáis una prenda a {p}.|strip"]
- }
-};
+// ---------- idiomas: los textos y las cartas viven en i18n.js ----------
+const L10N=window.L10N||{},LANGS=['es','en','pt','fr','it'].filter(k=>L10N[k]),LKEY='dado-atrevido-lang';
+let LANG=(()=>{
+  const q=new URLSearchParams(location.search).get('lang'),sv=lsGet(LKEY);
+  for(const c of [q,sv,...(navigator.languages||[navigator.language||''])]){const k=String(c||'').slice(0,2).toLowerCase();if(L10N[k])return k}
+  return L10N.en?'en':LANGS[0];
+})();
+let L=L10N[LANG];
+// en francés, «de Anne» y «que Anne» se contraen: «d'Anne», «qu'Anne»
+const elide=(t,k,v)=>LANG==='fr'&&/^[aeiouyhàâäéèêëîïôöùûü]/i.test(v)?t.replace(new RegExp('\\b([dD]|[qQ]u)e (<em>|<b>)?\\{'+k+'\\}','g'),"$1'$2{"+k+'}'):t;
+const put=(t,k,v)=>elide(t,k,v).split('{'+k+'}').join(v);
+const T=(key,...a)=>a.reduce((t,v,i)=>put(t,i,String(v)),L.ui[key]||key);
+const TOK=/\[(pareja|partner|par|parceiro|partenaire)\]/gi;
+
 // las diez caras: cinco arriba y cinco abajo, alternando colores
 const FACES=['verdad','reto','prenda','mandas','brindis','caricia','desnuda','duelo','todos','comodin'];
-const LAB={verdad:'Verdad',reto:'Reto',prenda:'Prenda',duelo:'Duelo',mandas:'Tú mandas',comodin:'Comodín',brindis:'Brindis',todos:'Todos',caricia:'Caricia',desnuda:'Desnúdame'};
 const HEX={verdad:'#f2c26b',reto:'#ff5d73',prenda:'#c58bff',duelo:'#ff8a4c',mandas:'#ffd166',comodin:'#7fe0a8',brindis:'#5fd3c9',todos:'#7cb7ff',caricia:'#ff9ecf',desnuda:'#ffffff'};
-const PEN={trago:'Bebo un trago',chupito:'Bebo un chupito',sin:'Paso y bebo'};
-const PENS={trago:'un trago',chupito:'un chupito',sin:'un trago sin alcohol'};
 
 // ---------- estado ----------
 let S=lsGet(KEY);
@@ -357,9 +365,9 @@ function targetFor(p,need){
 // concordancia: «atrevido o atrevida» según quien hace la carta
 // {s:x|y} concuerda con quien hace la carta y {t:x|y} con a quien va dirigida
 function gram(t,who,o){
-  const pickG=(g,x,y)=>g==='m'?y:g==='h'?x:x+' o '+y;
+  const pickG=(g,x,y)=>g==='m'?y:g==='h'?x:x+' '+T('or')+' '+y;
   t=t.replace(/\{s:([^|}]*)\|([^}]*)\}/g,(m,x,y)=>pickG(gOf(who),x,y)).replace(/\{t:([^|}]*)\|([^}]*)\}/g,(m,x,y)=>pickG(o!=null?gOf(o):'',x,y));
-  const g=gOf(who);if(!g)return t;
+  const g=gOf(who);if(!g||LANG!=='es')return t;
   return t.replace(/\b(\p{L}+)o o (\p{L}+)a\b/gu,(m,a,b)=>a===b?(g==='m'?b+'a':a+'o'):m);
 }
 // cartas propias (Ajustes → Vuestras cartas), guardadas solo en este dispositivo
@@ -367,22 +375,22 @@ const MKEY2='dado-atrevido-10-mis';
 let MIS=(()=>{const v=lsGet(MKEY2);return Array.isArray(v)?v.filter(c=>c&&typeof c.t==='string'):[]})();
 const saveMis=()=>lsSet(MKEY2,MIS);
 function pick(kind){
-  const lv=S.level,base=(DECK[kind]&&DECK[kind][lv])||[],k=kind+lv;
-  const mine=MIS.filter(c=>c.k===kind&&c.lv<=lv&&(!c.pareja||S.mode==='pareja')).map(c=>c.t.replace(/\[pareja\]/gi,'{o}'));
+  const lv=S.level,base=(L.deck[kind]&&L.deck[kind][lv])||[],k=kind+lv;
+  const mine=MIS.filter(c=>c.k===kind&&c.lv<=lv&&(!c.pareja||S.mode==='pareja')).map(c=>c.t.replace(TOK,'{o}'));
   if(!Array.isArray(S.used[k])||typeof S.used[k][0]==='number')S.used[k]=[];
   const used=S.used[k];
   let fm=mine.filter(t=>!used.includes(t)),fb=base.filter(t=>!used.includes(t));
   if(!fm.length&&!fb.length){S.used[k]=[];fm=mine.slice();fb=base.slice()}
   // vuestras cartas salen más a menudo que las del juego (un 40 % de las veces mientras queden)
-  const L=fm.length&&(!fb.length||rnd(100)<40)?fm:fb,t=L[rnd(L.length)];
+  const src=fm.length&&(!fb.length||rnd(100)<40)?fm:fb,t=src[rnd(src.length)];
   S.used[k].push(t);return t;
 }
-const fill=(t,o)=>t.replaceAll('{o}',name(o));
+const fill=(t,o)=>put(t,'o',name(o));
 
 // ---------- decaedro en 3D (trapezoedro pentagonal) ----------
 let R=null;
 function initDie(){
-  if(!window.THREE){$('dieBox').innerHTML='<div class="flat" id="flat" role="button" tabindex="0">Tirar</div>';return null}
+  if(!window.THREE){$('dieBox').innerHTML='<div class="flat" id="flat" role="button" tabindex="0">'+L.ui.flat+'</div>';return null}
   const cv=$('die'),T=THREE;
   const ren=new T.WebGLRenderer({canvas:cv,antialias:true,alpha:true,preserveDrawingBuffer:true});
   ren.setPixelRatio(1);ren.setSize(720,720,false);
@@ -433,10 +441,10 @@ function faceTex(kind,t){
   const c=document.createElement('canvas');c.width=c.height=512;const g=c.getContext('2d');
   const gr=g.createRadialGradient(200,170,40,256,256,380);gr.addColorStop(0,'#a8223f');gr.addColorStop(.6,'#7d1530');gr.addColorStop(1,'#4c0a1b');
   g.fillStyle=gr;g.fillRect(0,0,512,512);
-  const x=t[0]*512,y=(1-t[1])*512,w=LAB[kind];
+  const x=t[0]*512,y=(1-t[1])*512,w=L.lab[kind];
   g.fillStyle=HEX[kind];g.textAlign='center';g.textBaseline='middle';
   // el texto se ajusta al ancho de la cara (unos 190 px en la textura) y "Tú mandas" va en dos líneas
-  const lines=w.toUpperCase().split(' '),fam='Outfit, system-ui, sans-serif';
+  const lines=w.toUpperCase().split(/ |(?<=-)/),fam='Outfit, system-ui, sans-serif';
   let fs=64;g.font=`800 ${fs}px ${fam}`;
   const wid=Math.max(...lines.map(l=>g.measureText(l).width));if(wid>190)fs=Math.floor(fs*190/wid);
   g.font=`800 ${fs}px ${fam}`;g.shadowColor='rgba(0,0,0,.35)';g.shadowBlur=8;g.shadowOffsetY=3;
@@ -450,7 +458,7 @@ function faceTex(kind,t){
 function drawDie(){if(R)R.ren.render(R.scene,R.cam)}
 function setRest(f){if(!R)return;R.mesh.quaternion.copy(R.target(f));R.mesh.position.y=0;drawDie()}
 function spin(f,done){
-  if(!R){const el=$('flat');if(el){el.textContent=LAB[FACES[f]];el.style.color=HEX[FACES[f]]}setTimeout(done,TEST?10:500);return}
+  if(!R){const el=$('flat');if(el){el.textContent=L.lab[FACES[f]];el.style.color=HEX[FACES[f]]}setTimeout(done,TEST?10:500);return}
   const T=R.T,q0=R.mesh.quaternion.clone(),q1=R.target(f),ax=new T.Vector3(rnd(100)-50,rnd(100)-50,rnd(100)-50).normalize();
   const total=Math.PI*2*(3+rnd(2)),D=TEST?30:1700,t0=performance.now();
   if(!TEST)rollSound(D/1000);
@@ -473,35 +481,35 @@ function spin(f,done){
 function renderBoard(){
   const c=S.card,act=c&&c.who!=null?c.who:cur();$('board').dataset.n=N();
   $('board').innerHTML=S.players.map((n,i)=>{const l=S.left[i];
-    return `<div class="pl${i===act?' on':''}">${S.mode==='pareja'?`<i class="tm" style="background:${TEAM[i>>1]}" title="Pareja ${(i>>1)+1}"></i>`:''}<b>${esc(n)}</b>
-    <div class="clothes" aria-label="${l} prendas">${Array.from({length:Math.max(S.start?S.start[i]:S.clothes,l)},(_,k)=>`<i class="${k<l?'':'off'}"></i>`).join('')}</div>
-    <div class="row"><span>Prendas <em>${l}</em></span><span>Bebe <em>${S.drinks[i]}</em></span>${S.wild[i]?`<span style="color:var(--comodin)">Comodín <em>${S.wild[i]}</em></span>`:''}</div></div>`}).join('');
+    return `<div class="pl${i===act?' on':''}">${S.mode==='pareja'?`<i class="tm" style="background:${TEAM[i>>1]}" title="${esc(T('team',(i>>1)+1))}"></i>`:''}<b>${esc(n)}</b>
+    <div class="clothes" aria-label="${esc(T('clothes_aria',l))}">${Array.from({length:Math.max(S.start?S.start[i]:S.clothes,l)},(_,k)=>`<i class="${k<l?'':'off'}"></i>`).join('')}</div>
+    <div class="row"><span>${T('clothes')} <em>${l}</em></span><span>${T('drinks')} <em>${S.drinks[i]}</em></span>${S.wild[i]?`<span style="color:var(--comodin)">${L.lab.comodin} <em>${S.wild[i]}</em></span>`:''}</div></div>`}).join('');
 }
 function btns(list){$('acts').innerHTML=list.map(([t,a,cls,d])=>`<button class="btn ${cls||''}" data-a="${a}"${d!=null?` data-d="${d}"`:''}>${esc(t)}</button>`).join('')}
 function ui(){
   renderBoard();
   const p=cur(),c=S.card;
-  $('whose').innerHTML=`Turno de <em>${esc(name(p))}</em>${S.mode==='pareja'?`<small>Pareja de ${esc(name(partner(p)))}</small>`:''}`;
-  $('hint').textContent=c?(c.rolling?'Rodando…':'Resolved la carta para pasar el turno'):'Toca el dado para tirar';
+  $('whose').innerHTML=T('turn',esc(name(p)))+(S.mode==='pareja'?`<small>${T('partner_of',esc(name(partner(p))))}</small>`:'');
+  $('hint').textContent=c?(c.rolling?T('rolling'):T('hint_resolve')):T('hint_tap');
   const card=$('card');
-  if(!c){card.style.setProperty('--k','var(--line)');card.innerHTML=`<p class="empty">Le toca a <b style="color:var(--ink)">${esc(name(p))}</b>. Tira el dado y que decida la suerte.</p>${S.left.every(x=>x<=0)?'<span class="sub">Ya no le quedan prendas a nadie: Prenda, Desnúdame y Duelo se convierten en caricias, retos o tragos. Si alguien se vuelve a vestir, corregidlo en Ajustes.</span>':''}`;btns([]);return}
+  if(!c){card.style.setProperty('--k','var(--line)');card.innerHTML=`<p class="empty">${T('empty',esc(name(p)))}</p>${S.left.every(x=>x<=0)?`<span class="sub">${esc(T('all_naked'))}</span>`:''}`;btns([]);return}
   card.style.setProperty('--k',c.rolling?'var(--line)':HEX[c.kind]);
-  card.innerHTML=`<span class="tag">${c.rolling?'Rodando…':esc(c.tag||LAB[c.kind])}</span><p>${esc(gram(c.text,c.who,c.o))}</p>${c.sub?`<span class="sub">${esc(c.sub)}</span>`:''}`+timerHTML(c);
+  card.innerHTML=`<span class="tag">${c.rolling?T('rolling'):esc(c.tag||L.lab[c.kind])}</span><p>${esc(gram(c.text,c.who,c.o))}</p>${c.sub?`<span class="sub">${esc(c.sub)}</span>`:''}`+timerHTML(c);
   if(c.rolling){btns([]);return}
   const w=c.who;
-  const other=!c.changed&&(['verdad','reto','caricia'].includes(c.kind)||(c.kind==='todos'&&c.step==='ok'))?[['Otra carta','other','ghost']]:[];
-  if(c.step==='do'){const l=[[PEN[S.pen],'no','drink']];if(S.wild[w])l.push(['Usar comodín','wild','wild']);l.push(...other);l.push(['¡Hecho!','yes','main']);btns(l)}
-  else if(c.step==='ok')btns([...other,['Seguir','next','main']]);
-  else if(c.step==='all')btns([['¡Hecho!','allstrip','main']]);
+  const other=!c.changed&&(['verdad','reto','caricia'].includes(c.kind)||(c.kind==='todos'&&c.step==='ok'))?[[T('other'),'other','ghost']]:[];
+  if(c.step==='do'){const l=[[T('pen_btn_'+S.pen),'no','drink']];if(S.wild[w])l.push([T('wild_use'),'wild','wild']);l.push(...other);l.push([T('done'),'yes','main']);btns(l)}
+  else if(c.step==='ok')btns([...other,[T('next'),'next','main']]);
+  else if(c.step==='all')btns([[T('done'),'allstrip','main']]);
   else if(c.step==='rival')btns(S.players.map((n,i)=>i===p?null:[n,'rival','',i]).filter(Boolean));
   else if(c.step==='duel'){
-    if(c.duel&&c.duel.auto)btns([[c.duel.auto==='coin'?'Lanzar la moneda':'Tirar los dados','auto','main']]);
-    else btns([[`Gana ${name(c.who)}`,'win','',c.who],[`Gana ${name(c.rival)}`,'win','',c.rival]]);
+    if(c.duel&&c.duel.auto)btns([[c.duel.auto==='coin'?T('coin'):T('dice'),'auto','main']]);
+    else btns([[T('wins',name(c.who)),'win','',c.who],[T('wins',name(c.rival)),'win','',c.rival]]);
   }
-  else if(c.step==='choose')btns([['Verdad','give','','verdad'],['Reto','give','main','reto']]);
+  else if(c.step==='choose')btns([[L.lab.verdad,'give','','verdad'],[L.lab.reto,'give','main','reto']]);
 }
 const _ui=ui;ui=function(){_ui();paintTimer()};
-function legend(){$('legend').innerHTML=Object.keys(LAB).map(k=>`<span><i style="background:${HEX[k]}"></i>${LAB[k]}</span>`).join('')}
+function legend(){$('legend').innerHTML=Object.keys(HEX).map(k=>`<span><i style="background:${HEX[k]}"></i>${L.lab[k]}</span>`).join('')}
 function toast(t){let e=$('toast');if(!e){e=document.createElement('div');e.id='toast';e.className='toast';e.setAttribute('role','status');document.body.appendChild(e)}
   e.textContent=t;e.hidden=false;clearTimeout(toast.t);toast.t=setTimeout(()=>e.hidden=true,1900)}
 function dealIn(){const el=$('card');el.classList.remove('in');void el.offsetWidth;el.classList.add('in')}
@@ -515,79 +523,60 @@ function makeCard0(face,p,o){
   switch(face){
     case 'verdad':case 'reto':return {kind:face,who:p,step:'do',text:fill(pick(face),o)};
     case 'prenda':
-      return {kind:'prenda',tag:'Prenda · fuera una prenda',who:p,step:'do',strip:true,text:`${name(p)}, quítate una prenda. Tú eliges cuál.`,sub:`Te quedan ${S.left[p]} antes de quitártela.`};
+      return {kind:'prenda',tag:T('prenda_tag'),who:p,step:'do',strip:true,text:T('prenda_text',name(p)),sub:T('prenda_sub',S.left[p])};
     case 'duelo':return duelCard(p);
-    case 'mandas':return {kind:'mandas',who:p,step:'rival',text:`${name(p)} manda. Elige a quién le pones una verdad o un reto.`};
-    case 'comodin':S.wild[p]++;return {kind:'comodin',who:p,step:'ok',text:`${name(p)} se guarda un comodín.`,sub:'Úsalo cuando quieras para librarte de una carta sin beber.'};
-    case 'brindis':S.players.forEach((_,i)=>S.drinks[i]++);return {kind:'brindis',who:p,step:'ok',text:'¡Brindis! Bebe todo el mundo.',sub:S.pen==='sin'?'Sin alcohol, como habéis elegido.':'Un trago cada uno.'};
+    case 'mandas':return {kind:'mandas',who:p,step:'rival',text:T('mandas_text',name(p))};
+    case 'comodin':S.wild[p]++;return {kind:'comodin',who:p,step:'ok',text:T('comodin_text',name(p)),sub:T('comodin_sub')};
+    case 'brindis':S.players.forEach((_,i)=>S.drinks[i]++);return {kind:'brindis',who:p,step:'ok',text:T('brindis_text'),sub:S.pen==='sin'?T('brindis_sub_sin'):T('brindis_sub')};
     case 'caricia':return caricia(p,o);
     case 'desnuda':{const d=targetFor(p,i=>S.left[i]>0);
-      return {kind:'desnuda',tag:'Desnúdame',who:p,o:d,step:'do',stripOther:d,text:`Quítale a ${name(d)} una prenda. Tú eliges cuál.`,
-        sub:[`A ${name(d)} le quedan ${S.left[d]}.`,'Despacio, sin prisa.','Con los dientes, si te atreves.'][S.level-1]}}
-    case 'todos':{const [t,fx]=pick('todos').split('|'),pp=S.mode==='pareja'?'vuestra pareja':'quien tengáis a la derecha';
-      return {kind:'todos',who:p,step:fx?'all':'ok',allStrip:!!fx,text:t.replaceAll('{p}',pp),
-        sub:fx?'Cada uno pierde una prenda en el marcador. A quien ya no le quede ninguna, bebe.':'Lo hacéis todos a la vez. Quien no quiera, bebe.'}}
+      return {kind:'desnuda',who:p,o:d,step:'do',stripOther:d,text:T('desnuda_text',name(d)),
+        sub:[T('desnuda_sub1',name(d),S.left[d]),T('desnuda_sub2'),T('desnuda_sub3')][S.level-1]}}
+    case 'todos':{const [t,fx]=pick('todos').split('|'),pp=L.pp[S.mode==='pareja'?'pareja':'solo'];
+      return {kind:'todos',who:p,step:fx?'all':'ok',allStrip:!!fx,text:(L.contr||[]).reduce((x,[a,b])=>x.split(a).join(b),t.split('{p}').join(pp)),
+        sub:fx?T('todos_sub_strip'):T('todos_sub')}}
   }
 }
 // ---------- duelos: el tipo y lo que se juegan salen al azar ----------
 // auto: el propio juego decide (moneda o dados). {a} = quien tira, {b} = rival
-const DUELS={
- 1:[{t:'Piedra, papel o tijera entre {a} y {b}, a la de tres.'},{t:'Duelo de miradas: {a} y {b} os miráis a los ojos; quien se ría o aparte la vista, pierde.'},
-    {t:'Pares o nones con los dedos; {a} elige primero.'},{t:'Cara o cruz: {a} es cara y {b} es cruz.',auto:'coin'},{t:'Dado contra dado: tiráis los dos y gana el número más alto.',auto:'dice'},
-    {t:'Pulso de pulgares: quien atrape el pulgar del otro tres segundos, gana.'}],
- 2:[{t:'Duelo de cosquillas: os hacéis cosquillas a la vez; quien se ría primero, pierde.'},{t:'Duelo de susurros: os decís por turnos algo picante al oído; quien se ponga más rojo, pierde.'},
-    {t:'Beso sin respirar: os besáis y quien se separe primero para coger aire, pierde.'},{t:'Duelo de piropos subidos de tono: el primero que se quede sin piropo, pierde.'},
-    {t:'Duelo de quietos: {a} sopla despacio en el cuello de {b} durante 15 segundos; si {b} se estremece, gana {a}; si aguanta, gana {b}.'}],
- 3:[{t:'Duelo de besos en el cuello: os besáis el cuello por turnos; el primero que suspire o se estremezca, pierde.'},
-    {t:'Duelo de aguante: {a} acaricia a {b} donde quiera durante 20 segundos; si {b} no se inmuta, gana {b}; si reacciona, gana {a}.'},
-    {t:'Sin tocaros, tenéis 30 segundos para conseguir que el otro os pida un beso; quien lo pida primero, pierde.'},
-    {t:'Duelo de labios: os besáis sin usar las manos; el primero que use las manos, pierde.'}]
-};
+// el 4.º y el 5.º duelo del nivel suave los decide el juego: moneda y dados
+const duels=k=>L.duels[k].map((t,i)=>({t,auto:k==1&&i===3?'coin':k==1&&i===4?'dice':undefined}));
 // lo que se juega quien pierde, con más peso a lo picante en los niveles altos
 const STAKES={1:{prenda:3,reto:2,caricia:2,verdad:2,beber:1},2:{prenda:3,desnuda:2,reto:2,caricia:3,verdad:1},3:{prenda:2,desnuda:3,reto:3,caricia:3,servir:2}};
-const STXT={prenda:'Quien pierda se quita una prenda.',desnuda:'Quien gane le quita una prenda a quien pierda, como quiera.',reto:'Quien pierda cumple un reto con quien gane.',
-  caricia:'Quien pierda le hace una caricia a quien gane.',servir:'Quien gane elige dónde: quien pierda recibe una caricia.',verdad:'Quien pierda contesta una verdad sobre quien gane.',beber:'Quien pierda bebe dos veces.'};
 function duelCard(p){
-  const lv=S.level,list=Object.keys(DUELS).filter(k=>k<=lv).flatMap(k=>DUELS[k]);
+  const lv=S.level,list=[1,2,3].filter(k=>k<=lv).flatMap(duels);
   // los duelos del nivel elegido salen más a menudo
-  const pool=list.concat(lv>1?DUELS[lv]:[]),D=pool[rnd(pool.length)];
+  const pool=list.concat(lv>1?duels(lv):[]),D=pool[rnd(pool.length)];
   const c={kind:'duelo',who:p,duel:D};
   if(S.mode==='pareja'){c.rival=crossOf()!=='no'?otherCouple(p):partner(p);setDuel(c)}
   else if(N()===2){c.rival=p===0?1:0;setDuel(c)}
-  else{c.step='rival';c.text='Elige con quién te bates en duelo.';c.sub='El tipo de duelo y lo que os jugáis se descubren al elegir.'}
+  else{c.step='rival';c.text=T('duel_pick');c.sub=T('duel_pick_sub')}
   return c;
 }
 function setDuel(c){
   const a=c.who,b=c.rival,both=S.left[a]>0&&S.left[b]>0;
   const W=Object.entries(STAKES[S.level]).filter(([k])=>both||!['prenda','desnuda'].includes(k));
   let r=rnd(W.reduce((s,x)=>s+x[1],0));c.stake=W.find(x=>(r-=x[1])<0)[0];
-  c.step='duel';c.text=c.duel.t.replaceAll('{a}',name(a)).replaceAll('{b}',name(b));
-  c.sub='Os jugáis: '+STXT[c.stake].charAt(0).toLowerCase()+STXT[c.stake].slice(1);
-  c.tag='Duelo · '+name(a)+' contra '+name(b);
+  c.step='duel';c.text=put(put(c.duel.t,'a',name(a)),'b',name(b));
+  c.sub=T('stake_pre',L.stakes[c.stake]);
+  c.tag=T('duel_tag',name(a),name(b));
 }
 function duelResult(c,w){
   const l=w===c.who?c.rival:c.who,head=c.auto?c.auto+' ':'';
-  const base={kind:'duelo',tag:`Duelo · gana ${name(w)}`,who:l,o:w,step:'do'};
+  const base={kind:'duelo',tag:T('duel_won',name(w)),who:l,o:w,step:'do'};
   switch(c.stake){
-    case 'prenda':return Object.assign(base,{strip:true,text:`${head}${name(l)}, quítate una prenda. Tú eliges cuál.`,sub:`Te quedan ${S.left[l]} antes de quitártela.`});
-    case 'desnuda':return Object.assign(base,{who:w,o:l,stripOther:l,text:`${head}${name(w)}, quítale a ${name(l)} una prenda, como tú quieras.`});
+    case 'prenda':return Object.assign(base,{strip:true,text:head+T('prenda_text',name(l)),sub:T('prenda_sub',S.left[l])});
+    case 'desnuda':return Object.assign(base,{who:w,o:l,stripOther:l,text:head+T('duel_desnuda',name(w),name(l))});
     case 'reto':return Object.assign(base,{text:head+fill(pick('reto'),w)});
     case 'caricia':{const k=caricia(l,w);return Object.assign(base,{text:head+k.text,sub:k.sub})}
-    case 'servir':{const k=caricia(w,l);return Object.assign(base,{who:w,o:l,text:head+k.text,sub:`${name(w)} lo hace y ${name(l)} se deja.`})}
+    case 'servir':{const k=caricia(w,l);return Object.assign(base,{who:w,o:l,text:head+k.text,sub:T('servir_sub',name(w),name(l))})}
     case 'verdad':return Object.assign(base,{text:head+fill(pick('verdad'),w)});
-    case 'beber':S.drinks[l]+=2;return Object.assign(base,{step:'ok',text:`${head}${name(l)} bebe dos veces.`});
+    case 'beber':S.drinks[l]+=2;return Object.assign(base,{step:'ok',text:head+T('beber',name(l))});
   }
 }
 // caricia al azar: acción + zona + segundos; cada nivel añade acciones y zonas más atrevidas
-const CAR={
-  v:[['Besa','Acaricia','Sopla despacio sobre','Recorre con la punta de la nariz','Da besitos en','Acaricia con la yema de los dedos','Roza con los labios'],
-     ['Muerde con suavidad','Besa muy despacio','Recorre con los labios','Mordisquea','Masajea'],
-     ['Recorre con la lengua','Llena de besos','Besa con mucha calma','Acaricia con aceite o crema']],
-  z:[['el cuello','la oreja','la nuca','el hombro','la muñeca','los labios','la mejilla','la mano','el lóbulo de la oreja'],
-     ['la espalda','el ombligo','la cintura','el muslo','la clavícula','el abdomen','la parte de atrás de la rodilla','el costado'],
-     ['la cara interna del muslo','el pecho','la parte baja de la espalda','la zona que elija {o}','las caderas']],
-  t:[[10,15,20],[15,20,30],[20,30,45]]
-};
+// las formas y las zonas están en i18n.js; «~» marca las que usan los labios
+const CART=[[10,15,20],[15,20,30],[20,30,45]];
 // saca al azar de una bolsa barajada: no se repite nada hasta que han salido todos
 function draw(key,list){
   const B=S.used.bag||(S.used.bag={}),sig=list.join('|');
@@ -601,9 +590,9 @@ function draw(key,list){
   const x=b.left.pop();b.last=x;return x;
 }
 function caricia(p,o){
-  const lv=S.level,V=CAR.v.slice(0,lv).flat(),T=CAR.t[lv-1];
+  const lv=S.level,V=L.car.v.slice(0,lv).flat(),secs=CART[lv-1];
   // las zonas del nivel elegido entran dos veces en la bolsa, para que el nivel se note
-  const Z=CAR.z.slice(0,lv).flat().concat(lv>1?CAR.z[lv-1]:[]);
+  const Z=L.car.z.slice(0,lv).flat().concat(lv>1?L.car.z[lv-1]:[]);
   const z=draw('z'+lv,Z);
   // la forma se elige para que la combinación forma + zona no haya salido aún en la partida
   const C=S.used.combo||(S.used.combo={}),seen=C[lv]||(C[lv]=[]),total=V.length*new Set(Z).size;
@@ -612,12 +601,12 @@ function caricia(p,o){
   if(seen.includes(v+'|'+z)){const bag=S.used.bag['v'+lv].left,k=bag.findIndex(x=>!seen.includes(x+'|'+z));
     if(k>=0){bag.push(v);v=bag.splice(k,1)[0];S.used.bag['v'+lv].last=v}
     else{const alt=V.filter(x=>!seen.includes(x+'|'+z));if(alt.length)v=alt[rnd(alt.length)]}}
-  // que la forma y la zona no usen la misma parte del cuerpo («roza con los labios los labios…»)
-  const part=w=>(w.match(/labios|nariz|dedos|lengua/)||[''])[0];
-  if(part(v)&&z.includes(part(v))){const alt=V.filter(x=>!z.includes(part(x)||'#')&&!seen.includes(x+'|'+z));if(alt.length)v=alt[rnd(alt.length)]}
+  // que la forma y la zona no usen las dos los labios («roza con los labios los labios…»)
+  const lip=w=>w[0]==='~',bare=w=>lip(w)?w.slice(1):w;
+  if(lip(v)&&lip(z)){const alt=V.filter(x=>!lip(x)&&!seen.includes(x+'|'+z));if(alt.length)v=alt[rnd(alt.length)]}
   seen.push(v+'|'+z);
-  const zona=z.includes('{o}')?fill(z,o):`${z} de ${name(o)}`;
-  return {kind:'caricia',who:p,o,step:'do',text:`${v} ${zona} durante ${T[rnd(T.length)]} segundos.`,sub:'El tiempo lo cuenta quien recibe.'};
+  const zona=put(bare(z),'o',name(o)),frase=bare(v).split('{z}').join(zona);
+  return {kind:'caricia',who:p,o,step:'do',text:L.car.sent.split('{v}').join(frase).split('{n}').join(secs[rnd(secs.length)]),sub:T('car_sub')};
 }
 function roll(){
   if(!S||busy||S.card)return;busy=true;
@@ -636,9 +625,9 @@ function nextTurn(){S.card=null;S.ti=(S.ti+1)%S.order.length;save();ui()}
 $('acts').onclick=e=>{
   const b=e.target.closest('[data-a]');if(!b||!S.card||busy)return;
   const a=b.dataset.a,d=b.dataset.d,c=S.card,p=cur();
-  if(a==='yes'){S.done[c.who]++;if(c.strip)S.left[c.who]=Math.max(0,S.left[c.who]-1);if(c.stripOther!=null)S.left[c.stripOther]=Math.max(0,S.left[c.stripOther]-1);toast(c.strip||c.stripOther!=null?'Una prenda menos':'¡Cumplido!');nextTurn()}
-  else if(a==='no'){S.drinks[c.who]++;toast(name(c.who)+' bebe '+PENS[S.pen]);nextTurn()}
-  else if(a==='wild'){S.wild[c.who]--;toast(name(c.who)+' usa su comodín');nextTurn()}
+  if(a==='yes'){S.done[c.who]++;if(c.strip)S.left[c.who]=Math.max(0,S.left[c.who]-1);if(c.stripOther!=null)S.left[c.stripOther]=Math.max(0,S.left[c.stripOther]-1);toast(c.strip||c.stripOther!=null?T('t_strip'):T('t_done'));nextTurn()}
+  else if(a==='no'){S.drinks[c.who]++;toast(T('t_drinks',name(c.who),T('drink_'+S.pen)));nextTurn()}
+  else if(a==='wild'){S.wild[c.who]--;toast(T('t_wild',name(c.who)));nextTurn()}
   else if(a==='next')nextTurn();
   else if(a==='other'){ // cambiar la carta una vez, sin beber
     let n,k=0;
@@ -649,41 +638,41 @@ $('acts').onclick=e=>{
     }while(n.text===c.text&&++k<8);
     S.card=Object.assign({},c,{text:n.text,sub:n.sub!==undefined?n.sub:c.sub,step:n.step||c.step,allStrip:n.allStrip||false,changed:true});
     if(S.card.step==='all')S.card.changed=true;
-    toast('Carta cambiada');save();ui();dealIn()}
-  else if(a==='allstrip'){S.players.forEach((_,i)=>{if(S.left[i]>0)S.left[i]--;else S.drinks[i]++});toast('Una prenda menos para todos');nextTurn()}
+    toast(T('t_changed'));save();ui();dealIn()}
+  else if(a==='allstrip'){S.players.forEach((_,i)=>{if(S.left[i]>0)S.left[i]--;else S.drinks[i]++});toast(T('t_allstrip'));nextTurn()}
   else if(a==='rival'){const r=+d;
     if(c.kind==='duelo'){c.rival=r;setDuel(c)}
-    else{c.rival=r;c.step='choose';c.text=`¿Qué le pones a ${name(r)}?`}
+    else{c.rival=r;c.step='choose';c.text=T('mandas_q',name(r))}
     save();ui();dealIn()}
   else if(a==='win'){S.card=duelResult(c,+d);save();ui();dealIn()}
   else if(a==='auto'){ // moneda o dados, decide el juego
     let w;
-    if(c.duel.auto==='coin'){const cara=rnd(2)===0;w=cara?c.who:c.rival;c.auto=`Sale ${cara?'cara':'cruz'}: gana ${name(w)}.`}
-    else{let x,y;do{x=rnd(6)+1;y=rnd(6)+1}while(x===y);w=x>y?c.who:c.rival;c.auto=`${name(c.who)} saca un ${x} y ${name(c.rival)} un ${y}: gana ${name(w)}.`}
+    if(c.duel.auto==='coin'){const cara=rnd(2)===0;w=cara?c.who:c.rival;c.auto=T('coin_res',cara?T('heads'):T('tails'),name(w))}
+    else{let x,y;do{x=rnd(6)+1;y=rnd(6)+1}while(x===y);w=x>y?c.who:c.rival;c.auto=T('dice_res',name(c.who),x,name(c.rival),y,name(w))}
     S.card=duelResult(c,w);save();ui();dealIn()}
   else if(a==='give'){const r=c.rival;
     // por parejas, la carta va dirigida a la pareja de quien la cumple; si no, a quien la manda
     const tgt=S.mode==='pareja'?targetFor(r):p;
-    S.card={kind:d,tag:'Tú mandas · '+LAB[d],who:r,o:tgt,step:'do',text:fill(pick(d),tgt),sub:`Se lo manda ${name(p)}.`};save();ui();dealIn()}
+    S.card={kind:d,tag:L.lab.mandas+' · '+L.lab[d],who:r,o:tgt,step:'do',text:fill(pick(d),tgt),sub:T('sent_by',name(p))};save();ui();dealIn()}
 };
 
 // ---------- contador para las cartas con tiempo ----------
 let TM={key:null,total:0,left:0,run:false,end:0,last:-1},WL=null;
-function secsOf(t){const m=t.match(/(\d+)\s*segundos?/);if(m)return +m[1];if(/dos minutos/.test(t))return 120;if(/(un|1) minuto/.test(t))return 60;if(/medio minuto/.test(t))return 30;return 0}
+function secsOf(t){let m=t.match(/(\d+)\s*(segundos?|seconds?|secondes?|second[oi])/i);if(m)return +m[1];m=t.match(/(\d+)\s*(minutos?|minutes?|minut[oi])/i);if(m)return +m[1]*60;if(/dos minutos/.test(t))return 120;if(/un minuto/.test(t))return 60;if(/medio minuto/.test(t))return 30;return 0}
 const fmtS=n=>n>=60&&n%60===0?(n/60)+' min':n+' s';
 function timerHTML(c){
   const n=c.rolling?0:secsOf(c.text);
   if(!n){stopTimer();TM.key=null;return ''}
   const key=c.text+'|'+S.ti+'|'+S.handN;
   if(TM.key!==key){stopTimer();TM={key,total:n,left:n,run:false,end:0,last:-1}}
-  return `<div class="timer"><button class="tbtn" id="tbtn" aria-label="Contador"><svg viewBox="0 0 64 64"><circle cx="32" cy="32" r="28" class="tr0"/><circle cx="32" cy="32" r="28" class="tr1" id="tring"/></svg><b id="tnum"></b></button>
-    <div class="tinfo"><button class="tgo" id="tgo"></button><button class="tlink" id="treset">Reiniciar</button></div></div>`;
+  return `<div class="timer"><button class="tbtn" id="tbtn" aria-label="${esc(T('tm_aria'))}"><svg viewBox="0 0 64 64"><circle cx="32" cy="32" r="28" class="tr0"/><circle cx="32" cy="32" r="28" class="tr1" id="tring"/></svg><b id="tnum"></b></button>
+    <div class="tinfo"><button class="tgo" id="tgo"></button><button class="tlink" id="treset">${esc(T('tm_reset'))}</button></div></div>`;
 }
 const tLeft=()=>TM.run?Math.max(0,(TM.end-performance.now())/1000):TM.left;
 function paintTimer(){
   const n=$('tnum');if(!n||!TM.total)return;const l=tLeft();
   n.textContent=Math.ceil(l);$('tring').style.strokeDashoffset=String(176*(1-l/TM.total));
-  $('tgo').textContent=TM.run?'Pausar':l<=0?'¡Tiempo! Otra vez':l<TM.total?'Seguir':'Empezar · '+fmtS(TM.total);
+  $('tgo').textContent=TM.run?T('tm_pause'):l<=0?T('tm_again'):l<TM.total?T('tm_cont'):T('tm_start',fmtS(TM.total));
   $('treset').hidden=TM.run||l>=TM.total||l<=0;
   $('tbtn').classList.toggle('run',TM.run);$('tbtn').classList.toggle('done',l<=0);
 }
@@ -701,7 +690,7 @@ function toggleTimer(){
   if(TM.run){const l=tLeft(),c=Math.ceil(l);
     if(c!==TM.last){TM.last=c;if(c<=3&&c>0)beep(880,.12,.3)}
     if(l<=0){TM.run=false;TM.left=0;wake(false);beep(1320,.18,.35);setTimeout(()=>beep(1320,.18,.35),220);setTimeout(()=>beep(1760,.4,.35),440);
-      try{navigator.vibrate&&navigator.vibrate([200,100,200])}catch(e){}toast('¡Tiempo!')}
+      try{navigator.vibrate&&navigator.vibrate([200,100,200])}catch(e){}toast(T('tm_time'))}
     paintTimer()}
   requestAnimationFrame(tloop);
 })();
@@ -718,29 +707,30 @@ function seg(id,v){$(id).querySelectorAll('button').forEach(b=>b.classList.toggl
 function renderSetup(){
   seg('mode',D.mode);seg('lvl',D.level);seg('clo',D.clothes);seg('pen',D.pen);
   const pr=D.mode==='pareja';
-  $('cntLab').textContent=pr?'Número de parejas':'Número de jugadores';
+  $('cntLab').textContent=pr?T('n_couples'):T('n_players');
   const opts=pr?[1,2,3]:[2,3,4,5,6];
   if(!opts.includes(D.count))D.count=pr?1:2;
   $('cnt').innerHTML=opts.map(v=>`<button data-v="${v}" class="${v===D.count?'on':''}">${v}</button>`).join('');
   const n=pr?D.count*2:D.count;while(D.names.length<n)D.names.push('');while(D.cl.length<n)D.cl.push(D.clothes);while(D.g.length<n)D.g.push('');while(D.likes.length<n)D.likes.push('');
   // en mitad de una partida el contador corrige las prendas que le quedan a cada uno
-  const lab=D.live?'Le quedan':'Prendas';
-  const cell=(k,ph)=>`<div class="pin"><input class="inp" data-i="${k}" maxlength="14" placeholder="${ph}" value="${esc(D.names[k]||'')}" autocomplete="off">
-    <div class="stp"><span>${lab}</span><button data-s="-1" data-k="${k}" aria-label="Una prenda menos" ${D.cl[k]<=0?'disabled':''}>−</button><b>${D.cl[k]}</b><button data-s="1" data-k="${k}" aria-label="Una prenda más" ${D.cl[k]>=10?'disabled':''}>+</button></div>
-    ${pr&&!(D.count>1&&D.cross!=='no')?gseg(k):`<div class="gl"><div><p class="glab">Es</p>${gseg(k)}</div><div><p class="glab">Le gustan</p><div class="seg">${[['h','Chicos'],['m','Chicas'],['a','Ambos']].map(([v,l])=>`<button data-lk="${v}" data-k="${k}" class="${D.likes[k]===v?'on':''}">${l}</button>`).join('')}</div></div></div>`}</div>`;
-  const gseg=k=>`<div class="seg gseg">${[['h','Chico'],['m','Chica']].map(([v,l])=>`<button data-gn="${v}" data-k="${k}" class="${D.g[k]===v?'on':''}">${l}</button>`).join('')}</div>`;
+  const lab=D.live?T('left'):T('clothes');
+  const cell=(k,ph)=>`<div class="pin"><input class="inp" data-i="${k}" maxlength="14" placeholder="${esc(ph)}" value="${esc(D.names[k]||'')}" autocomplete="off">
+    <div class="stp"><span>${lab}</span><button data-s="-1" data-k="${k}" aria-label="${esc(T('minus'))}" ${D.cl[k]<=0?'disabled':''}>−</button><b>${D.cl[k]}</b><button data-s="1" data-k="${k}" aria-label="${esc(T('plus'))}" ${D.cl[k]>=10?'disabled':''}>+</button></div>
+    ${pr&&!(D.count>1&&D.cross!=='no')?gseg(k):`<div class="gl"><div><p class="glab">${T('is')}</p>${gseg(k)}</div><div><p class="glab">${T('likes')}</p><div class="seg">${[['h',T('boys')],['m',T('girls')],['a',T('both')]].map(([v,l])=>`<button data-lk="${v}" data-k="${k}" class="${D.likes[k]===v?'on':''}">${l}</button>`).join('')}</div></div></div>`}</div>`;
+  const gseg=k=>`<div class="seg gseg">${[['h',T('boy')],['m',T('girl')]].map(([v,l])=>`<button data-gn="${v}" data-k="${k}" class="${D.g[k]===v?'on':''}">${l}</button>`).join('')}</div>`;
   let h='';
-  if(pr)for(let t=0;t<D.count;t++)h+=`<div class="pair"><i class="dot" style="background:${TEAM[t]}"></i>${[0,1].map(k=>cell(t*2+k,'Pareja '+(t+1))).join('')}</div>`;
-  else for(let i=0;i<n;i++)h+=`<div class="pair">${cell(i,'Jugador '+(i+1))}</div>`;
+  if(pr)for(let t=0;t<D.count;t++)h+=`<div class="pair"><i class="dot" style="background:${TEAM[t]}"></i>${[0,1].map(k=>cell(t*2+k,T('team',t+1))).join('')}</div>`;
+  else for(let i=0;i<n;i++)h+=`<div class="pair">${cell(i,T('player',i+1))}</div>`;
   $('names').innerHTML=h;$('names').classList.toggle('solo',!pr);
   $('crossBox').hidden=!(pr&&D.count>1);seg('cross',D.cross);
-  $('crossNote').textContent={no:'Todo queda entre cada pareja.',duelo:'Los duelos son contra alguien de otra pareja; el resto de cartas, con la tuya.',todo:'Duelos y la mitad de los retos, caricias, verdades y Desnúdame van a alguien de otra pareja.'}[D.cross];
-  $('cloLab').textContent=D.live?'Poner a todos las mismas prendas que les quedan':'Prendas con las que empieza cada uno (luego podéis cambiarlo por persona)';
+  $('crossNote').textContent=T('cross_note_'+D.cross);
+  $('cloLab').textContent=D.live?T('clo_live'):T('clo_start');
+  $('sgo').textContent=S?T('save'):T('play');
 }
 function openSetup(){
   D=S?{mode:S.mode,count:S.mode==='pareja'?N()/2:N(),names:S.players.slice(),level:S.level,clothes:S.clothes,pen:S.pen,cl:S.left.slice(),g:(S.g||[]).slice(),likes:(S.likes||[]).slice(),cross:S.cross||'duelo',live:true}
      :{mode:'pareja',count:1,names:[],level:1,clothes:5,pen:'trago',cl:[],g:[],likes:[],cross:'duelo',live:false};
-  $('scancel').hidden=!S;$('sacts').classList.toggle('one',!S);$('serr').textContent='';$('sgo').textContent=S?'Guardar':'¡A jugar!';
+  $('scancel').hidden=!S;$('sacts').classList.toggle('one',!S);$('serr').textContent='';
   renderSetup();renderMis();$('setup').hidden=false;
 }
 $('names').oninput=e=>{const i=e.target.dataset.i;if(i!=null)D.names[+i]=e.target.value};
@@ -761,10 +751,10 @@ $('clo').onclick=e=>{const b=e.target.closest('button');if(!b)return;D.clothes=+
 $('sgo').onclick=()=>{
   const n=D.mode==='pareja'?D.count*2:D.count;
   const names=D.names.slice(0,n).map(v=>String(v||'').replace(/[<>]/g,'').replace(/\s+/g,' ').trim().slice(0,14));
-  if(names.some(v=>!v)){$('serr').textContent='Escribid todos los nombres para saber a quién le toca.';return}
-  if(new Set(names.map(v=>v.toLowerCase())).size<names.length){$('serr').textContent='Poned nombres distintos para no liaros con los turnos.';return}
+  if(names.some(v=>!v)){$('serr').textContent=T('e_names');return}
+  if(new Set(names.map(v=>v.toLowerCase())).size<names.length){$('serr').textContent=T('e_dup');return}
   const cl=D.cl.slice(0,n),g=D.g.slice(0,n),likes=D.likes.slice(0,n).map((l,i)=>l||'a');
-  if(g.some(x=>!x)){$('serr').textContent='Indicad si cada jugador es chico o chica.';renderSetup();document.querySelectorAll('.pin').forEach((el,i)=>el.classList.toggle('miss',!g[i]));return}
+  if(g.some(x=>!x)){$('serr').textContent=T('e_gender');renderSetup();document.querySelectorAll('.pin').forEach((el,i)=>el.classList.toggle('miss',!g[i]));return}
   const same=S&&S.mode===D.mode&&N()===n;
   if(same){S.players=names;S.level=D.level;S.pen=D.pen;S.clothes=D.clothes;S.g=g;S.likes=likes;S.cross=D.cross;
     S.start=(S.start||S.left.map(()=>S.clothes)).map((x,i)=>Math.max(x,cl[i]));S.left=cl;if(S.card&&!S.card.rolling)S.card=null}
@@ -774,28 +764,27 @@ $('sgo').onclick=()=>{
 
 // ---------- vuestras cartas: alta, lista y borrado ----------
 let MD={k:'reto',lv:3};
-const LVN=['','Todos los niveles','Desde picante','Solo muy picante'];
 function renderMis(){
   seg('misK',MD.k);seg('misL',MD.lv);
-  $('misList').innerHTML=MIS.map((c,i)=>`<div class="mc"><div>${esc(c.t).replace(/\[pareja\]/gi,'<mark>[pareja]</mark>')}<small>${c.k==='reto'?'Reto':'Verdad'} · ${LVN[c.lv]}${c.pareja?' · Solo por parejas':''}</small></div><button data-del="${i}" aria-label="Borrar carta">×</button></div>`).join('');
+  $('misList').innerHTML=MIS.map((c,i)=>`<div class="mc"><div>${esc(c.t).replace(TOK,m=>'<mark>'+m+'</mark>')}<small>${L.lab[c.k]} · ${T('misL'+c.lv)}${c.pareja?' · '+T('mis_only_tag'):''}</small></div><button data-del="${i}" aria-label="${esc(T('mis_del'))}">×</button></div>`).join('');
 }
 $('misK').onclick=e=>{const b=e.target.closest('button');if(b){MD.k=b.dataset.v;renderMis()}};
 $('misL').onclick=e=>{const b=e.target.closest('button');if(b){MD.lv=+b.dataset.v;renderMis()}};
-$('misIns').onclick=()=>{const t=$('misT');t.focus();try{t.setRangeText('[pareja]',t.selectionStart,t.selectionEnd,'end')}catch(e){t.value+='[pareja]'}};
+$('misIns').onclick=()=>{const t=$('misT');t.focus();try{t.setRangeText(L.token,t.selectionStart,t.selectionEnd,'end')}catch(e){t.value+=L.token}};
 $('misAdd').onclick=()=>{
   const t=$('misT').value.replace(/[<>]/g,'').replace(/\s+/g,' ').trim();
-  if(t.length<3){toast('Escribe la carta primero');return}
-  if(MIS.some(c=>c.t.toLowerCase()===t.toLowerCase()&&c.k===MD.k)){toast('Esa carta ya está');return}
-  MIS.push({t,k:MD.k,lv:MD.lv,pareja:$('misP').checked});saveMis();$('misT').value='';renderMis();toast('Carta añadida');
+  if(t.length<3){toast(T('m_empty'));return}
+  if(MIS.some(c=>c.t.toLowerCase()===t.toLowerCase()&&c.k===MD.k)){toast(T('m_dup'));return}
+  MIS.push({t,k:MD.k,lv:MD.lv,pareja:$('misP').checked});saveMis();$('misT').value='';renderMis();toast(T('m_added'));
 };
-$('misList').onclick=e=>{const b=e.target.closest('[data-del]');if(!b)return;MIS.splice(+b.dataset.del,1);saveMis();renderMis();toast('Carta borrada')};
+$('misList').onclick=e=>{const b=e.target.closest('[data-del]');if(!b)return;MIS.splice(+b.dataset.del,1);saveMis();renderMis();toast(T('m_deleted'))};
 $('scancel').onclick=()=>$('setup').hidden=true;
 $('cfg').onclick=openSetup;
 let arm=0;
 $('reset').onclick=()=>{
   if(!S)return;
-  if(Date.now()-arm>3000){arm=Date.now();$('reset').textContent='¿Seguro? Toca otra vez';setTimeout(()=>$('reset').textContent='Empezar de cero',3000);return}
-  S=fresh({mode:S.mode,players:S.players,level:S.level,clothes:S.clothes,pen:S.pen,start:S.start,g:S.g,likes:S.likes,cross:S.cross});save();$('reset').textContent='Empezar de cero';ui();toast('Partida nueva');
+  if(Date.now()-arm>3000){arm=Date.now();$('reset').textContent=T('reset_sure');setTimeout(()=>$('reset').textContent=T('reset'),3000);return}
+  S=fresh({mode:S.mode,players:S.players,level:S.level,clothes:S.clothes,pen:S.pen,start:S.start,g:S.g,likes:S.likes,cross:S.cross});save();$('reset').textContent=T('reset');ui();toast(T('new_game'));
 };
 
 
@@ -804,7 +793,7 @@ const MKEY='dado-atrevido-mute';
 let muted=lsGet(MKEY)===true,AC=null,NOISE=null;
 const ICS={on:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5 6 9H3v6h3l5 4z"/><path d="M15.5 8.5a5 5 0 0 1 0 7M18.5 5.5a9 9 0 0 1 0 13"/></svg>',
   off:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5 6 9H3v6h3l5 4z"/><path d="m16 9 6 6M22 9l-6 6"/></svg>'};
-function sndBtn(){const b=$('snd');b.innerHTML=muted?ICS.off:ICS.on;b.setAttribute('aria-pressed',String(!muted));b.title=muted?'Activar sonido':'Silenciar'}
+function sndBtn(){const b=$('snd');b.innerHTML=muted?ICS.off:ICS.on;b.setAttribute('aria-pressed',String(!muted));b.title=muted?T('snd_on'):T('snd_off');b.setAttribute('aria-label',T('snd'))}
 function audio(){
   if(muted)return null;
   try{if(!AC){const C=window.AudioContext||window.webkitAudioContext;if(!C)return null;AC=new C();
@@ -835,18 +824,42 @@ function rollSound(dur){
 $('snd').onclick=()=>{muted=!muted;lsSet(MKEY,muted);sndBtn();if(!muted){const a=audio();if(a)tick(a,a.currentTime+.02,.3,2400)}};
 sndBtn();
 // ---------- arranque ----------
-legend();
-try{R=initDie()}catch(e){R=null;$('dieBox').innerHTML='<div class="flat" id="flat" role="button" tabindex="0">Tirar</div>'}
+function retex(){if(R){R.mesh.material.forEach((m,i)=>{const t=m.map.__t;m.map.dispose();m.map=faceTex(FACES[i],t);m.needsUpdate=true});drawDie()}}
+function applyLang(){
+  L=L10N[LANG];document.documentElement.lang=LANG;
+  document.querySelectorAll('[data-t]').forEach(e=>e.innerHTML=L.ui[e.dataset.t]);
+  document.querySelectorAll('[data-tp]').forEach(e=>e.placeholder=L.ui[e.dataset.tp]);
+  document.querySelectorAll('[data-ta]').forEach(e=>e.setAttribute('aria-label',L.ui[e.dataset.ta]));
+  document.querySelectorAll('[data-tl]').forEach(e=>e.textContent=L.lab[e.dataset.tl]);
+  $('rules').innerHTML=esc(L.rules).replace(/\{(\w+)\}/g,(m,k)=>`<b style="color:var(--${k})">${L.lab[k]}</b>`);
+  document.querySelectorAll('select.lang').forEach(s=>s.value=LANG);
+  legend();sndBtn();retex();
+  const f=$('flat');if(f){f.textContent=L.ui.flat;f.style.color=''}
+  if(!$('setup').hidden&&D){renderSetup();renderMis()}
+  if(S)ui();
+}
+document.querySelectorAll('select.lang').forEach(s=>{
+  s.innerHTML=LANGS.map(k=>`<option value="${k}">${s.classList.contains('vlang')?L10N[k].name:k.toUpperCase()}</option>`).join('');
+  s.onchange=()=>{
+    const l=s.value;if(!L10N[l]||l===LANG||busy){s.value=LANG;return}
+    LANG=l;lsSet(LKEY,l);
+    // las cartas en curso están escritas en el idioma anterior: se retira la que haya y se rebaraja
+    if(S){S.card=null;S.used={};save()}
+    applyLang();
+  };
+});
+try{R=initDie()}catch(e){R=null;$('dieBox').innerHTML='<div class="flat" id="flat" role="button" tabindex="0">'+L.ui.flat+'</div>'}
 bindDie();
+applyLang();
 if(S&&S.card&&S.card.rolling){S.card.text=S.card.textHidden||S.card.text;delete S.card.textHidden;delete S.card.rolling}
 // al abrir, el dado enseña una cara al azar (o la última que salió)
 const show=()=>setRest(S&&S.q!=null?S.q:rnd(10));
 // cuando carga la fuente, se repintan las caras con ella
-document.fonts&&document.fonts.load('800 60px Outfit').then(()=>{if(R){R.mesh.material.forEach((m,i)=>{const t=m.map.__t;m.map.dispose();m.map=faceTex(FACES[i],t);m.needsUpdate=true});drawDie()}}).catch(()=>{});
+document.fonts&&document.fonts.load('800 60px Outfit').then(retex).catch(()=>{});
 function start(){if(!S)openSetup();else ui();show()}
 if(TEST||lsGet(AGE))start();else{$('age').hidden=false;show()}
 $('ageOk').onclick=()=>{lsSet(AGE,true);$('age').hidden=true;start()};
-if(TEST)window.__t={get S(){return S},roll,FACES,DECK,get busy(){return busy},click:(a,d)=>{const b=[...$('acts').querySelectorAll('[data-a]')].find(x=>x.dataset.a===a&&(d==null||x.dataset.d==String(d)));if(b)b.click();return !!b}};
+if(TEST)window.__t={get S(){return S},roll,FACES,get DECK(){return L.deck},get L(){return L},get LANG(){return LANG},get busy(){return busy},click:(a,d)=>{const b=[...$('acts').querySelectorAll('[data-a]')].find(x=>x.dataset.a===a&&(d==null||x.dataset.d==String(d)));if(b)b.click();return !!b}};
 })();
 </script>
 </body>

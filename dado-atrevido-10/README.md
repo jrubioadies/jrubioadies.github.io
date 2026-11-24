@@ -27,8 +27,10 @@ Con varias parejas se elige el juego entre parejas: solo con tu pareja, duelos c
 
 Quien no quiere cumplir, bebe y pasa el turno. Si una carta no os convence, se puede cambiar una vez con «Otra carta». El dado no repite la misma cara dos veces seguidas ni a un jugador la que le salió la vez anterior, y las cartas no se repiten hasta agotar el mazo. Por parejas, las verdades y los retos van siempre dirigidos a tu pareja. Tres niveles (suave, picante y muy picante), prendas iniciales distintas para cada persona (de 0 a 10; en Ajustes se pueden corregir en mitad de la partida) y castigo a elegir (trago, chupito o sin alcohol).
 
+Está en cinco idiomas: español, inglés, portugués, francés e italiano. Se elige con el selector de la esquina del dado (o en la pantalla de inicio y en Ajustes) y por defecto coge el del dispositivo; también se puede forzar con `?lang=fr`. Las traducciones están en `i18n/*.json`; tras tocarlas hay que ejecutar `python3 build-i18n.py`, que comprueba que no falte ninguna clave y genera `i18n.js`.
+
 **Juega aquí:** https://jrubioadies.github.io/dado-atrevido-10/
 
-Un único `index.html`; el dado es un trapezoedro pentagonal dibujado con [three.js](https://threejs.org).
+`index.html` más `i18n.js` (los textos); el dado es un trapezoedro pentagonal dibujado con [three.js](https://threejs.org).
 
 La versión de seis caras para dos sigue en https://jrubioadies.github.io/dado-atrevido/
