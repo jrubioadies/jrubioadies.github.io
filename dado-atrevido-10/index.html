@@ -227,7 +227,7 @@ textarea.inp{resize:vertical;min-height:76px;font-size:15.5px;line-height:1.4}
     <p>Si a alguien no le apetece algo, lo dice y bebe. Lo importante es que lo paséis bien todos.</p>
     <button class="btn sm ghost" id="reset">Empezar de cero</button>
   </div>
-  <p class="rules">Cómo se juega: cada uno tira por turnos un dado de diez caras: <b style="color:var(--verdad)">Verdad</b>, <b style="color:var(--reto)">Reto</b>, <b style="color:var(--caricia)">Caricia</b> (una caricia al azar: qué, dónde y cuántos segundos), <b style="color:var(--desnuda)">Desnúdame</b> (le quitas una prenda a tu pareja, la que tú elijas), <b style="color:var(--prenda)">Prenda</b> (te quitas la que tú elijas), <b style="color:var(--duelo)">Duelo</b> (piedra, papel o tijera con alguien, y quien pierde se quita una prenda), <b style="color:var(--mandas)">Tú mandas</b> (eliges a quién y le pones verdad o reto), <b style="color:var(--comodin)">Comodín</b> (te lo guardas y te libra de una carta sin beber), <b style="color:var(--brindis)">Brindis</b> (bebe todo el mundo) y <b style="color:var(--todos)">Todos</b> (una acción que hacéis todos a la vez con vuestra pareja, o con quien tengáis a la derecha si jugáis cada uno). Quien no quiere cumplir, bebe y pasa el turno; si una carta no os convence, se puede cambiar una vez con «Otra carta». En Ajustes podéis escribir vuestras propias cartas. Las cartas con tiempo traen un contador: tocadlo para empezar. El dado no repite la misma cara dos veces seguidas. El dado solo cae en caras que se pueden cumplir: si ya no te quedan prendas no sale Prenda, y si a quien te toca desnudar no le quedan, no sale Desnúdame. Por parejas, las verdades y los retos van siempre dirigidos a tu pareja; si jugáis cada uno, a alguien de la mesa que os guste según lo que indicó cada jugador. Bebed con cabeza: también se puede jugar sin alcohol.</p>
+  <p class="rules">Cómo se juega: cada uno tira por turnos un dado de diez caras: <b style="color:var(--verdad)">Verdad</b>, <b style="color:var(--reto)">Reto</b>, <b style="color:var(--caricia)">Caricia</b> (una caricia al azar: qué, dónde y cuántos segundos), <b style="color:var(--desnuda)">Desnúdame</b> (le quitas una prenda a tu pareja, la que tú elijas), <b style="color:var(--prenda)">Prenda</b> (te quitas la que tú elijas), <b style="color:var(--duelo)">Duelo</b> (un desafío al azar contra tu pareja o contra quien elijas; quien pierde paga lo que os jugáis: una prenda, un reto, una caricia…), <b style="color:var(--mandas)">Tú mandas</b> (eliges a quién y le pones verdad o reto), <b style="color:var(--comodin)">Comodín</b> (te lo guardas y te libra de una carta sin beber), <b style="color:var(--brindis)">Brindis</b> (bebe todo el mundo) y <b style="color:var(--todos)">Todos</b> (una acción que hacéis todos a la vez con vuestra pareja, o con quien tengáis a la derecha si jugáis cada uno). Quien no quiere cumplir, bebe y pasa el turno; si una carta no os convence, se puede cambiar una vez con «Otra carta». En Ajustes podéis escribir vuestras propias cartas. Las cartas con tiempo traen un contador: tocadlo para empezar. El dado no repite la misma cara dos veces seguidas. El dado solo cae en caras que se pueden cumplir: si ya no te quedan prendas no sale Prenda, y si a quien te toca desnudar no le quedan, no sale Desnúdame. Por parejas, las cartas van a tu pareja, salvo que con varias parejas elijáis duelos cruzados o todo cruzado; si jugáis cada uno, a alguien de la mesa que os guste según lo que indicó cada jugador. Bebed con cabeza: también se puede jugar sin alcohol.</p>
 </div>
 
 <div class="veil" id="age" hidden>
@@ -247,6 +247,11 @@ textarea.inp{resize:vertical;min-height:76px;font-size:15.5px;line-height:1.4}
       <div class="seg" id="mode"><button data-v="pareja">Por parejas<small>de 1 a 3 parejas</small></button><button data-v="solo">Cada uno<small>de 2 a 6 jugadores</small></button></div>
       <p class="lab" id="cntLab">Número de parejas</p>
       <div class="seg" id="cnt"></div>
+      <div id="crossBox" hidden>
+        <p class="lab">Juego entre parejas</p>
+        <div class="seg" id="cross"><button data-v="no">Solo con tu pareja</button><button data-v="duelo">Duelos cruzados</button><button data-v="todo">Todo cruzado</button></div>
+        <p class="mnote" id="crossNote"></p>
+      </div>
       <div class="names" id="names"></div>
     </div>
     <div class="box">
@@ -319,7 +324,7 @@ function fresh(c){
   let order=[...Array(n).keys()];
   if(c.mode==='pareja'){const k=n/2;order=[];for(let r=0;r<2;r++)for(let t=0;t<k;t++)order.push(t*2+r)}
   const start=Array.from({length:n},(_,i)=>c.start&&c.start[i]!=null?c.start[i]:c.clothes);
-  return {mode:c.mode,players:c.players,level:c.level,clothes:c.clothes,pen:c.pen,order,ti:rnd(n),start,g:c.g||[],likes:c.likes||[],
+  return {mode:c.mode,players:c.players,level:c.level,clothes:c.clothes,pen:c.pen,order,ti:rnd(n),start,g:c.g||[],likes:c.likes||[],cross:c.cross||'no',
     left:start.slice(),drinks:Array(n).fill(0),done:Array(n).fill(0),wild:Array(n).fill(0),used:{},card:null,q:null};
 }
 const save=()=>lsSet(KEY,S);
@@ -329,8 +334,20 @@ const name=i=>S.players[i];
 const partner=i=>i^1;
 const likesOf=i=>(S.likes&&S.likes[i])||'a',gOf=i=>(S.g&&S.g[i])||'';
 const wants=(a,b)=>{const l=likesOf(a),g=gOf(b);return l==='a'||!g||l===g};
+const crossOf=()=>S.mode==='pareja'&&N()>2?(S.cross||'no'):'no';
+// alguien de otra pareja: primero con atracción mutua, luego a quien le guste a quien tira, luego cualquiera
+function otherCouple(p,need){
+  let o=[...Array(N()).keys()].filter(i=>i!==p&&i!==partner(p));
+  if(need&&o.some(need))o=o.filter(need);
+  const both=o.filter(i=>wants(p,i)&&wants(i,p)),one=o.filter(i=>wants(p,i)),L=both.length?both:one.length?one:o;
+  return L[rnd(L.length)];
+}
 function targetFor(p,need){
-  if(S.mode==='pareja')return partner(p);
+  if(S.mode==='pareja'){
+    // «todo cruzado»: la mitad de las veces la carta va a alguien de otra pareja
+    if(crossOf()==='todo'&&(rnd(2)||(need&&!need(partner(p))))){const x=otherCouple(p,need);if(x!=null&&(!need||need(x)))return x}
+    return partner(p);
+  }
   let o=[...Array(N()).keys()].filter(i=>i!==p);
   if(need&&o.some(need))o=o.filter(need); // p. ej., solo quien aún tiene prendas
   // primero quien os gustáis mutuamente; si no hay, a quien le guste a quien tira; si tampoco, cualquiera
@@ -477,7 +494,10 @@ function ui(){
   else if(c.step==='ok')btns([...other,['Seguir','next','main']]);
   else if(c.step==='all')btns([['¡Hecho!','allstrip','main']]);
   else if(c.step==='rival')btns(S.players.map((n,i)=>i===p?null:[n,'rival','',i]).filter(Boolean));
-  else if(c.step==='duel')btns([[`Gana ${name(p)}`,'win','',p],[`Gana ${name(c.rival)}`,'win','',c.rival]]);
+  else if(c.step==='duel'){
+    if(c.duel&&c.duel.auto)btns([[c.duel.auto==='coin'?'Lanzar la moneda':'Tirar los dados','auto','main']]);
+    else btns([[`Gana ${name(c.who)}`,'win','',c.who],[`Gana ${name(c.rival)}`,'win','',c.rival]]);
+  }
   else if(c.step==='choose')btns([['Verdad','give','','verdad'],['Reto','give','main','reto']]);
 }
 const _ui=ui;ui=function(){_ui();paintTimer()};
@@ -496,19 +516,66 @@ function makeCard0(face,p,o){
     case 'verdad':case 'reto':return {kind:face,who:p,step:'do',text:fill(pick(face),o)};
     case 'prenda':
       return {kind:'prenda',tag:'Prenda · fuera una prenda',who:p,step:'do',strip:true,text:`${name(p)}, quítate una prenda. Tú eliges cuál.`,sub:`Te quedan ${S.left[p]} antes de quitártela.`};
-    case 'duelo':
-      if(S.mode==='pareja'&&N()===2)return {kind:'duelo',who:p,rival:partner(p),step:'duel',text:`Piedra, papel o tijera contra ${name(partner(p))}. Quien pierda, fuera una prenda.`,sub:'A la de tres. Si a quien pierde no le quedan prendas, bebe.'};
-      return {kind:'duelo',who:p,step:'rival',text:'Elige a quién retas a piedra, papel o tijera. Quien pierda, fuera una prenda.'};
+    case 'duelo':return duelCard(p);
     case 'mandas':return {kind:'mandas',who:p,step:'rival',text:`${name(p)} manda. Elige a quién le pones una verdad o un reto.`};
     case 'comodin':S.wild[p]++;return {kind:'comodin',who:p,step:'ok',text:`${name(p)} se guarda un comodín.`,sub:'Úsalo cuando quieras para librarte de una carta sin beber.'};
     case 'brindis':S.players.forEach((_,i)=>S.drinks[i]++);return {kind:'brindis',who:p,step:'ok',text:'¡Brindis! Bebe todo el mundo.',sub:S.pen==='sin'?'Sin alcohol, como habéis elegido.':'Un trago cada uno.'};
     case 'caricia':return caricia(p,o);
-    case 'desnuda':{const d=S.mode==='pareja'?partner(p):targetFor(p,i=>S.left[i]>0);
+    case 'desnuda':{const d=targetFor(p,i=>S.left[i]>0);
       return {kind:'desnuda',tag:'Desnúdame',who:p,o:d,step:'do',stripOther:d,text:`Quítale a ${name(d)} una prenda. Tú eliges cuál.`,
         sub:[`A ${name(d)} le quedan ${S.left[d]}.`,'Despacio, sin prisa.','Con los dientes, si te atreves.'][S.level-1]}}
     case 'todos':{const [t,fx]=pick('todos').split('|'),pp=S.mode==='pareja'?'vuestra pareja':'quien tengáis a la derecha';
       return {kind:'todos',who:p,step:fx?'all':'ok',allStrip:!!fx,text:t.replaceAll('{p}',pp),
         sub:fx?'Cada uno pierde una prenda en el marcador. A quien ya no le quede ninguna, bebe.':'Lo hacéis todos a la vez. Quien no quiera, bebe.'}}
+  }
+}
+// ---------- duelos: el tipo y lo que se juegan salen al azar ----------
+// auto: el propio juego decide (moneda o dados). {a} = quien tira, {b} = rival
+const DUELS={
+ 1:[{t:'Piedra, papel o tijera entre {a} y {b}, a la de tres.'},{t:'Duelo de miradas: {a} y {b} os miráis a los ojos; quien se ría o aparte la vista, pierde.'},
+    {t:'Pares o nones con los dedos; {a} elige primero.'},{t:'Cara o cruz: {a} es cara y {b} es cruz.',auto:'coin'},{t:'Dado contra dado: tiráis los dos y gana el número más alto.',auto:'dice'},
+    {t:'Pulso de pulgares: quien atrape el pulgar del otro tres segundos, gana.'}],
+ 2:[{t:'Duelo de cosquillas: os hacéis cosquillas a la vez; quien se ría primero, pierde.'},{t:'Duelo de susurros: os decís por turnos algo picante al oído; quien se ponga más rojo, pierde.'},
+    {t:'Beso sin respirar: os besáis y quien se separe primero para coger aire, pierde.'},{t:'Duelo de piropos subidos de tono: el primero que se quede sin piropo, pierde.'},
+    {t:'Duelo de quietos: {a} sopla despacio en el cuello de {b} durante 15 segundos; si {b} se estremece, gana {a}; si aguanta, gana {b}.'}],
+ 3:[{t:'Duelo de besos en el cuello: os besáis el cuello por turnos; el primero que suspire o se estremezca, pierde.'},
+    {t:'Duelo de aguante: {a} acaricia a {b} donde quiera durante 20 segundos; si {b} no se inmuta, gana {b}; si reacciona, gana {a}.'},
+    {t:'Sin tocaros, tenéis 30 segundos para conseguir que el otro os pida un beso; quien lo pida primero, pierde.'},
+    {t:'Duelo de labios: os besáis sin usar las manos; el primero que use las manos, pierde.'}]
+};
+// lo que se juega quien pierde, con más peso a lo picante en los niveles altos
+const STAKES={1:{prenda:3,reto:2,caricia:2,verdad:2,beber:1},2:{prenda:3,desnuda:2,reto:2,caricia:3,verdad:1},3:{prenda:2,desnuda:3,reto:3,caricia:3,servir:2}};
+const STXT={prenda:'Quien pierda se quita una prenda.',desnuda:'Quien gane le quita una prenda a quien pierda, como quiera.',reto:'Quien pierda cumple un reto con quien gane.',
+  caricia:'Quien pierda le hace una caricia a quien gane.',servir:'Quien gane elige dónde: quien pierda recibe una caricia.',verdad:'Quien pierda contesta una verdad sobre quien gane.',beber:'Quien pierda bebe dos veces.'};
+function duelCard(p){
+  const lv=S.level,list=Object.keys(DUELS).filter(k=>k<=lv).flatMap(k=>DUELS[k]);
+  // los duelos del nivel elegido salen más a menudo
+  const pool=list.concat(lv>1?DUELS[lv]:[]),D=pool[rnd(pool.length)];
+  const c={kind:'duelo',who:p,duel:D};
+  if(S.mode==='pareja'){c.rival=crossOf()!=='no'?otherCouple(p):partner(p);setDuel(c)}
+  else if(N()===2){c.rival=p===0?1:0;setDuel(c)}
+  else{c.step='rival';c.text='Elige con quién te bates en duelo.';c.sub='El tipo de duelo y lo que os jugáis se descubren al elegir.'}
+  return c;
+}
+function setDuel(c){
+  const a=c.who,b=c.rival,both=S.left[a]>0&&S.left[b]>0;
+  const W=Object.entries(STAKES[S.level]).filter(([k])=>both||!['prenda','desnuda'].includes(k));
+  let r=rnd(W.reduce((s,x)=>s+x[1],0));c.stake=W.find(x=>(r-=x[1])<0)[0];
+  c.step='duel';c.text=c.duel.t.replaceAll('{a}',name(a)).replaceAll('{b}',name(b));
+  c.sub='Os jugáis: '+STXT[c.stake].charAt(0).toLowerCase()+STXT[c.stake].slice(1);
+  c.tag='Duelo · '+name(a)+' contra '+name(b);
+}
+function duelResult(c,w){
+  const l=w===c.who?c.rival:c.who,head=c.auto?c.auto+' ':'';
+  const base={kind:'duelo',tag:`Duelo · gana ${name(w)}`,who:l,o:w,step:'do'};
+  switch(c.stake){
+    case 'prenda':return Object.assign(base,{strip:true,text:`${head}${name(l)}, quítate una prenda. Tú eliges cuál.`,sub:`Te quedan ${S.left[l]} antes de quitártela.`});
+    case 'desnuda':return Object.assign(base,{who:w,o:l,stripOther:l,text:`${head}${name(w)}, quítale a ${name(l)} una prenda, como tú quieras.`});
+    case 'reto':return Object.assign(base,{text:head+fill(pick('reto'),w)});
+    case 'caricia':{const k=caricia(l,w);return Object.assign(base,{text:head+k.text,sub:k.sub})}
+    case 'servir':{const k=caricia(w,l);return Object.assign(base,{who:w,o:l,text:head+k.text,sub:`${name(w)} lo hace y ${name(l)} se deja.`})}
+    case 'verdad':return Object.assign(base,{text:head+fill(pick('verdad'),w)});
+    case 'beber':S.drinks[l]+=2;return Object.assign(base,{step:'ok',text:`${head}${name(l)} bebe dos veces.`});
   }
 }
 // caricia al azar: acción + zona + segundos; cada nivel añade acciones y zonas más atrevidas
@@ -557,7 +624,7 @@ function roll(){
   const p=cur();S.pf=S.pf||{};
   // el dado no repite la última cara ni la que le salió a este jugador la vez anterior
   // y solo cae en caras que se pueden cumplir: sin prendas no sale Prenda; si nadie a quien desnudar tiene, no sale Desnúdame
-  const ok=f=>FACES[f]==='prenda'?S.left[p]>0:FACES[f]==='desnuda'?(S.mode==='pareja'?S.left[partner(p)]>0:S.left.some((x,i)=>i!==p&&x>0)):true;
+  const ok=f=>FACES[f]==='prenda'?S.left[p]>0:FACES[f]==='desnuda'?(S.mode==='pareja'&&crossOf()!=='todo'?S.left[partner(p)]>0:S.left.some((x,i)=>i!==p&&x>0)):true;
   let f,k=0;do{f=rnd(10)}while((!ok(f)||(k<60&&(f===S.lastF||f===S.pf[p])))&&++k<200);
   S.lastF=f;S.pf[p]=f;
   S.card=Object.assign(makeCard(FACES[f],p),{face:f,rolling:true});
@@ -585,16 +652,18 @@ $('acts').onclick=e=>{
     toast('Carta cambiada');save();ui();dealIn()}
   else if(a==='allstrip'){S.players.forEach((_,i)=>{if(S.left[i]>0)S.left[i]--;else S.drinks[i]++});toast('Una prenda menos para todos');nextTurn()}
   else if(a==='rival'){const r=+d;
-    if(c.kind==='duelo'){c.rival=r;c.step='duel';c.text=`Piedra, papel o tijera: ${name(p)} contra ${name(r)}. Quien pierda, fuera una prenda.`;c.sub='A la de tres. Si a quien pierde no le quedan prendas, bebe.'}
+    if(c.kind==='duelo'){c.rival=r;setDuel(c)}
     else{c.rival=r;c.step='choose';c.text=`¿Qué le pones a ${name(r)}?`}
     save();ui();dealIn()}
-  else if(a==='win'){const w=+d,l=w===p?c.rival:p;
-    if(S.left[l]>0){S.left[l]--;S.card={kind:'duelo',who:l,step:'ok',text:`Gana ${name(w)}. ${name(l)} se quita una prenda.`,sub:`A ${name(l)} le quedan ${S.left[l]}.`}}
-    else{S.drinks[l]++;S.card={kind:'duelo',who:l,step:'ok',text:`Gana ${name(w)}. Como a ${name(l)} no le quedan prendas, bebe ${PENS[S.pen]}.`}}
-    save();ui();dealIn()}
+  else if(a==='win'){S.card=duelResult(c,+d);save();ui();dealIn()}
+  else if(a==='auto'){ // moneda o dados, decide el juego
+    let w;
+    if(c.duel.auto==='coin'){const cara=rnd(2)===0;w=cara?c.who:c.rival;c.auto=`Sale ${cara?'cara':'cruz'}: gana ${name(w)}.`}
+    else{let x,y;do{x=rnd(6)+1;y=rnd(6)+1}while(x===y);w=x>y?c.who:c.rival;c.auto=`${name(c.who)} saca un ${x} y ${name(c.rival)} un ${y}: gana ${name(w)}.`}
+    S.card=duelResult(c,w);save();ui();dealIn()}
   else if(a==='give'){const r=c.rival;
     // por parejas, la carta va dirigida a la pareja de quien la cumple; si no, a quien la manda
-    const tgt=S.mode==='pareja'?partner(r):p;
+    const tgt=S.mode==='pareja'?targetFor(r):p;
     S.card={kind:d,tag:'Tú mandas · '+LAB[d],who:r,o:tgt,step:'do',text:fill(pick(d),tgt),sub:`Se lo manda ${name(p)}.`};save();ui();dealIn()}
 };
 
@@ -658,17 +727,19 @@ function renderSetup(){
   const lab=D.live?'Le quedan':'Prendas';
   const cell=(k,ph)=>`<div class="pin"><input class="inp" data-i="${k}" maxlength="14" placeholder="${ph}" value="${esc(D.names[k]||'')}" autocomplete="off">
     <div class="stp"><span>${lab}</span><button data-s="-1" data-k="${k}" aria-label="Una prenda menos" ${D.cl[k]<=0?'disabled':''}>−</button><b>${D.cl[k]}</b><button data-s="1" data-k="${k}" aria-label="Una prenda más" ${D.cl[k]>=10?'disabled':''}>+</button></div>
-    ${pr?gseg(k):`<div class="gl"><div><p class="glab">Es</p>${gseg(k)}</div><div><p class="glab">Le gustan</p><div class="seg">${[['h','Chicos'],['m','Chicas'],['a','Ambos']].map(([v,l])=>`<button data-lk="${v}" data-k="${k}" class="${D.likes[k]===v?'on':''}">${l}</button>`).join('')}</div></div></div>`}</div>`;
+    ${pr&&!(D.count>1&&D.cross!=='no')?gseg(k):`<div class="gl"><div><p class="glab">Es</p>${gseg(k)}</div><div><p class="glab">Le gustan</p><div class="seg">${[['h','Chicos'],['m','Chicas'],['a','Ambos']].map(([v,l])=>`<button data-lk="${v}" data-k="${k}" class="${D.likes[k]===v?'on':''}">${l}</button>`).join('')}</div></div></div>`}</div>`;
   const gseg=k=>`<div class="seg gseg">${[['h','Chico'],['m','Chica']].map(([v,l])=>`<button data-gn="${v}" data-k="${k}" class="${D.g[k]===v?'on':''}">${l}</button>`).join('')}</div>`;
   let h='';
   if(pr)for(let t=0;t<D.count;t++)h+=`<div class="pair"><i class="dot" style="background:${TEAM[t]}"></i>${[0,1].map(k=>cell(t*2+k,'Pareja '+(t+1))).join('')}</div>`;
   else for(let i=0;i<n;i++)h+=`<div class="pair">${cell(i,'Jugador '+(i+1))}</div>`;
   $('names').innerHTML=h;$('names').classList.toggle('solo',!pr);
+  $('crossBox').hidden=!(pr&&D.count>1);seg('cross',D.cross);
+  $('crossNote').textContent={no:'Todo queda entre cada pareja.',duelo:'Los duelos son contra alguien de otra pareja; el resto de cartas, con la tuya.',todo:'Duelos y la mitad de los retos, caricias, verdades y Desnúdame van a alguien de otra pareja.'}[D.cross];
   $('cloLab').textContent=D.live?'Poner a todos las mismas prendas que les quedan':'Prendas con las que empieza cada uno (luego podéis cambiarlo por persona)';
 }
 function openSetup(){
-  D=S?{mode:S.mode,count:S.mode==='pareja'?N()/2:N(),names:S.players.slice(),level:S.level,clothes:S.clothes,pen:S.pen,cl:S.left.slice(),g:(S.g||[]).slice(),likes:(S.likes||[]).slice(),live:true}
-     :{mode:'pareja',count:1,names:[],level:1,clothes:5,pen:'trago',cl:[],g:[],likes:[],live:false};
+  D=S?{mode:S.mode,count:S.mode==='pareja'?N()/2:N(),names:S.players.slice(),level:S.level,clothes:S.clothes,pen:S.pen,cl:S.left.slice(),g:(S.g||[]).slice(),likes:(S.likes||[]).slice(),cross:S.cross||'duelo',live:true}
+     :{mode:'pareja',count:1,names:[],level:1,clothes:5,pen:'trago',cl:[],g:[],likes:[],cross:'duelo',live:false};
   $('scancel').hidden=!S;$('sacts').classList.toggle('one',!S);$('serr').textContent='';$('sgo').textContent=S?'Guardar':'¡A jugar!';
   renderSetup();renderMis();$('setup').hidden=false;
 }
@@ -680,6 +751,7 @@ $('names').onclick=e=>{
   else D.likes[k]=b.dataset.lk;
   renderSetup();
 };
+$('cross').onclick=e=>{const b=e.target.closest('button');if(b){D.cross=b.dataset.v;renderSetup()}};
 $('mode').onclick=e=>{const b=e.target.closest('button');if(b){D.mode=b.dataset.v;D.live=false;renderSetup()}};
 $('cnt').onclick=e=>{const b=e.target.closest('button');if(b){D.count=+b.dataset.v;D.live=false;renderSetup()}};
 for(const [id,k,num] of [['lvl','level',1],['pen','pen',0]])
@@ -694,9 +766,9 @@ $('sgo').onclick=()=>{
   const cl=D.cl.slice(0,n),g=D.g.slice(0,n),likes=D.likes.slice(0,n).map((l,i)=>l||'a');
   if(g.some(x=>!x)){$('serr').textContent='Indicad si cada jugador es chico o chica.';renderSetup();document.querySelectorAll('.pin').forEach((el,i)=>el.classList.toggle('miss',!g[i]));return}
   const same=S&&S.mode===D.mode&&N()===n;
-  if(same){S.players=names;S.level=D.level;S.pen=D.pen;S.clothes=D.clothes;S.g=g;S.likes=likes;
+  if(same){S.players=names;S.level=D.level;S.pen=D.pen;S.clothes=D.clothes;S.g=g;S.likes=likes;S.cross=D.cross;
     S.start=(S.start||S.left.map(()=>S.clothes)).map((x,i)=>Math.max(x,cl[i]));S.left=cl;if(S.card&&!S.card.rolling)S.card=null}
-  else S=fresh({mode:D.mode,players:names,level:D.level,clothes:D.clothes,pen:D.pen,start:cl,g,likes});
+  else S=fresh({mode:D.mode,players:names,level:D.level,clothes:D.clothes,pen:D.pen,start:cl,g,likes,cross:D.cross});
   save();$('setup').hidden=true;ui();
 };
 
@@ -723,7 +795,7 @@ let arm=0;
 $('reset').onclick=()=>{
   if(!S)return;
   if(Date.now()-arm>3000){arm=Date.now();$('reset').textContent='¿Seguro? Toca otra vez';setTimeout(()=>$('reset').textContent='Empezar de cero',3000);return}
-  S=fresh({mode:S.mode,players:S.players,level:S.level,clothes:S.clothes,pen:S.pen,start:S.start,g:S.g,likes:S.likes});save();$('reset').textContent='Empezar de cero';ui();toast('Partida nueva');
+  S=fresh({mode:S.mode,players:S.players,level:S.level,clothes:S.clothes,pen:S.pen,start:S.start,g:S.g,likes:S.likes,cross:S.cross});save();$('reset').textContent='Empezar de cero';ui();toast('Partida nueva');
 };
 
 
