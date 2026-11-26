@@ -165,7 +165,8 @@
     "Percorri {z} con la lingua",
     "Copri di baci {z}",
     "Bacia con tutta calma {z}",
-    "Accarezza {z} con olio o crema"
+    "Accarezza {z} con olio o crema",
+    "Lecca piano {z}"
    ]
   ],
   "z": [
@@ -371,7 +372,10 @@
   "tm_again": "Tempo! Ancora",
   "tm_cont": "Riprendi",
   "tm_start": "Via · {0}",
-  "tm_time": "Tempo!"
+  "tm_time": "Tempo!",
+  "mus": "Musica",
+  "mus_on": "Metti la musica",
+  "mus_off": "Togli la musica"
  },
  "contr": [
   [

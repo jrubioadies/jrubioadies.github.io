@@ -21,6 +21,8 @@ Las cartas con tiempo («durante 20 segundos», «un minuto»…) traen un conta
 
 El dado suena al rodar (traqueteo, tres botes y una campanita); se puede silenciar con el botón del altavoz.
 
+Con el botón de la nota musical suena música de fondo, compuesta en el propio navegador (sin canciones con derechos): suave y luminosa en el nivel suave, en menor en picante y más grave y rítmica en muy picante. Cambia sola al cambiar el nivel y se recuerda encendida o apagada.
+
 Cada jugador indica si es chico o chica (para que los textos concuerden) y, si jugáis cada uno, qué le gusta: las cartas se dirigen a alguien compatible de la mesa.
 
 Con varias parejas se elige el juego entre parejas: solo con tu pareja, duelos cruzados (los duelos son contra alguien de otra pareja) o todo cruzado (también la mitad de retos, caricias, verdades y Desnúdame).

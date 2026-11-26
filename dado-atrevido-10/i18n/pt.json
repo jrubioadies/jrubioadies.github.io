@@ -165,7 +165,8 @@
     "Percorra {z} com a língua",
     "Cubra de beijos {z}",
     "Beije com toda a calma {z}",
-    "Acaricie {z} com óleo ou creme"
+    "Acaricie {z} com óleo ou creme",
+    "Lamba devagar {z}"
    ]
   ],
   "z": [
@@ -371,7 +372,10 @@
   "tm_again": "Tempo! De novo",
   "tm_cont": "Continuar",
   "tm_start": "Começar · {0}",
-  "tm_time": "Tempo!"
+  "tm_time": "Tempo!",
+  "mus": "Música",
+  "mus_on": "Tocar música",
+  "mus_off": "Parar música"
  },
  "contr": []
 }

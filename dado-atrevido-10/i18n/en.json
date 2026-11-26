@@ -165,7 +165,8 @@
     "Run your tongue over {z}",
     "Cover {z} with kisses",
     "Kiss {z} nice and slow",
-    "Caress {z} with oil or lotion"
+    "Caress {z} with oil or lotion",
+    "Slowly lick {z}"
    ]
   ],
   "z": [
@@ -371,7 +372,10 @@
   "tm_again": "Time's up! Again",
   "tm_cont": "Resume",
   "tm_start": "Start · {0}",
-  "tm_time": "Time's up!"
+  "tm_time": "Time's up!",
+  "mus": "Music",
+  "mus_on": "Play music",
+  "mus_off": "Stop music"
  },
  "contr": []
 }

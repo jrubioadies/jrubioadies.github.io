@@ -43,6 +43,8 @@ h1 small{display:block;font:700 12px var(--body);letter-spacing:.2em;text-transf
 .snd{position:absolute;top:12px;right:12px;z-index:2;width:40px;height:40px;padding:0;background:rgba(0,0,0,.2)}
 .snd svg{width:20px;height:20px}
 .snd[aria-pressed="false"]{opacity:.6}
+.snd.mus{top:60px}
+.snd.mus[aria-pressed="true"]{color:var(--caricia);box-shadow:inset 0 0 0 2px var(--caricia)}
 .lang{appearance:none;-webkit-appearance:none;border:0;border-radius:11px;background:rgba(0,0,0,.2);box-shadow:inset 0 0 0 2px var(--line);color:var(--ink);font:700 13px var(--body);padding:0 11px;height:40px;cursor:pointer}
 .lang option{background:var(--card);color:var(--ink)}
 .stage>.lang{position:absolute;top:12px;left:12px;z-index:2}
@@ -226,6 +228,7 @@ h1{white-space:nowrap}h1 small{white-space:normal}#cfg{white-space:nowrap;flex:n
   <div class="stage">
     <select class="lang" id="lang" aria-label="Language"></select>
     <button class="btn sm ghost snd" id="snd" aria-pressed="true"></button>
+    <button class="btn sm ghost snd mus" id="mus" aria-pressed="false"></button>
     <div class="whose" id="whose"></div>
     <div id="dieBox"><canvas id="die" width="720" height="720" role="button" tabindex="0" data-ta="roll_aria"></canvas></div>
     <div class="hint" id="hint" data-t="hint_tap"></div>
@@ -794,8 +797,8 @@ let muted=lsGet(MKEY)===true,AC=null,NOISE=null;
 const ICS={on:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5 6 9H3v6h3l5 4z"/><path d="M15.5 8.5a5 5 0 0 1 0 7M18.5 5.5a9 9 0 0 1 0 13"/></svg>',
   off:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5 6 9H3v6h3l5 4z"/><path d="m16 9 6 6M22 9l-6 6"/></svg>'};
 function sndBtn(){const b=$('snd');b.innerHTML=muted?ICS.off:ICS.on;b.setAttribute('aria-pressed',String(!muted));b.title=muted?T('snd_on'):T('snd_off');b.setAttribute('aria-label',T('snd'))}
-function audio(){
-  if(muted)return null;
+function audio(){return muted?null:ctx()}
+function ctx(){
   try{if(!AC){const C=window.AudioContext||window.webkitAudioContext;if(!C)return null;AC=new C();
       NOISE=AC.createBuffer(1,AC.sampleRate*.5,AC.sampleRate);const d=NOISE.getChannelData(0);for(let i=0;i<d.length;i++)d[i]=Math.random()*2-1}
     if(AC.state==='suspended')AC.resume();return AC}catch(e){return null}
@@ -823,6 +826,64 @@ function rollSound(dur){
 }
 $('snd').onclick=()=>{muted=!muted;lsSet(MKEY,muted);sndBtn();if(!muted){const a=audio();if(a)tick(a,a.currentTime+.02,.3,2400)}};
 sndBtn();
+
+// ---------- música de fondo: se compone aquí mismo (sin canciones con derechos) y cambia con el nivel ----------
+const MUKEY='dado-atrevido-music';
+let musicOn=lsGet(MUKEY)===true,MU=null;
+// acordes en notas MIDI: suave y luminoso, picante en menor, muy picante más grave y más rápido
+const SONGS={
+ 1:{bpm:78,cut:1500,prog:[[53,57,60,64],[52,55,59,62],[50,53,57,60],[48,52,55,59]],kick:0,hat:.25,arp:.35},
+ 2:{bpm:86,cut:1150,prog:[[57,60,64,67,71],[53,57,60,64,67],[50,53,57,60,64],[52,56,59,62]],kick:1,hat:.5,arp:.5},
+ 3:{bpm:94,cut:850,prog:[[48,51,55,58,62],[44,48,51,55],[41,44,48,51,55],[43,47,50,53]],kick:1,hat:.7,arp:.6}
+};
+const hz=m=>440*Math.pow(2,(m-69)/12);
+const MUS_IC='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l11-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="17" cy="16" r="3"/></svg>';
+function musBtn(){const b=$('mus');b.innerHTML=MUS_IC;b.setAttribute('aria-pressed',String(musicOn));b.title=musicOn?T('mus_off'):T('mus_on');b.setAttribute('aria-label',T('mus'))}
+function musStart(){
+  const a=ctx();if(!a||MU)return;const t=a.currentTime;
+  const out=a.createGain();out.gain.setValueAtTime(0,t);out.gain.linearRampToValueAtTime(.22,t+2.5);
+  const comp=a.createDynamicsCompressor();out.connect(comp);comp.connect(a.destination);
+  // eco suave solo para los acordes y las notas sueltas, para que suene a sala
+  const send=a.createGain(),dl=a.createDelay(1),fb=a.createGain();send.gain.value=.35;fb.gain.value=.3;
+  send.connect(dl);dl.connect(fb);fb.connect(dl);dl.connect(out);
+  MU={a,out,send,dl,step:0,t:t+.1,timer:setInterval(musTick,90)};musTick();
+}
+function musStop(){
+  if(!MU)return;const m=MU,t=m.a.currentTime;MU=null;clearInterval(m.timer);
+  m.out.gain.cancelScheduledValues(t);m.out.gain.setValueAtTime(m.out.gain.value,t);m.out.gain.linearRampToValueAtTime(0,t+.8);
+  setTimeout(()=>{try{m.out.disconnect();m.send.disconnect()}catch(e){}},1200);
+}
+function mnote(t,f,type,d,v,att,fx){const a=MU.a,o=a.createOscillator(),g=a.createGain();o.type=type;o.frequency.value=f;
+  g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(v,t+att);g.gain.exponentialRampToValueAtTime(.001,t+d);o.connect(g);g.connect(MU.out);if(fx)g.connect(MU.send);o.start(t);o.stop(t+d+.05)}
+function mpad(t,ch,d,cut){const a=MU.a,f=a.createBiquadFilter(),g=a.createGain();f.type='lowpass';f.Q.value=.7;
+  f.frequency.setValueAtTime(cut*.55,t);f.frequency.linearRampToValueAtTime(cut,t+d*.5);f.frequency.linearRampToValueAtTime(cut*.55,t+d);
+  g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(.028,t+.9);g.gain.setValueAtTime(.028,t+d-.5);g.gain.linearRampToValueAtTime(0,t+d+.5);
+  f.connect(g);g.connect(MU.out);g.connect(MU.send);
+  ch.forEach(m=>[-7,7].forEach(dt=>{const o=a.createOscillator();o.type='sawtooth';o.frequency.value=hz(m);o.detune.value=dt;o.connect(f);o.start(t);o.stop(t+d+.6)}))}
+function mkick(t){const a=MU.a,o=a.createOscillator(),g=a.createGain();o.frequency.setValueAtTime(105,t);o.frequency.exponentialRampToValueAtTime(42,t+.18);
+  g.gain.setValueAtTime(.4,t);g.gain.exponentialRampToValueAtTime(.001,t+.3);o.connect(g);g.connect(MU.out);o.start(t);o.stop(t+.32)}
+function mhat(t,v){const a=MU.a,s=a.createBufferSource();s.buffer=NOISE;const f=a.createBiquadFilter();f.type='highpass';f.frequency.value=7000;
+  const g=a.createGain();g.gain.setValueAtTime(v,t);g.gain.exponentialRampToValueAtTime(.001,t+.05);s.connect(f);f.connect(g);g.connect(MU.out);s.start(t,Math.random()*.4,.06)}
+function musTick(){
+  if(!MU)return;const a=MU.a,song=SONGS[(S&&S.level)||1],sx=60/song.bpm/4; // una semicorchea
+  MU.dl.delayTime.setValueAtTime(sx*3,a.currentTime);
+  if(MU.t<a.currentTime)MU.t=a.currentTime+.05; // si la pestaña se durmió, se retoma sin amontonar notas
+  while(MU.t<a.currentTime+.35){
+    const st=MU.step%64,b=st%16,ch=song.prog[Math.floor(st/16)%song.prog.length],t=MU.t;
+    if(b===0)mpad(t,ch,sx*16,song.cut);
+    if(b===0)mnote(t,hz(ch[0]-24),'sine',sx*9,.3,.02);
+    if(b===10)mnote(t,hz(ch[0]-24),'sine',sx*5,.24,.02);
+    if(b===7)mnote(t,hz(ch[0]-17),'sine',sx*3,.16,.02);
+    if(song.kick&&(b===0||b===8))mkick(t);
+    if(b%4===2&&Math.random()<song.hat+.25)mhat(t,b===10?.06:.04);
+    if(b%2===0&&b&&Math.random()<song.arp)mnote(t,hz(ch[1+rnd(ch.length-1)]+12),'triangle',sx*3,.06,.005,true);
+    MU.step++;MU.t+=sx*(b%2?.9:1.1); // un poco de swing
+  }
+}
+$('mus').onclick=()=>{musicOn=!musicOn;lsSet(MUKEY,musicOn);musBtn();if(musicOn)musStart();else musStop()};
+// el navegador solo deja sonar tras un toque: si la música estaba puesta, arranca con el primero
+document.addEventListener('pointerdown',e=>{if(musicOn&&!MU&&!TEST&&!e.target.closest('#mus'))musStart()},true);
+document.addEventListener('visibilitychange',()=>{if(document.hidden)musStop();else if(musicOn&&AC&&AC.state==='running')musStart()});
 // ---------- arranque ----------
 function retex(){if(R){R.mesh.material.forEach((m,i)=>{const t=m.map.__t;m.map.dispose();m.map=faceTex(FACES[i],t);m.needsUpdate=true});drawDie()}}
 function applyLang(){
@@ -833,7 +894,7 @@ function applyLang(){
   document.querySelectorAll('[data-tl]').forEach(e=>e.textContent=L.lab[e.dataset.tl]);
   $('rules').innerHTML=esc(L.rules).replace(/\{(\w+)\}/g,(m,k)=>`<b style="color:var(--${k})">${L.lab[k]}</b>`);
   document.querySelectorAll('select.lang').forEach(s=>s.value=LANG);
-  legend();sndBtn();retex();
+  legend();sndBtn();musBtn();retex();
   const f=$('flat');if(f){f.textContent=L.ui.flat;f.style.color=''}
   if(!$('setup').hidden&&D){renderSetup();renderMis()}
   if(S)ui();

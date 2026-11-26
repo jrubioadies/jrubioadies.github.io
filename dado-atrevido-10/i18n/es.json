@@ -39,7 +39,8 @@
     "Recorre con la lengua {z}",
     "Llena de besos {z}",
     "Besa con mucha calma {z}",
-    "Acaricia con aceite o crema {z}"
+    "Acaricia con aceite o crema {z}",
+    "Lame despacio {z}"
    ]
   ],
   "z": [
@@ -245,7 +246,10 @@
   "tm_again": "¡Tiempo! Otra vez",
   "tm_cont": "Seguir",
   "tm_start": "Empezar · {0}",
-  "tm_time": "¡Tiempo!"
+  "tm_time": "¡Tiempo!",
+  "mus": "Música",
+  "mus_on": "Poner música",
+  "mus_off": "Quitar música"
  },
  "deck": {
   "verdad": {

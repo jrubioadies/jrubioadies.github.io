@@ -165,7 +165,8 @@
     "Parcours {z} avec ta langue",
     "Couvre {z} de baisers",
     "Embrasse {z} tout en douceur",
-    "Caresse {z} avec de l'huile ou de la crème"
+    "Caresse {z} avec de l'huile ou de la crème",
+    "Lèche doucement {z}"
    ]
   ],
   "z": [
@@ -371,7 +372,10 @@
   "tm_again": "Terminé ! Encore",
   "tm_cont": "Reprendre",
   "tm_start": "Démarrer · {0}",
-  "tm_time": "Terminé !"
+  "tm_time": "Terminé !",
+  "mus": "Musique",
+  "mus_on": "Mettre la musique",
+  "mus_off": "Couper la musique"
  },
  "contr": []
 }
