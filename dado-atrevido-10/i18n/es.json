@@ -94,7 +94,7 @@
   "3": [
    "Duelo de besos en el cuello: os besáis el cuello por turnos; el primero que suspire o se estremezca, pierde.",
    "Duelo de aguante: {a} acaricia a {b} donde quiera durante 20 segundos; si {b} no se inmuta, gana {b}; si reacciona, gana {a}.",
-   "Sin tocaros, tenéis 30 segundos para conseguir que el otro os pida un beso; quien lo pida primero, pierde.",
+   "Sin tocar: {a} tiene 30 segundos para provocar a {b} solo con la mirada, la voz y acercándose mucho. Si {b} se ríe, aparta la vista o se acerca, gana {a}; si aguanta sin inmutarse, gana {b}.",
    "Duelo de labios: os besáis sin usar las manos; el primero que use las manos, pierde."
   ]
  },

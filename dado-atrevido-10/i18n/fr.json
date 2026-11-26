@@ -220,7 +220,7 @@
   "3": [
    "Duel de baisers dans le cou : embrassez-vous le cou à tour de rôle ; le premier qui soupire ou frissonne a perdu.",
    "Duel d'endurance : {a} caresse {b} où bon lui semble pendant 20 secondes ; si {b} reste de marbre, {b} gagne ; si {b} réagit, {a} gagne.",
-   "Sans vous toucher, vous avez 30 secondes pour amener l'autre à réclamer un baiser ; qui le réclame en premier a perdu.",
+   "Sans se toucher : {a} a 30 secondes pour provoquer {b} rien qu'avec le regard, la voix et en s'approchant tout près. Si {b} rit, détourne les yeux ou se rapproche, {a} gagne ; si {b} reste de marbre, {b} gagne.",
    "Duel de lèvres : embrassez-vous sans les mains ; le premier qui utilise ses mains a perdu."
   ]
  },

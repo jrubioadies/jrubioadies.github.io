@@ -220,7 +220,7 @@
   "3": [
    "Duello di baci sul collo: baciatevi il collo a turno; il primo che sospira o ha un brivido perde.",
    "Duello di resistenza: {a} accarezza {b} dove vuole per 20 secondi; se {b} resta impassibile, vince {b}; se reagisce, vince {a}.",
-   "Senza toccarvi, avete 30 secondi per far sì che l'altro vi chieda un bacio; chi lo chiede per primo perde.",
+   "Senza toccarsi: {a} ha 30 secondi per provocare {b} solo con lo sguardo, la voce e avvicinandosi molto. Se {b} ride, distoglie lo sguardo o si avvicina, vince {a}; se resta impassibile, vince {b}.",
    "Duello di labbra: baciatevi senza usare le mani; il primo che usa le mani perde."
   ]
  },
