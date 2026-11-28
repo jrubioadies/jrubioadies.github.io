@@ -64,6 +64,20 @@
     "Qu'as-tu le plus de mal à demander au lit ? Demande-le à {o}.",
     "Décris en trois mots ta nuit parfaite avec {o}.",
     "Quelle est la première chose que tu ferais si tu te retrouvais {s:seul|seule} avec {o} maintenant ?"
+   ],
+   "4": [
+    "Qu'est-ce qui t'excite le plus chez {o} sans que tu le lui aies jamais dit ?",
+    "Quelle partie de ton corps veux-tu que {o} explore ce soir ?",
+    "Quel a été le moment le plus torride de ta vie ? Raconte-le à {o}, sans donner de noms.",
+    "Que ferais-tu avec {o} si vous aviez une nuit entière sans que personne ne vous dérange ?",
+    "Décris à {o}, à voix basse, comment tu aimerais être {s:déshabillé|déshabillée}.",
+    "Quels sous-vêtements portes-tu en ce moment ? Décris-les à {o} en détail.",
+    "Quelle est la chose la plus osée que tu aies faite dans un lieu public ?",
+    "Quelle partie du corps de {o} aimerais-tu voir tout de suite ?",
+    "Qu'est-ce qui t'exciterait le plus : que {o} t'attache les mains ou les lui attacher toi ?",
+    "Murmure à l'oreille de {o} la première chose que tu ferais si vous étiez seuls.",
+    "Quel son ou quel mot de {o} te rendrait {s:fou|folle} ?",
+    "Quel est ton fantasme le plus inavouable ? Raconte-le à {o}, même à moitié."
    ]
   },
   "reto": {
@@ -108,6 +122,20 @@
     "Allonge-toi et laisse {o} faire ce qu'{t:il|elle} veut de toi pendant 1 minute.",
     "Retire un vêtement à {o} avec les dents, sans les mains.",
     "Fais en sorte que {o} te réclame un baiser sans que tu {t:le|la} touches."
+   ],
+   "4": [
+    "Embrasse {o} pendant 1 minute entière, lentement, sans vous séparer.",
+    "Assieds-toi à califourchon sur {o} et bouge au rythme de la musique pendant 30 secondes.",
+    "Bande les yeux de {o} et parcours son corps avec tes lèvres pendant 1 minute.",
+    "Laisse {o} t'embrasser où bon lui semble pendant 45 secondes, sans bouger.",
+    "Passe un glaçon sur le cou et le dos de {o}, puis réchauffe-{t:le|la} de baisers.",
+    "Allonge-toi sur le ventre et laisse {o} te masser lentement tout le corps pendant 2 minutes.",
+    "Embrasse le cou de {o} en lui caressant le dos sous ses vêtements pendant 45 secondes.",
+    "Fais à {o} une danse sensuelle collée à son corps pendant 1 minute ; {o} n'a pas le droit de te toucher.",
+    "Murmure à l'oreille de {o}, dans les moindres détails, ce que tu lui ferais après cette partie.",
+    "Pendant 1 minute, {o} décide où tu l'embrasses : tu obéis.",
+    "Attache doucement les mains de {o} avec un vêtement et embrasse-{t:le|la} où tu veux pendant 30 secondes.",
+    "Mordille lentement la lèvre de {o}, puis embrasse-{t:le|la} comme si c'était la dernière fois."
    ]
   },
   "todos": {
@@ -140,6 +168,16 @@
     "Chacun montre ses sous-vêtements pendant 10 secondes.",
     "Chacun s'allonge et se laisse embrasser par {p} où bon lui semble.",
     "Chacun retire un vêtement à {p}.|strip"
+   ],
+   "4": [
+    "Chacun enlève le vêtement choisi par {p}.|strip",
+    "Chacun fait à {p} un baiser de 1 minute sans s'arrêter.",
+    "Chacun enlève un vêtement en même temps que les autres, lentement, en regardant {p}.|strip",
+    "Chacun parcourt avec ses lèvres le cou et les épaules de {p} pendant 30 secondes.",
+    "Chacun danse 1 minute tout contre {p}.",
+    "Chacun laisse {p} lui retirer un vêtement.|strip",
+    "Chacun murmure à {p} ce qu'il lui ferait ce soir.",
+    "Chacun se laisse embrasser par {p} où bon lui semble pendant 30 secondes."
    ]
   }
  },
@@ -167,6 +205,12 @@
     "Embrasse {z} tout en douceur",
     "Caresse {z} avec de l'huile ou de la crème",
     "Lèche doucement {z}"
+   ],
+   [
+    "Embrasse et mordille doucement {z}",
+    "~Parcours {z} avec tes lèvres et ta langue",
+    "Couvre {z} de baisers lents et humides",
+    "~Fais glisser un glaçon puis tes lèvres sur {z}"
    ]
   ],
   "z": [
@@ -197,6 +241,12 @@
     "le bas du dos de {o}",
     "l'endroit que {o} choisira",
     "les hanches de {o}"
+   ],
+   [
+    "le bas du ventre de {o}",
+    "le bord des sous-vêtements de {o}",
+    "l'arrière de la cuisse de {o}",
+    "la cambrure du dos de {o}"
    ]
   ],
   "sent": "{v} pendant {n} secondes."
@@ -222,6 +272,12 @@
    "Duel d'endurance : {a} caresse {b} où bon lui semble pendant 20 secondes ; si {b} reste de marbre, {b} gagne ; si {b} réagit, {a} gagne.",
    "Sans se toucher : {a} a 30 secondes pour provoquer {b} rien qu'avec le regard, la voix et en s'approchant tout près. Si {b} rit, détourne les yeux ou se rapproche, {a} gagne ; si {b} reste de marbre, {b} gagne.",
    "Duel de lèvres : embrassez-vous sans les mains ; le premier qui utilise ses mains a perdu."
+  ],
+  "4": [
+   "Duel de glace : {a} passe un glaçon sur le cou de {b} pendant 20 secondes ; si {b} frissonne ou se plaint, {a} gagne ; si {b} tient bon, {b} gagne.",
+   "Duel à l'aveugle : {b} ferme les yeux et {a} l'embrasse à trois endroits ; si {b} les devine tous les trois, {b} gagne ; sinon, {a} gagne.",
+   "Murmures brûlants : {a} décrit à l'oreille de {b} ce qu'{s:il|elle} lui ferait ; si {b} rougit ou sourit avant 30 secondes, {a} gagne ; sinon, {b} gagne.",
+   "Danse sans les mains : dansez collés pendant 30 secondes sans utiliser les mains ; le premier qui utilise ses mains a perdu."
   ]
  },
  "stakes": {
@@ -375,7 +431,9 @@
   "tm_time": "Terminé !",
   "mus": "Musique",
   "mus_on": "Mettre la musique",
-  "mus_off": "Couper la musique"
+  "mus_off": "Couper la musique",
+  "lv4": "Brûlant<small>jusqu'au bout</small>",
+  "desnuda_sub4": "Lentement, en embrassant la peau que tu découvres."
  },
  "contr": []
 }

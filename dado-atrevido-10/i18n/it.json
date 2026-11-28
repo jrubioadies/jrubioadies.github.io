@@ -64,6 +64,20 @@
     "Cosa fai più fatica a chiedere a letto? Chiedilo a {o}.",
     "Descrivi in tre parole la tua notte perfetta con {o}.",
     "Qual è la prima cosa che faresti se rimanessi da {s:solo|sola} con {o} adesso?"
+   ],
+   "4": [
+    "Cosa ti eccita di più di {o} e non gliel'hai mai detto?",
+    "Quale parte del tuo corpo vuoi che {o} esplori stanotte?",
+    "Qual è stato il momento più bollente della tua vita? Raccontalo a {o}, senza fare nomi.",
+    "Cosa faresti con {o} se aveste una notte intera senza che nessuno vi disturbi?",
+    "Descrivi a {o}, a voce bassa, come ti piacerebbe essere {s:spogliato|spogliata}.",
+    "Che intimo hai addosso in questo momento? Descrivilo a {o} nei dettagli.",
+    "Qual è la cosa più audace che hai fatto in un luogo pubblico?",
+    "Quale parte del corpo di {o} vorresti vedere adesso?",
+    "Cosa ti ecciterebbe di più: che {o} ti legasse le mani o legargliele tu?",
+    "Sussurra all'orecchio di {o} la prima cosa che faresti se foste da soli.",
+    "Quale suono o quale parola di {o} ti farebbe impazzire?",
+    "Qual è la tua fantasia più inconfessabile? Raccontala a {o}, anche solo a metà."
    ]
   },
   "reto": {
@@ -108,6 +122,20 @@
     "Sdraiati e lascia che {o} faccia di te quello che vuole per 1 minuto.",
     "Togli un capo a {o} con i denti, senza usare le mani.",
     "Fai in modo che {o} ti chieda un bacio senza che tu {t:lo|la} tocchi."
+   ],
+   "4": [
+    "Bacia {o} per 1 minuto intero, piano, senza staccarvi.",
+    "Siediti a cavalcioni su {o} e muoviti a ritmo di musica per 30 secondi.",
+    "Benda gli occhi a {o} e percorri il suo corpo con le labbra per 1 minuto.",
+    "Lascia che {o} ti baci dove vuole per 45 secondi, senza muoverti.",
+    "Passa un cubetto di ghiaccio sul collo e sulla schiena di {o} e poi scalda{t:lo|la} di baci.",
+    "Sdraiati a pancia in giù e lascia che {o} ti faccia un massaggio lento su tutto il corpo per 2 minuti.",
+    "Bacia il collo di {o} mentre {t:gli|le} accarezzi la schiena sotto i vestiti per 45 secondi.",
+    "Fai a {o} un ballo sensuale incollato al suo corpo per 1 minuto; {o} non può toccarti.",
+    "Sussurra all'orecchio di {o}, nei minimi dettagli, cosa {t:gli|le} faresti dopo questa partita.",
+    "Per 1 minuto {o} decide dove baciar{t:lo|la}: tu obbedisci.",
+    "Lega delicatamente le mani a {o} con un capo e bacia{t:lo|la} dove vuoi per 30 secondi.",
+    "Mordi piano il labbro di {o} e poi bacia{t:lo|la} come se fosse l'ultima volta."
    ]
   },
   "todos": {
@@ -140,6 +168,16 @@
     "Ognuno mostra l'intimo per 10 secondi.",
     "Ognuno si sdraia e si lascia baciare da {p} dove vuole.",
     "Ognuno toglie un capo a {p}.|strip"
+   ],
+   "4": [
+    "Ognuno si toglie il capo scelto da {p}.|strip",
+    "Ognuno dà a {p} un bacio di 1 minuto senza fermarsi.",
+    "Ognuno si toglie un capo nello stesso momento, piano, guardando {p}.|strip",
+    "Ognuno percorre con le labbra il collo e le spalle di {p} per 30 secondi.",
+    "Ognuno balla 1 minuto stretto stretto a {p}.",
+    "Ognuno lascia che {p} gli tolga un capo.|strip",
+    "Ognuno sussurra a {p} cosa gli farebbe stanotte.",
+    "Ognuno si lascia baciare da {p} dove vuole per 30 secondi."
    ]
   }
  },
@@ -167,6 +205,12 @@
     "Bacia con tutta calma {z}",
     "Accarezza {z} con olio o crema",
     "Lecca piano {z}"
+   ],
+   [
+    "Bacia e mordicchia piano {z}",
+    "~Percorri {z} con le labbra e la lingua",
+    "Copri di baci lenti e umidi {z}",
+    "~Fai scivolare un cubetto di ghiaccio e poi le labbra sopra {z}"
    ]
   ],
   "z": [
@@ -197,6 +241,12 @@
     "la parte bassa della schiena di {o}",
     "il punto che sceglie {o}",
     "i fianchi di {o}"
+   ],
+   [
+    "il basso ventre di {o}",
+    "il bordo dell'intimo di {o}",
+    "il retro della coscia di {o}",
+    "la curva della schiena di {o}"
    ]
   ],
   "sent": "{v} per {n} secondi."
@@ -222,6 +272,12 @@
    "Duello di resistenza: {a} accarezza {b} dove vuole per 20 secondi; se {b} resta impassibile, vince {b}; se reagisce, vince {a}.",
    "Senza toccarsi: {a} ha 30 secondi per provocare {b} solo con lo sguardo, la voce e avvicinandosi molto. Se {b} ride, distoglie lo sguardo o si avvicina, vince {a}; se resta impassibile, vince {b}.",
    "Duello di labbra: baciatevi senza usare le mani; il primo che usa le mani perde."
+  ],
+  "4": [
+   "Duello di ghiaccio: {a} passa un cubetto di ghiaccio sul collo di {b} per 20 secondi; se {b} rabbrividisce o si lamenta, vince {a}; se resiste, vince {b}.",
+   "Duello alla cieca: {b} chiude gli occhi e {a} dà tre baci in tre punti diversi; se {b} li indovina tutti e tre, vince {b}; se no, vince {a}.",
+   "Sussurri bollenti: {a} racconta all'orecchio di {b} cosa farebbe; se {b} arrossisce o sorride entro 30 secondi, vince {a}; se no, vince {b}.",
+   "Ballo senza mani: ballate stretti per 30 secondi senza usare le mani; il primo che usa le mani perde."
   ]
  },
  "stakes": {
@@ -375,7 +431,9 @@
   "tm_time": "Tempo!",
   "mus": "Musica",
   "mus_on": "Metti la musica",
-  "mus_off": "Togli la musica"
+  "mus_off": "Togli la musica",
+  "lv4": "Fuoco<small>al limite</small>",
+  "desnuda_sub4": "Piano, baciando la pelle che scopri."
  },
  "contr": [
   [

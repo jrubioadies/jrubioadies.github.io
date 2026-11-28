@@ -64,6 +64,20 @@
     "What do you find hardest to ask for in bed? Ask {o} for it.",
     "Describe your perfect night with {o} in three words.",
     "What's the first thing you'd do if you were alone with {o} right now?"
+   ],
+   "4": [
+    "What turns you on most about {o} that you've never told them?",
+    "Which part of your body do you want {o} to explore tonight?",
+    "What's the hottest moment of your life? Tell {o}, no names.",
+    "What would you do with {o} if you had a whole night with nobody to interrupt?",
+    "Describe to {o}, in a low voice, how you'd like to be undressed.",
+    "What underwear are you wearing right now? Describe it to {o} in detail.",
+    "What's the boldest thing you've ever done in a public place?",
+    "Which part of {o}'s body would you like to see right now?",
+    "What would turn you on more: {o} tying your hands, or you tying theirs?",
+    "Whisper in {o}'s ear the first thing you'd do if you were alone together.",
+    "What sound or word from {o} would drive you wild?",
+    "What's your most unspeakable fantasy? Tell {o}, even if only half of it."
    ]
   },
   "reto": {
@@ -108,6 +122,20 @@
     "Lie down and let {o} do whatever they want with you for 1 minute.",
     "Take a piece of clothing off {o} with your teeth, no hands.",
     "Make {o} ask you for a kiss without touching them."
+   ],
+   "4": [
+    "Kiss {o} for 1 whole minute, slowly, without pulling apart.",
+    "Straddle {o} and move to the music for 30 seconds.",
+    "Blindfold {o} and explore their body with your lips for 1 minute.",
+    "Let {o} kiss you wherever they like for 45 seconds without moving.",
+    "Run an ice cube along {o}'s neck and back, then warm them up with kisses.",
+    "Lie face down and let {o} give you a slow full-body massage for 2 minutes.",
+    "Kiss {o}'s neck while stroking their back under their clothes for 45 seconds.",
+    "Give {o} a sensual dance pressed against their body for 1 minute; {o} can't touch you.",
+    "Whisper in {o}'s ear, in full detail, what you'd do to them after this game.",
+    "For 1 minute, {o} decides where you kiss them: you obey.",
+    "Gently tie {o}'s hands with a piece of clothing and kiss them wherever you like for 30 seconds.",
+    "Slowly bite {o}'s lip, then kiss them like it's the last time."
    ]
   },
   "todos": {
@@ -140,6 +168,16 @@
     "Everyone shows their underwear for 10 seconds.",
     "Everyone lies down and lets {p} kiss them wherever they like.",
     "Everyone takes one piece of clothing off {p}.|strip"
+   ],
+   "4": [
+    "Everyone takes off the piece of clothing chosen by {p}.|strip",
+    "Everyone gives {p} a kiss lasting 1 minute without stopping.",
+    "Everyone takes off a piece of clothing at the same time, slowly, looking at {p}.|strip",
+    "Everyone runs their lips along the neck and shoulders of {p} for 30 seconds.",
+    "Everyone dances for 1 minute pressed close to {p}.",
+    "Everyone lets {p} take off one of their clothes.|strip",
+    "Everyone whispers to {p} what they'd do to them tonight.",
+    "Everyone lets {p} kiss them wherever they like for 30 seconds."
    ]
   }
  },
@@ -167,6 +205,12 @@
     "Kiss {z} nice and slow",
     "Caress {z} with oil or lotion",
     "Slowly lick {z}"
+   ],
+   [
+    "Kiss and gently nibble {z}",
+    "~Trace {z} with your lips and tongue",
+    "Cover {z} with slow, wet kisses",
+    "~Run an ice cube and then your lips over {z}"
    ]
   ],
   "z": [
@@ -197,6 +241,12 @@
     "{o}'s lower back",
     "the spot {o} chooses",
     "{o}'s hips"
+   ],
+   [
+    "{o}'s lower belly",
+    "the edge of {o}'s underwear",
+    "the back of {o}'s thigh",
+    "the curve of {o}'s back"
    ]
   ],
   "sent": "{v} for {n} seconds."
@@ -222,6 +272,12 @@
    "Endurance duel: {a} caresses {b} wherever they like for 20 seconds; if {b} doesn't react, {b} wins; if {b} reacts, {a} wins.",
    "No touching: {a} has 30 seconds to tease {b} using only eyes, voice and getting very close. If {b} laughs, looks away or leans in, {a} wins; if {b} keeps a straight face, {b} wins.",
    "Lips duel: kiss without using your hands; the first to use their hands loses."
+  ],
+  "4": [
+   "Ice duel: {a} runs an ice cube along {b}'s neck for 20 seconds; if {b} shivers or complains, {a} wins; if {b} holds out, {b} wins.",
+   "Blind duel: {b} closes their eyes and {a} kisses them in three places; if {b} guesses all three, {b} wins; if not, {a} wins.",
+   "Hot whispers: {a} tells {b}, in their ear, what they'd do to them; if {b} blushes or smiles within 30 seconds, {a} wins; if not, {b} wins.",
+   "Hands-free dance: dance pressed together for 30 seconds without using your hands; the first to use their hands loses."
   ]
  },
  "stakes": {
@@ -375,7 +431,9 @@
   "tm_time": "Time's up!",
   "mus": "Music",
   "mus_on": "Play music",
-  "mus_off": "Stop music"
+  "mus_off": "Stop music",
+  "lv4": "Fire<small>to the limit</small>",
+  "desnuda_sub4": "Slowly, kissing the skin you uncover."
  },
  "contr": []
 }

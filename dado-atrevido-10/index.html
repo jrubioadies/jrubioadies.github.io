@@ -133,7 +133,7 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid 
 .seg button{border:0;background:none;color:var(--muted);font:700 13.5px var(--body);padding:10px 4px;border-radius:10px;cursor:pointer;line-height:1.2}
 .seg button.on{background:var(--ink);color:var(--bg)}
 .seg button small{display:block;font-weight:600;font-size:11px;opacity:.75;margin-top:2px}
-.levels button.on[data-v="1"]{background:var(--verdad)} .levels button.on[data-v="2"]{background:var(--reto)} .levels button.on[data-v="3"]{background:var(--prenda)}
+.levels button.on[data-v="1"]{background:var(--verdad)} .levels button.on[data-v="2"]{background:var(--reto)} .levels button.on[data-v="3"]{background:var(--prenda)} .levels button.on[data-v="4"]{background:var(--duelo)}
 .err{color:var(--reto)!important;font-weight:700;font-size:13px!important}
 .err:empty{display:none}
 .acts.one{grid-template-columns:1fr}
@@ -273,7 +273,7 @@ h1{white-space:nowrap}h1 small{white-space:normal}#cfg{white-space:nowrap;flex:n
     </div>
     <div class="box">
       <p class="lab" data-t="level"></p>
-      <div class="seg levels" id="lvl"><button data-v="1" data-t="lv1"></button><button data-v="2" data-t="lv2"></button><button data-v="3" data-t="lv3"></button></div>
+      <div class="seg levels" id="lvl"><button data-v="1" data-t="lv1"></button><button data-v="2" data-t="lv2"></button><button data-v="3" data-t="lv3"></button><button data-v="4" data-t="lv4"></button></div>
     </div>
     <div class="box">
       <p class="lab" id="cloLab"></p>
@@ -534,7 +534,7 @@ function makeCard0(face,p,o){
     case 'caricia':return caricia(p,o);
     case 'desnuda':{const d=targetFor(p,i=>S.left[i]>0);
       return {kind:'desnuda',who:p,o:d,step:'do',stripOther:d,text:T('desnuda_text',name(d)),
-        sub:[T('desnuda_sub1',name(d),S.left[d]),T('desnuda_sub2'),T('desnuda_sub3')][S.level-1]}}
+        sub:[T('desnuda_sub1',name(d),S.left[d]),T('desnuda_sub2'),T('desnuda_sub3'),T('desnuda_sub4')][S.level-1]}}
     case 'todos':{const [t,fx]=pick('todos').split('|'),pp=L.pp[S.mode==='pareja'?'pareja':'solo'];
       return {kind:'todos',who:p,step:fx?'all':'ok',allStrip:!!fx,text:(L.contr||[]).reduce((x,[a,b])=>x.split(a).join(b),t.split('{p}').join(pp)),
         sub:fx?T('todos_sub_strip'):T('todos_sub')}}
@@ -545,9 +545,9 @@ function makeCard0(face,p,o){
 // el 4.º y el 5.º duelo del nivel suave los decide el juego: moneda y dados
 const duels=k=>L.duels[k].map((t,i)=>({t,auto:k==1&&i===3?'coin':k==1&&i===4?'dice':undefined}));
 // lo que se juega quien pierde, con más peso a lo picante en los niveles altos
-const STAKES={1:{prenda:3,reto:2,caricia:2,verdad:2,beber:1},2:{prenda:3,desnuda:2,reto:2,caricia:3,verdad:1},3:{prenda:2,desnuda:3,reto:3,caricia:3,servir:2}};
+const STAKES={1:{prenda:3,reto:2,caricia:2,verdad:2,beber:1},2:{prenda:3,desnuda:2,reto:2,caricia:3,verdad:1},3:{prenda:2,desnuda:3,reto:3,caricia:3,servir:2},4:{prenda:3,desnuda:4,reto:3,caricia:2,servir:3}};
 function duelCard(p){
-  const lv=S.level,list=[1,2,3].filter(k=>k<=lv).flatMap(duels);
+  const lv=S.level,list=[1,2,3,4].filter(k=>k<=lv).flatMap(duels);
   // los duelos del nivel elegido salen más a menudo
   const pool=list.concat(lv>1?duels(lv):[]),D=pool[rnd(pool.length)];
   const c={kind:'duelo',who:p,duel:D};
@@ -579,7 +579,7 @@ function duelResult(c,w){
 }
 // caricia al azar: acción + zona + segundos; cada nivel añade acciones y zonas más atrevidas
 // las formas y las zonas están en i18n.js; «~» marca las que usan los labios
-const CART=[[10,15,20],[15,20,30],[20,30,45]];
+const CART=[[10,15,20],[15,20,30],[20,30,45],[30,45,60]];
 // saca al azar de una bolsa barajada: no se repite nada hasta que han salido todos
 function draw(key,list){
   const B=S.used.bag||(S.used.bag={}),sig=list.join('|');
@@ -834,7 +834,8 @@ let musicOn=lsGet(MUKEY)===true,MU=null;
 const SONGS={
  1:{bpm:78,cut:1500,prog:[[53,57,60,64],[52,55,59,62],[50,53,57,60],[48,52,55,59]],kick:0,hat:.25,arp:.35},
  2:{bpm:86,cut:1150,prog:[[57,60,64,67,71],[53,57,60,64,67],[50,53,57,60,64],[52,56,59,62]],kick:1,hat:.5,arp:.5},
- 3:{bpm:94,cut:850,prog:[[48,51,55,58,62],[44,48,51,55],[41,44,48,51,55],[43,47,50,53]],kick:1,hat:.7,arp:.6}
+ 3:{bpm:94,cut:850,prog:[[48,51,55,58,62],[44,48,51,55],[41,44,48,51,55],[43,47,50,53]],kick:1,hat:.7,arp:.6},
+ 4:{bpm:100,cut:720,prog:[[45,48,52,55,59],[41,45,48,52],[38,41,45,48,52],[40,44,47,50]],kick:1,hat:.8,arp:.7}
 };
 const hz=m=>440*Math.pow(2,(m-69)/12);
 const MUS_IC='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l11-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="17" cy="16" r="3"/></svg>';

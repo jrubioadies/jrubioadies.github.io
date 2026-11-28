@@ -41,6 +41,12 @@
     "Besa con mucha calma {z}",
     "Acaricia con aceite o crema {z}",
     "Lame despacio {z}"
+   ],
+   [
+    "Besa y mordisquea despacio {z}",
+    "~Recorre con los labios y la lengua {z}",
+    "Llena de besos lentos y húmedos {z}",
+    "~Pasa un hielo y después los labios por {z}"
    ]
   ],
   "z": [
@@ -71,6 +77,12 @@
     "la parte baja de la espalda de {o}",
     "la zona que elija {o}",
     "las caderas de {o}"
+   ],
+   [
+    "el bajo vientre de {o}",
+    "el borde de la ropa interior de {o}",
+    "la parte de atrás del muslo de {o}",
+    "la curva de la espalda de {o}"
    ]
   ],
   "sent": "{v} durante {n} segundos."
@@ -96,6 +108,12 @@
    "Duelo de aguante: {a} acaricia a {b} donde quiera durante 20 segundos; si {b} no se inmuta, gana {b}; si reacciona, gana {a}.",
    "Sin tocar: {a} tiene 30 segundos para provocar a {b} solo con la mirada, la voz y acercándose mucho. Si {b} se ríe, aparta la vista o se acerca, gana {a}; si aguanta sin inmutarse, gana {b}.",
    "Duelo de labios: os besáis sin usar las manos; el primero que use las manos, pierde."
+  ],
+  "4": [
+   "Duelo de hielo: {a} pasa un hielo por el cuello de {b} durante 20 segundos; si {b} se estremece o se queja, gana {a}; si aguanta, gana {b}.",
+   "Duelo a ciegas: {b} cierra los ojos y {a} le da besos en tres sitios; si {b} los acierta los tres, gana {b}; si falla alguno, gana {a}.",
+   "Susurros calientes: {a} le cuenta al oído a {b} lo que le haría; si {b} se ruboriza o sonríe antes de 30 segundos, gana {a}; si no, gana {b}.",
+   "Baile sin manos: bailáis pegados 30 segundos sin usar las manos; el primero que use las manos, pierde."
   ]
  },
  "stakes": {
@@ -249,7 +267,9 @@
   "tm_time": "¡Tiempo!",
   "mus": "Música",
   "mus_on": "Poner música",
-  "mus_off": "Quitar música"
+  "mus_off": "Quitar música",
+  "lv4": "Fuego<small>al límite</small>",
+  "desnuda_sub4": "Despacio, besando la piel que vayas descubriendo."
  },
  "deck": {
   "verdad": {
@@ -298,6 +318,20 @@
     "¿Qué es lo que más te cuesta pedir en la cama? Pídeselo a {o}.",
     "Describe en tres palabras cómo sería tu noche perfecta con {o}.",
     "¿Qué es lo primero que harías si te quedaras a solas con {o} ahora?"
+   ],
+   "4": [
+    "¿Qué es lo que más te excita de {o} y nunca le has dicho?",
+    "¿Qué parte de tu cuerpo quieres que {o} explore esta noche?",
+    "¿Cuál ha sido el momento más caliente de tu vida? Cuéntaselo a {o}, sin dar nombres.",
+    "¿Qué harías con {o} si tuvierais una noche entera sin que nadie os molestara?",
+    "Descríbele a {o}, en voz baja, cómo te gustaría que te desnudara.",
+    "¿Qué ropa interior llevas ahora mismo? Descríbesela a {o} con detalle.",
+    "¿Qué es lo más atrevido que has hecho en un sitio público?",
+    "¿Qué parte del cuerpo de {o} te gustaría ver ahora mismo?",
+    "¿Qué te pondría más: que {o} te atara las manos o atárselas tú?",
+    "Susúrrale a {o} al oído qué es lo primero que harías si os quedarais a solas.",
+    "¿Qué sonido o qué palabra de {o} te volvería {s:loco|loca}?",
+    "¿Cuál es tu fantasía más inconfesable? Cuéntasela a {o}, aunque sea a medias."
    ]
   },
   "reto": {
@@ -342,6 +376,20 @@
     "Túmbate y deja que {o} haga contigo lo que quiera durante un minuto.",
     "Quítale a {o} una prenda con los dientes, sin usar las manos.",
     "Haz que {o} te pida un beso sin que tú le toques."
+   ],
+   "4": [
+    "Besa a {o} durante un minuto entero, despacio, sin separaros.",
+    "Siéntate a horcajadas sobre {o} y muévete al ritmo de la música durante 30 segundos.",
+    "Véndale los ojos a {o} y recórrele el cuerpo con los labios durante un minuto.",
+    "Deja que {o} te bese donde quiera durante 45 segundos, sin moverte.",
+    "Pasa un cubito de hielo por el cuello y la espalda de {o} y después caliéntale a besos.",
+    "Túmbate boca abajo y deja que {o} te dé un masaje lento por todo el cuerpo durante dos minutos.",
+    "Bésale el cuello a {o} mientras le acaricias la espalda por debajo de la ropa durante 45 segundos.",
+    "Hazle a {o} un baile sensual pegado a su cuerpo durante un minuto; {o} no puede tocarte.",
+    "Susúrrale a {o} al oído, con todo detalle, lo que le harías después de esta partida.",
+    "Durante un minuto, {o} decide dónde quiere que le beses: tú obedeces.",
+    "Átale suavemente las manos a {o} con una prenda y bésale donde quieras durante 30 segundos.",
+    "Muérdele despacio el labio a {o} y después bésale como si fuera la última vez."
    ]
   },
   "todos": {
@@ -374,6 +422,16 @@
     "Todos enseñáis la ropa interior durante 10 segundos.",
     "Todos os tumbáis y os dejáis besar por {p} donde quiera.",
     "Todos le quitáis una prenda a {p}.|strip"
+   ],
+   "4": [
+    "Todos os quitáis la prenda que elija {p}.|strip",
+    "Todos dais a {p} un beso de un minuto sin parar.",
+    "Todos os quitáis una prenda a la vez, despacio, mirando a {p}.|strip",
+    "Todos recorréis con los labios el cuello y los hombros de {p} durante 30 segundos.",
+    "Todos bailáis un minuto muy pegados a {p}.",
+    "Todos dejáis que {p} os quite una prenda.|strip",
+    "Todos le susurráis a {p} lo que le haríais esta noche.",
+    "Todos os dejáis besar por {p} donde quiera durante 30 segundos."
    ]
   }
  },
